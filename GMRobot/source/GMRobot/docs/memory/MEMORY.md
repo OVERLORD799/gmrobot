@@ -1,0 +1,12 @@
+- [User Context](user-context.md) — 本科生，GM-SafePick 项目用于发表论文
+- [Project Phase Status](project-phase-status.md) — 2026-07-01 项目阶段与关键指标快照（含审计后更新）
+- [Paper Submission Readiness](paper-submission-readiness.md) — 论文投稿准备状态与关键实验缺口
+- [Novel Contributions](novel-contributions.md) — 相对原论文的增量贡献（5 个方向）
+- [Advisor Submission Checklist](advisor-submission-checklist.md) — 上交导师前的检查清单（P0/P1/P2，被论文清单覆盖）
+- [Sphere Hand Approximation](sphere-hand-approximation.md) — 小球作为人手近似的设计合理性论证
+- [Architecture Then Tuning](architecture-then-tuning.md) — 先完成架构再调参的工程依据
+- [Avoidance L-Shaped Path](avoidance-l-shaped-path.md) — L 形绕行路径的球形障碍物几何原理
+- [VLM Model Sizing](vlm-model-sizing.md) — 为什么 7B 是最低可接受 VLM 规模
+- [Configuration System](configuration-system.md) — YAML 驱动配置系统，18 个可调参数概览
+- [Code Audit 2026-07-01](code-audit-2026-07-01.md) — 代码审计报告，8 修复 + 51 新测试
+- [GitHub Push Configuration](github-push-configuration.md) — GitHub 推送配置与操作方法

@@ -1,0 +1,90 @@
+# === Secrets / credentials (NEVER commit) ===
+.github_token
+*.token
+*_token
+*_secret
+**/.env
+**/信息.md
+
+# === Browser download duplicates ===
+*(1).*
+*（1）.*
+
+# === Python ===
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+.pytest_cache/
+*.pb
+
+# === Logs / local setup artifacts ===
+*.log
+.docker_build.log
+.docker_build.meta
+.setup_*.log
+.isaac-lab-docker-history
+
+# === Docker local data / build context copies ===
+.docker-data/
+**/docker/context/
+**/docker/cluster/exports/
+**/docker/.container.cfg
+**/docker/artifacts/
+**/*.sif
+
+# === Caches / build ===
+**/cmake-build*/
+**/build*/
+**/*.so
+_isaac_sim*
+_repo
+_build
+.lastformat
+.cache/
+*.tmp
+
+# === IDE / OS ===
+.DS_Store
+Thumbs.db
+.idea/
+**/.vscode/
+!.vscode
+**/.thumbs
+**/*.dmp
+
+# === Outputs / experiments ===
+**/output/
+**/outputs/
+**/videos/
+**/wandb/
+**/.neptune/
+**/runs/
+**/logs/
+**/recordings/
+**/results/
+**/out/
+/.pretrained_checkpoints/
+/datasets/
+
+# === Large / generated binaries (LFS preferred when tracked) ===
+# Subprojects may track selected *.usd/*.pt via LFS; ignore common junk:
+*.usd.bak
+*.tar
+
+# === Git backups from monorepo merge ===
+.git.bak/
+**/.git.bak/
+**/.git.bak.*/
+
+# === Nested git (should not exist after merge) ===
+# keep working trees only
+
+# === Conda / local envs outside repo ===
+.conda/
+venv/
+.env/
+
+# === Tests (from GMRobot legacy) ===
+# tests/ kept if present under subdirs intentionally

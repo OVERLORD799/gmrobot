@@ -1,0 +1,85 @@
+# Layer 1 rule-based safety — 挡空箱/高干预 preset（机械臂夹持零件移向 B 时，人手挡在空箱放置口）。
+# 人手对准 B 容器（x≈0.75, y≈+0.25）rim 高度，夹持 descend 阶段 EE 进入 static 泡或 TTC 危险区；CSV 预期 static/ttc 的 STOP/SLOW_DOWN。
+# control_dt must match gmrobot_env_cfg: sim.dt=1/200, decimation=4 -> 50 Hz
+#
+# Calibrated for UR10e + dual containers (A/B @ x=0.75, y=±0.25) + SeattleLabTable @ (0.6,0,0).
+# EE carry: lift@A 201–250 → move_above_B 251–300 → descend_to_B 301–350（gripper closed until open@351）。
+
+# Legacy reference; dual-threshold uses safe_dist_hard_stop / safe_dist_warn below.
+safe_dist_static: 0.25
+# Phase 1 dual-threshold: hard STOP inside ~collision envelope; SLOW_DOWN in caution band.
+safe_dist_hard_stop: 0.065
+safe_dist_warn: 0.08
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+ttc_dist_source: ee
+
+# EE operational envelope: HOME (0.9,0,0.4), grasp z≈0.13, containers x≈0.75 y∈[-0.35,0.35]
+# x_min must cover HOME→A transit arc (EE x min ≈0.527 m in Isaac logs); 0.55 was too tight → 98% workspace STOP
+workspace:
+  x: [0.45, 1.05]
+  y: [-0.45, 0.45]
+  z: [0.08, 0.75]
+
+control_frequency: 50
+control_dt: 0.02
+# R9 speed-smoothness calibration (2026-07-01):
+#   slow_down_alpha:     0.18 → 0.50  (less aggressive braking on static proximity)
+#   slow_down_alpha_ttc: 0.15 → 0.50  (TTC now skipped on vertical lift; transit slowdown at 50%)
+#   slow_down_alpha_far: 0.55 → 0.65  (far-band blend)
+# Rationale: earlier values caused ~7% task elongation even in far_observer (no-threat)
+# scenarios.  The skip_ttc_on_lift fix (rule_engine.py) eliminates the dominant false-positive
+# source (vertical lift ~0.5 m/s => TTC<1.5s => SLOW_DOWN @0.15x).  Raising transit alphas to
+# 0.50 gives the robot most of its normal velocity while still providing meaningful slowdown
+# when the gate genuinely detects proximity.
+slow_down_alpha: 0.50
+slow_down_alpha_ttc: 0.50
+# Far caution band (warn..slow_far): mild slowdown when human present but EE still > warn.
+# See ADR GM-SafePick_Phase2.5_EnvelopeDecisions.md §6.
+safe_dist_slow_far: 0.35
+slow_down_alpha_far: 0.65
+# Carry + fast retreat: clamp gripper further closed to reduce slip-out.
+gripper_boost_vel_threshold: 0.22
+gripper_boost_extra_closed: 0.12
+replan_lateral_offset_m: 0.10
+replan_detour_stage_duration: 55
+log_enabled: true
+log_dir: /root/GMRobot/output/safety_logs
+human_enabled: true
+
+human_trajectory:
+  type: linear_approach
+  # 挡空箱：Part 5 落 B 时人手挡放置口 → 停留 ~20s → 撤回远场（wait-hold 叙事）。
+  # start_step=1680：step<1680 手在远场，避免与 Part 1 carry（201–250）扫掠重叠。
+  # 1680+55=1735 到位 end_pos；hold 1000 步 @50Hz=20s；约 step 2735 起撤回 start_pos。
+  start_pos: [0.35, -0.55, 0.50]
+  end_pos: [0.72, 0.22, 0.20]
+  start_step: 1680
+  duration_steps: 55
+  hold_steps: 1000
+  retreat_pos: [0.35, -0.55, 0.50]
+  retreat_duration_steps: 80
+  hold_far: true
+
+# Ground-truth collision v1.1: EE sphere envelope at wrist_3_link + human_hand sphere.
+# Intrusion when dist < collision_threshold = human_hand_radius + ee_radius = 0.13 m.
+human_hand_radius: 0.05
+ee_radius: 0.08
+# collision_threshold: null  # default = human_hand_radius + ee_radius
+
+# Optional human torso: second kinematic sphere below the hand (W17).
+# Set human_torso_radius > 0 to enable (e.g., 0.15 for a ~30cm torso sphere).
+human_torso_radius: 0.0
+human_torso_offset: [0.0, 0.0, -0.30]  # 30cm below hand centre
+
+# Audit-only GT branches (log columns; never gate g_t).
+gt_branches:
+  arm_links_enabled: true
+  contact_enabled: true  # best-effort in sim; kinematic hand often logs gt_contact=unknown
+
+# Phase 2.5: full envelope audit + gating (production presets).
+envelope:
+  gating_enabled: true
+
+# Proxy for task completion (is_success() = trajectory index done, not 20-part physics).
+expected_task_steps: 7521

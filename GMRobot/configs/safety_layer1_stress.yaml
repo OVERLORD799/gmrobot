@@ -1,0 +1,33 @@
+# Layer 1 stress-test preset — high static intervention (~70–80% STOP).
+# Human hand moves into the shared A↔B desktop channel and holds at table height.
+# Use for T3 (static STOP) and regression against pre-tuning logs.
+# workspace x_min synced with low-intervention preset (0.45) so transit arc is not mis-flagged.
+
+# Legacy reference; dual-threshold uses safe_dist_hard_stop / safe_dist_warn below.
+safe_dist_static: 0.25
+# Stress preset: explicit wide dual-threshold (both 0.25 m) for T3 high-intervention test.
+safe_dist_hard_stop: 0.25
+safe_dist_warn: 0.25
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+workspace:
+  x: [0.45, 1.05]
+  y: [-0.45, 0.45]
+  z: [0.08, 0.75]
+
+control_frequency: 50
+control_dt: 0.02
+slow_down_alpha: 0.3
+log_enabled: true
+log_dir: /root/GMRobot/output/safety_logs
+human_enabled: true
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.45, -0.35, 0.18]
+  # Center of shared channel — chronic static STOP when EE transits or descends
+  end_pos: [0.72, 0.0, 0.18]
+  start_step: 150
+  duration_steps: 100
+  hold_far: true

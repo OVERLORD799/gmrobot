@@ -1,0 +1,11 @@
+# IV-J: static shoulder pass — hand in shared A↔B channel (stress preset pattern).
+# No safe_dist_hard_stop / safe_dist_warn: from_dict defaults both to safe_dist_static (0.25).
+base: _base.yaml
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.45, -0.35, 0.18]
+  end_pos: [0.72, 0.0, 0.18]
+  start_step: 150
+  duration_steps: 100
+  hold_far: true

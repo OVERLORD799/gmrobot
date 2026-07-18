@@ -1,0 +1,32 @@
+# IV-J: dynamic fast sweep — TTC stress (from safety_layer1_ttc.yaml).
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.60
+slow_down_alpha_ttc: 0.40
+# TTC warn must sustain ≥6 steps during sweep; low replan bar only when hand is moving.
+ttc_replan_trigger_threshold: 6
+ttc_replan_hand_speed_min: 0.05
+# S13 P0 phase 2: early replan from shadow ttc_forecast_s (disabled when omitted).
+ttc_forecast_replan_threshold: 1.0
+# S13 P1: SAM2 /track kinematics bonus in select_detour_strategy (shadow-first).
+use_perception_track_strategy: true
+# G4: shorter detour stages (default 55) — retreat_then_arc 3×stage; saves ~60 sim steps vs 55.
+replan_detour_stage_duration: 35
+
+human_trajectory:
+  type: linear_approach
+  # Trajectory v2 (2026-06-22): TTC dodge-hand GUI testability optimization (S12)
+  # Old: step≈800 sweeps across descend phase (task_ts≈751, EE z≈0.58) → detour lift hits workspace z=0.75 freeze @916.
+  # v2: step≈640 enters carry/lift phase (task_ts≈625, EE z≈0.54) into TTC warn zone, min_dist_ee≈0.25 TTC-only no static STOP,
+  #     lift to z≈0.60 with lateral detour space; 70-step sweep (1.4s, v2.1 decel signed-off in GUI) ensures TTC warn ≥6 steps triggering replan.
+  start_pos: [0.35, -0.55, 0.50]
+  end_pos: [0.54, 0.10, 0.32]
+  start_step: 640
+  duration_steps: 70
+  # Sweep then retreat to far field so end_pos doesn't cause static STOP (dist<0.25) during rejoin phase.
+  hold_steps: 0
+  retreat_pos: [0.35, -0.55, 0.50]
+  retreat_duration_steps: 50
+  hold_far: true

@@ -1,0 +1,13 @@
+# IV-J: dynamic late entry — hand enters during carry/descend (later start_step).
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.55, 0.38, 0.30]
+  end_pos: [0.72, 0.22, 0.20]
+  start_step: 320
+  duration_steps: 30
+  hold_far: true

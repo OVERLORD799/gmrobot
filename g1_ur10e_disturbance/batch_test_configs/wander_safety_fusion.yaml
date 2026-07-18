@@ -1,0 +1,12 @@
+name: "wander_safety_fusion"
+description: "constrained_wander + safety_fusion (L1+L2 baseline)"
+mode: "constrained_wander"
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+episode:
+  max_steps: 5000
+  num_parts: 20
+output:
+  step_csv: true
+  episode_json: true

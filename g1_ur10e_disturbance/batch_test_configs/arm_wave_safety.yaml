@@ -1,0 +1,12 @@
+name: "arm_wave_safety"
+description: "arm_wave scripted scenario + safety_fusion (dynamic obstacle test)"
+mode: "scripted"
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+episode:
+  max_steps: 5000
+  num_parts: 20
+output:
+  step_csv: true
+  episode_json: true

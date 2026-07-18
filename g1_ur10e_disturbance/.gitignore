@@ -1,0 +1,38 @@
+# Python
+__pycache__/
+*.py[cod]
+*.so
+.eggs/
+*.egg-info/
+
+# IDE
+.vscode/
+.idea/
+
+# Isaac Lab
+logs/
+*.log
+*.usd.bak
+
+# Output
+results/
+videos/
+out/
+
+# Checkpoints / large binary files (not tracked in git — use git-lfs if needed)
+*.pt
+*.usd
+*.tar
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Credentials (NEVER commit tokens)
+*.token
+*_token
+*_secret
+.github_token
+__pycache__/
+assets/*.usd
+assets/*.pt

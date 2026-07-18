@@ -1,0 +1,12 @@
+name: "wander_no_safety"
+description: "constrained_wander + NO safety (ungated baseline)"
+mode: "constrained_wander"
+safety:
+  config_path: ""
+  enable_envelope: false
+episode:
+  max_steps: 5000
+  num_parts: 20
+output:
+  step_csv: true
+  episode_json: true

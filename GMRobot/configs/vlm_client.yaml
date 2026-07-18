@@ -1,0 +1,6 @@
+backend: remote_http
+base_url: "http://127.0.0.1:18080"
+endpoint: "/analyze"
+health_endpoint: "/health"
+model_id: "Qwen2.5-VL-7B-Instruct-awq"
+timeout_s: 5.0

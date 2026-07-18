@@ -1,0 +1,13 @@
+# IV-J: timing approach — hand moves into caution band without hard intrusion.
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.22
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.35, -0.55, 0.50]
+  end_pos: [0.68, 0.15, 0.25]
+  start_step: 280
+  duration_steps: 80
+  hold_far: true

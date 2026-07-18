@@ -1,0 +1,62 @@
+# IV-J scenario registry v0.1 — metadata for Layer 1 preset evaluation.
+version: "0.1"
+description: >
+  Intervention validation scenarios for GM-SafePick Layer 1.
+  Each preset maps to a safety_layer1-compatible YAML under configs/ivj/.
+
+scenarios:
+  ivj_static_far_observer:
+    config: ivj_static_far_observer.yaml
+    expected_risk: low
+    expected_intervention_band: "0-5%"
+    gt_semantics: "v1.1 ee_radius envelope; dist >= safe_dist_warn"
+    task_should_complete: true
+    notes: "Far observer; baseline low intervention (T2/T6 style)."
+
+  ivj_static_shoulder_pass:
+    config: ivj_static_shoulder_pass.yaml
+    expected_risk: medium
+    expected_intervention_band: "30-50%"
+    gt_semantics: "v1.1; hand in A↔B channel at table height"
+    task_should_complete: false
+    notes: "Chronic static STOP when EE transits shared channel (stress variant)."
+
+  ivj_static_block_place:
+    config: ivj_static_block_place.yaml
+    expected_risk: high
+    expected_intervention_band: "40-70%"
+    gt_semantics: "v1.1; hand blocks empty B container placement"
+    task_should_complete: false
+    notes: "挡空箱 default preset; dual-threshold SLOW_DOWN + STOP."
+
+  ivj_dynamic_fast_sweep:
+    config: ivj_dynamic_fast_sweep.yaml
+    expected_risk: medium
+    expected_intervention_band: "TTC 5-15% of steps"
+    gt_semantics: "v1.1; dynamic approach before static bubble"
+    task_should_complete: false
+    notes: "Derived from safety_layer1_ttc.yaml fast sweep."
+
+  ivj_dynamic_late_entry:
+    config: ivj_dynamic_late_entry.yaml
+    expected_risk: medium-high
+    expected_intervention_band: "20-40%"
+    gt_semantics: "v1.1; late hand entry during descend phase"
+    task_should_complete: false
+    notes: "Hand enters during carry/descend window (block_place timing)."
+
+  ivj_timing_approach:
+    config: ivj_timing_approach.yaml
+    expected_risk: low-medium
+    expected_intervention_band: "5-20% SLOW_DOWN"
+    gt_semantics: "v1.1; hand approaches but stays in warn band"
+    task_should_complete: true
+    notes: "Caution-zone SLOW_DOWN without hard STOP if tuned."
+
+  ivj_intrusion_positive:
+    config: ivj_intrusion_positive.yaml
+    expected_risk: high
+    expected_intervention_band: "GT STOP > 0"
+    gt_semantics: "v1.1; hand end_pos on EE path — dist < collision_threshold"
+    task_should_complete: false
+    notes: "Part 5 lift knock-off GUI: human_hand start_step=1670 (v8, hold_steps=120 + retreat to far field, duration=18, task_ts ~1688 z=0.40); GT positive / knock-off. Detour recovery: --enable_replan (proactive_route_replan route_conflict @ task_ts~1635/1660 before dist_min=0; held_critical_early + ttc_forecast; held_critical STOP still replans in transit)."

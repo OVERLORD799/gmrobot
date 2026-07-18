@@ -1,0 +1,13 @@
+# Phase 2+ tier fusion — shadow + optional online gate (--enable_layer2_fusion).
+#
+# Tier0: dist < safe_dist_hard_stop → STOP (non-overridable)
+# Tier1: g_rule STOP in static warn → g_ml ALLOW → ALLOW; or g_ml STOP with P(STOP) < theta → ALLOW
+# Tier1 static_far: trigger=static and dist_ee > safe_dist_warn → ALLOW (bubble false positive)
+# Tier2: g_rule SLOW_DOWN / caution band → SLOW_DOWN
+#
+# Shadow logs both would_fuse (tier) and would_fuse_or (legacy OR) for comparison.
+
+tier_fusion:
+  ml_override_theta: 0.65
+  safe_dist_hard_stop: 0.065
+  safe_dist_warn: 0.08  # halved from 0.16 — hand following EE during pick/place won't trigger

@@ -1,0 +1,17 @@
+name: "wander_vhand_replan"
+description: "Virtual hand obstacle + GMRobot geometry replan — tests UR10e path re-planning when G1 virtual hand intrudes into safety envelope"
+mode: "constrained_wander"
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+  enable_replan: true
+virtual_hand:
+  radius: 0.45
+  speed: 0.12
+  height_mode: "table"
+episode:
+  max_steps: 10000
+  num_parts: 20
+output:
+  step_csv: true
+  episode_json: true

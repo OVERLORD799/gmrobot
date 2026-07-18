@@ -1,0 +1,51 @@
+# IV-J Phase 2+: GT STOP positive samples — human_hand sphere intrudes EE envelope (GUI: Part 5 knock-off ball).
+# v8 (2026-06-25): longer hold + retreat to far field; early replan for fast held intrusion.
+# v8.1 (2026-06-26): Part5 placement fix — hold must end BEFORE approach_start=1735.
+#   Part 5 pick phases (task_ts): descend_to_slot_A_5 1584–1634, close_gripper 1634–1635,
+#   grasp 1635–1685, lift_slot_A_5 1685–1735 (xy A@5→B@5 at z=0.40).
+#   v8 end_pos on lift mid-path (α≈0.5): [0.723, 0.093, 0.40].
+#   v8.1 hold_steps=42 → hold window 1688–1730 (ends 5 steps before Part5 approach); retreat 1730–1780.
+#   v8.0 hold_steps=120 overlapped place (1688–1808) → conservative freeze (C) dominated Part5 placement.
+#   v8 start_step=1670, duration 18 → hand reaches end_pos at task_ts 1688 (~during lift xy transit).
+#   After hold, retreat_pos returns ball to far field (start_pos) over 50 steps — avoids static STOP freeze.
+#   v7 reference: hold_steps=60, no retreat; knock-off peak when ball stops and EE+held sweep through.
+#
+# Expected: g_ground_truth STOP > 0 on 3000-step runs; g_rule STOP/SLOW_DOWN high.
+# Detour recovery: --enable_safety --enable_replan — held_critical_early (SLOW+fast hand) or
+# ttc_forecast triggers detour before Tier0 STOP; held_critical STOP still replans in transit.
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha_ttc: 0.15
+replan_lateral_offset_m: 0.10
+# Early replan: fast hand during carry (S13 P0 forecast + lower TTC sustained bar).
+ttc_replan_trigger_threshold: 4
+ttc_replan_hand_speed_min: 0.05
+ttc_forecast_replan_threshold: 1.0
+# ivj_intrusion_positive v8: held_critical transit replan (block_place/fast_sweep leave disabled).
+held_critical_replan_enabled: true
+# Route-aware proactive detour: forecast EE carry path vs scripted hand before collision.
+proactive_route_replan_enabled: true
+proactive_route_horizon_steps: 100
+proactive_route_warn_gap_m: 0.19
+proactive_route_hard_gap_m: 0.13
+# Shorter detour stages — 3×35 vs 3×55 saves ~60 sim steps before rejoin.
+replan_detour_stage_duration: 35
+
+human_trajectory:
+  type: linear_approach
+  # Far-field start; duration_steps=18 → ~1.1 m/s effective (vs v7/30 ≈ 0.65 m/s) for TTC early trigger.
+  start_pos: [0.20, -0.70, 0.58]
+  end_pos: [0.723, 0.093, 0.40]
+  start_step: 1670
+  duration_steps: 18
+  hold_steps: 42
+  retreat_pos: [0.20, -0.70, 0.58]
+  retreat_duration_steps: 50
+  hold_far: true
+
+# 2.5b envelope gating: GT v1.2 uses dist_min_envelope (held box / arm), not EE point
+# alone — required so fusion B group sees GT STOP when hand intrudes the carry envelope.
+envelope:
+  gating_enabled: true

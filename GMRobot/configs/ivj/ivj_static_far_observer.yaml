@@ -1,0 +1,13 @@
+# IV-J: static far observer — low intervention baseline.
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.35, -0.55, 0.50]
+  end_pos: [0.40, -0.50, 0.45]
+  start_step: 150
+  duration_steps: 100
+  hold_far: true

@@ -1,0 +1,30 @@
+# IV-J: static block placement — 挡空箱 (symlink pattern to main safety_layer1 preset).
+# Content mirrors configs/safety_layer1.yaml for IV-J registry discoverability.
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.50
+slow_down_alpha_ttc: 0.50
+safe_dist_slow_far: 0.35
+slow_down_alpha_far: 0.65
+gripper_boost_vel_threshold: 0.22
+gripper_boost_extra_closed: 0.12
+replan_lateral_offset_m: 0.10
+replan_detour_stage_duration: 55
+# S1 accept ref task_ts=2015 calibrated with EE TTC distance (pre S7 Option B).
+ttc_dist_source: ee
+
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.35, -0.55, 0.50]
+  end_pos: [0.72, 0.22, 0.20]
+  start_step: 1680
+  duration_steps: 55
+  hold_steps: 1000
+  retreat_pos: [0.35, -0.55, 0.50]
+  retreat_duration_steps: 80
+  hold_far: true
+
+envelope:
+  gating_enabled: true

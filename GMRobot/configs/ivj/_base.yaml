@@ -1,0 +1,30 @@
+# IV-J base config — common defaults shared across all intervention validation scenarios.
+# Each scenario YAML uses `base: _base.yaml` and deep-merges its overrides on top.
+#
+# This file is NOT a standalone safety_layer1 preset; it is only meaningful as a merge
+# source for the IV-J registry entries.
+
+safe_dist_static: 0.25
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+workspace:
+  x: [0.45, 1.05]
+  y: [-0.45, 0.45]
+  z: [0.08, 0.75]
+
+control_frequency: 50
+control_dt: 0.02
+slow_down_alpha: 0.3
+log_enabled: true
+log_dir: /root/GMRobot/output/safety_logs
+human_enabled: true
+
+human_hand_radius: 0.05
+ee_radius: 0.08
+
+gt_branches:
+  arm_links_enabled: true
+  contact_enabled: true
+
+expected_task_steps: 7521

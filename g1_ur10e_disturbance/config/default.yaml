@@ -1,0 +1,106 @@
+# G1-UR10e Disturbance — All tunable parameters (was hardcoded across run_phase3.py,
+# g1_virtual_hand.py, g1_disturbance_controller.py).
+# =============================================================================
+
+# ---- disturbance controller ----
+disturbance:
+  cautious_threshold: 0.15      # m — d < this → retreat/stop (CAUTIOUS)
+  moderate_threshold: 0.55      # m — d < this → slow+steer (MODERATE); else AGGRESSIVE (F1 fix: was 0.30)
+  speed_aggressive: 0.20        # wander speed multiplier (kept low to prevent tilting)
+  speed_moderate: 0.10          # slow-speed multiplier for MODERATE
+  speed_cautious: 0.0           # stop (CAUTIOUS)
+
+  workspace_x: [0.0, 0.8]       # m — G1 wander bounds (min, max)
+  workspace_y: [-0.5, 0.5]
+
+  vy_scale: 0.05                 # vy = uniform(-vy_scale, +vy_scale); 0 = disabled (safe default)
+
+  resample_interval: 200        # steps between velocity resamples (4 s @ 50 Hz)
+  # steer_away_strength is a module-level constant in g1_disturbance_controller.py
+  # (STEER_AWAY_STRENGTH = 0.3).  Not configurable via YAML — add a constructor
+  # parameter if it needs runtime tuning.
+  # CAUTIOUS retreat speed is urgency-based (0.20→0.50 m/s ramp, see
+  # g1_disturbance_controller._retreat_command).  No config parameter needed.
+  # ponytail: boundary_margin, boundary_repel_speed, vx/vy/wz_range,
+  # wz_schedule_scale, stabilise_steps, and stuck.* removed — these are
+  # hardcoded module-level constants in g1_disturbance_controller.py.
+  # Wire them through the constructor if they ever need tuning.
+
+# ---- virtual hand (safety proxy sphere drifting near G1 head) ----
+virtual_hand:
+  default_radius: 0.45          # m — max distance from head (arm reach)
+  height_mode: "table"          # "table"=EE height; "head"=head+0.2m
+  # ponytail: all other behaviour (velocity persistence, attractor strength,
+  # corridor geometry, table obstacle margins, reflection damping) lives in
+  # g1_virtual_hand.py module-level constants — tuned for the standard scene.
+
+# ---- simulated arm (visualisation + safety gate input) ----
+arm:
+  arm_length: 0.8
+  arm_length_fixed: false     # true = clamp to exactly arm_length; false = variable within [min, max]
+  arm_length_min: 0.6         # m — shortest allowed (0 = no floor)
+  arm_length_max: 0.9         # m — longest allowed (0 = no ceiling)
+
+# ---- EE tracking point (which UR10e body the arm points at) ----
+ee_track:
+  ee_track_body: "wrist_3_link"           # UR10e body name to track
+  ee_track_offset: [0.0, 0.0, 0.02]      # XYZ offset from body centre (m)
+
+# ---- VLM navigation (remote VLM queries from head camera) ----
+vlm:
+  # ---- SSH tunnel to remote VLM service ----
+  # Server will be decommissioned after development -- credentials here are temporary.
+  ssh:
+    host: "120.209.70.195"      # jump host IP
+    port: 30481                 # SSH port
+    user: "root"                # SSH user
+    # password: set via VLM_SSH_PASSWORD env var or ~/.ssh/config
+    # key: "/path/to/ssh_key"   # preferred over password when set
+
+  # ---- VLM service endpoint (after tunnel or direct) ----
+  host: "localhost"
+  port: 8080
+
+  interval: 200                 # steps between tactical queries (4 s @ 50 Hz)
+  scene_interval: 800           # steps between strategic queries (16 s @ 50 Hz)
+  log_every_n: 5                # log every Nth query
+
+  # action -> (vx, vy, wz) velocity mapping
+  actions:
+    circle_left:  [0.10, 0.0,  0.3]
+    circle_right: [0.10, 0.0, -0.3]
+    approach:     [0.25, 0.0,  0.0]
+    retreat:      [-0.20, 0.0, 0.0]
+    stand_wave:   [0.0,  0.0,  0.0]
+
+  # hybrid drive — blend VLM intent with corridor attractor
+  blend_vlm_weight: 0.4         # fraction of cmd from VLM
+  blend_corridor_weight: 0.6     # fraction from corridor pull
+  corridor_pull_gain: 0.35       # gain on unit vector toward corridor
+  corridor_activate_dist: 0.1    # m — attractor inactive below this distance
+
+  # boundary spring — retreat if G1 strays too far from EE
+  boundary_max_dist: 2.0         # m — trigger spring beyond this
+  boundary_spring_gain: 0.2      # scale on retreat velocity
+
+# ---- safety / replan ----
+safety:
+  control_dt: 0.02              # s — safety adapter timestep (50 Hz)
+  tilt_threshold_rad: 0.35      # rad (~20°) — retract arms above this tilt
+  collapse_z: -1.0              # m — episode ends if G1 root drops below this
+
+  replan:
+    trigger_threshold: 3        # consecutive SLOW_DOWN steps → replan (R7: was 5, lowered for faster response)
+    detour_lateral_m: 0.10      # m — lateral offset
+    detour_duration: 55         # steps — detour segment length
+    # ponytail: cooldown / slow_decay / detour_raise_m removed — GMRobot manages
+    # cooldown internally (200 steps), sustained_slow decay is built into the
+    # trigger, and raise_m lives on ReplanHint (default 0.05).
+
+# ---- batch / episode ----
+batch:
+  max_steps: 10000              # max simulation steps per episode
+  progress_interval: 200        # steps between progress printouts
+  mode_default: "auto"          # auto | AGGRESSIVE | MODERATE | CAUTIOUS
+  repeats_default: 1            # episodes per radius in batch mode
+  output_csv: "/tmp/gmdisturb_phase3.csv"

@@ -1,0 +1,35 @@
+# Layer 1 TTC stress preset — for T4 acceptance (dynamic TTC STOP).
+# Human holds far until mid-sequence, then sweeps quickly toward the A↔B transit corridor
+# at table height. Goal: trigger trigger_rule=ttc STOP/SLOW_DOWN while dist >= safe_dist_static.
+#
+# Isaac-validated 2026-06-17 (T4): step 800 fast sweep → trigger_rule=ttc STOP/SLOW_DOWN.
+# Static rule still wins if end_pos lands inside safe_dist_static (0.25 m); keep end_pos on the
+# approach arc but outside the static bubble during the fast segment.
+
+safe_dist_static: 0.25
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+workspace:
+  x: [0.45, 1.05]
+  y: [-0.45, 0.45]
+  z: [0.08, 0.75]
+
+control_frequency: 50
+control_dt: 0.02
+slow_down_alpha: 0.3
+log_enabled: true
+log_dir: /root/GMRobot/output/safety_logs
+human_enabled: true
+
+human_trajectory:
+  type: linear_approach
+  # Far observer — outside static zone for entire hold phase
+  start_pos: [0.35, -0.55, 0.50]
+  # Fast sweep toward shared channel; y=0 aligns with EE transit, z=0.30 keeps ~0.27 m clearance
+  # when EE x≈0.53 (tune after first T4 run)
+  end_pos: [0.55, 0.0, 0.30]
+  start_step: 800
+  # 25 steps @ 50 Hz = 0.5 s → ~1.2 m/s along ~0.6 m chord (TTC STOP target)
+  duration_steps: 25
+  hold_far: true

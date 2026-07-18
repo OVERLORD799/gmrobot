@@ -1,0 +1,25 @@
+# G5b: Functional risk — simulated misgrasp (part offset during grasp).
+# The hand enters during the close_gripper phase, potentially knocking
+# the part out of alignment.  This triggers re-grasp attempts which may
+# exhaust GRASP_MAX_REWIND_ATTEMPTS → functional_grip STOP.
+base: _base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.40
+
+# Human hand enters right at grasp closure to cause misalignment.
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.45, -0.35, 0.30]     # far field
+  end_pos: [0.62, 0.02, 0.15]         # close to Part 1 pick position
+  start_step: 145                      # just before close_gripper_slot_A_1 @150
+  duration_steps: 20                   # fast approach
+  hold_steps: 60                       # stay during grasp attempt
+  retreat_pos: [0.45, -0.35, 0.30]     # back to far field
+  retreat_duration_steps: 30
+  hold_far: true
+
+# Envelope gating for held-object knock detection.
+envelope:
+  gating_enabled: true
