@@ -11,7 +11,7 @@
 #   GMDISTURB_ROOT  — path to g1_ur10e_disturbance  (default: ../g1_ur10e_disturbance)
 #   GMROBOT_ROOT    — path to GMRobot               (default: ../GMRobot)
 #   PRESSURE_MAT    — path to pressure_mat_repro    (default: ../pressure_mat_repro)
-#   GHCR_REPO       — ghcr.io target, e.g. overlord799/gmdisturb
+#   GHCR_REPO       — ghcr.io target, e.g. overlord799/gmrobot
 set -euo pipefail
 
 TAG="gmdisturb:latest"
@@ -105,8 +105,9 @@ docker build \
 
 # ── Push (optional) ────────────────────────────
 if [ "${PUSH}" = true ]; then
+  GHCR_REPO="${GHCR_REPO:-overlord799/gmrobot}"
   if [ -z "${GHCR_REPO:-}" ]; then
-    echo "ERROR: GHCR_REPO not set. Example: GHCR_REPO=overlord799/gmdisturb"
+    echo "ERROR: GHCR_REPO not set. Example: GHCR_REPO=overlord799/gmrobot"
     exit 1
   fi
   GHCR_TAG="ghcr.io/${GHCR_REPO}:${TAG##*:}"

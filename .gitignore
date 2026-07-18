@@ -72,7 +72,7 @@ Thumbs.db
 # === Large / generated binaries (LFS preferred when tracked) ===
 # Subprojects may track selected *.usd/*.pt via LFS; ignore common junk:
 *.usd.bak
-*.tar
+# *.tar via LFS when tracked
 
 # === Git backups from monorepo merge ===
 .git.bak/

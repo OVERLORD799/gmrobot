@@ -9,10 +9,10 @@
 **/.thumbs
 
 # No USD files allowed in the repo
-**/*.usd
-**/*.usda
-**/*.usdc
-**/*.usdz
+# monorepo LFS: was **/*.usd
+# monorepo LFS: was # monorepo LFS: was **/*.usda
+# monorepo LFS: was # monorepo LFS: was **/*.usdc
+# monorepo LFS: was # monorepo LFS: was **/*.usdz
 
 # Python
 .DS_Store
