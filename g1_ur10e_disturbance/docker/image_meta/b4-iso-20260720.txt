@@ -1,0 +1,5 @@
+tag=gmdisturb:b4-iso-20260720
+image_id=sha256:d6cb7cc09d66a19012c6e934b67f015121e4b0cc395e03602b1c9e01e4b5adbf
+base_image=nvcr.io/nvidia/isaac-sim:5.1.0
+base_image_digest=nvcr.io/nvidia/isaac-sim@sha256:f3563cb2ba0c18af0b2fb321360dcb73a917b899f879e3213623d6bee484fa54
+built_at=2026-07-20T11:13:38Z

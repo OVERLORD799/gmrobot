@@ -1,13 +1,13 @@
-"""G1VirtualHand — a smoothly-drifting hand sphere centred on G1's head.
+"""G1VirtualHand — smoothly-drifting hand centre, reach-limited from G1's head.
 
-Phase 4.2: decouples hand position from G1 kinematics.  A virtual sphere
-orbits G1's head with a persistent random walk, staying within a
-configurable radius.  The safety adapter feeds this position directly to
-the RuleEngine — identical to real hand motion from the safety gate's
-perspective.
+Phase 4.2: decouples hand *centre* from G1 kinematics.  A virtual centre
+orbits G1's head within ``reach_radius``.  Safety gating uses a separate
+``proxy_radius`` (occupancy / envelope) applied in ``run_phase3`` when
+projecting the centre to a surface point for the RuleEngine.
 
 Parameters:
-    radius:       max distance from head (metres) — adjustable via CLI
+    reach_radius: max centre distance from head (metres) — arm reach
+    proxy_radius: safety occupancy radius (metres) — not the same as reach
     speed:        max drift speed (m/s) — lower = smoother
     height:       "head" = at head height, "table" = at UR10e EE height
 """
@@ -16,9 +16,13 @@ from __future__ import annotations
 
 import numpy as np
 
-# G1 arm reaches ~0.55 m from shoulder, ~0.45 m from head.
-DEFAULT_RADIUS = 0.45   # m
-DEFAULT_SPEED  = 0.12   # m/s — smooth drift
+# G1 arm reaches ~0.55 m from shoulder, ~0.45–0.50 m from head (reach only).
+DEFAULT_REACH_RADIUS = 0.45   # m — kinematic reach of proxy centre
+DEFAULT_PROXY_RADIUS = 0.40   # m — TRANSIT occupancy envelope (paper geometry)
+DEFAULT_SPEED = 0.12          # m/s — smooth drift
+
+# Backward-compat alias (tests / old call sites).
+DEFAULT_RADIUS = DEFAULT_REACH_RADIUS
 
 # Table obstacle: the SeattleLabTable centre is at (0.6, 0, 0) with a ~0.9 m
 # depth.  The near edge (G1 approach side) is at approximately x = 0.15.
@@ -37,21 +41,19 @@ TABLE_OBSTACLE_MARGIN = 0.02
 
 
 class G1VirtualHand:
-    """A virtual hand that drifts near G1's head with persistent random motion.
+    """Virtual hand *centre* with reach-limited motion near G1's head.
 
-    The hand follows a correlated random walk with a gentle bias toward
-    the UR10e EE, producing natural-looking arm-like motion.  It avoids
-    the table's near edge.
-
-    Usage per env step::
-
-        virtual_hand.step(dt=0.02, head_pos=g1_head_xyz)
-        adapter.human_hand_pos = virtual_hand.position
+    ``reach_radius`` clamps how far the centre may travel from the head.
+    ``proxy_radius`` is the occupancy / safety envelope used by callers for
+    surface projection — it must NOT be used to clamp reach.
     """
 
     def __init__(
         self,
-        radius: float = DEFAULT_RADIUS,
+        radius: float | None = None,
+        *,
+        reach_radius: float | None = None,
+        proxy_radius: float = DEFAULT_PROXY_RADIUS,
         speed: float = DEFAULT_SPEED,
         height_mode: str = "table",
         seed: int = 42,
@@ -59,10 +61,18 @@ class G1VirtualHand:
         pursuit_mode: bool = False,
         retreat_steps: int = 400,
     ):
-        self.radius = float(radius)
+        # Prefer explicit reach_radius; legacy ``radius=`` maps to reach.
+        if reach_radius is not None:
+            self.reach_radius = float(reach_radius)
+        elif radius is not None:
+            self.reach_radius = float(radius)
+        else:
+            self.reach_radius = float(DEFAULT_REACH_RADIUS)
+        self.proxy_radius = float(proxy_radius)
         self.speed = float(speed)
         self.height_mode = height_mode
-        self._rng = np.random.RandomState(seed)
+        self.seed = int(seed)
+        self._rng = np.random.RandomState(self.seed)
         self._attractor = np.array(attractor, dtype=np.float32)
         self._pursuit = pursuit_mode  # aggressive EE tracking for replan testing
         self._retreat_steps_default = retreat_steps  # steps to retreat after replan
@@ -75,6 +85,9 @@ class G1VirtualHand:
         self._head_pos: np.ndarray = np.zeros(3, dtype=np.float32)
         self._world_pos: np.ndarray = np.zeros(3, dtype=np.float32)
         self._target_z: float = 0.0
+        # True when attractor was truncated by arm reach or local offset
+        # was clamped to reach_radius this step.
+        self.last_reach_clamped: bool = False
 
         # --- Block-retreat-reblock cycle (pursuit mode) ---
         self._retreat_steps: int = 0       # remaining retreat steps
@@ -84,6 +97,15 @@ class G1VirtualHand:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
+
+    @property
+    def radius(self) -> float:
+        """Legacy alias for ``reach_radius`` (do not use for proxy envelope)."""
+        return self.reach_radius
+
+    @radius.setter
+    def radius(self, value: float) -> None:
+        self.reach_radius = float(value)
 
     @property
     def position(self) -> np.ndarray:
@@ -96,6 +118,14 @@ class G1VirtualHand:
     @property
     def cycle_count(self) -> int:
         return self._cycle_count
+
+    def head_to_attractor_distance(self) -> float:
+        """||attractor_xy - head_xy|| (metres)."""
+        return float(np.linalg.norm(self._attractor[:2] - self._head_pos[:2]))
+
+    def reach_margin(self) -> float:
+        """reach_radius - ||attractor - head||; negative ⇒ attractor beyond reach."""
+        return float(self.reach_radius - self.head_to_attractor_distance())
 
     def on_replan(self) -> None:
         """Called when a replan detour is applied.  Retreats the hand for
@@ -128,10 +158,12 @@ class G1VirtualHand:
         head_pos: np.ndarray,
         ee_z: float | None = None,
     ):
-        """Advance the virtual hand by *dt* seconds."""
+        """Advance the virtual hand centre by *dt* seconds."""
         self._head_pos = head_pos.astype(np.float32)
         if ee_z is not None:
             self._target_z = float(ee_z)
+        self.last_reach_clamped = False
+        r = self.reach_radius
 
         world_xy = self._head_pos[:2] + self._local_xy
 
@@ -174,12 +206,17 @@ class G1VirtualHand:
             else:
                 target_x = 0.75
                 target_y = offset_y
-            # Clamp to what the hand can actually reach (head_x + radius).
-            reach_x = self._head_pos[0] + self.radius
+            # Clamp to kinematic reach only (head + reach_radius) — not proxy.
+            reach_x = self._head_pos[0] + r
+            y_lo = self._head_pos[1] - r
+            y_hi = self._head_pos[1] + r
             block_x = min(target_x, reach_x)
-            block_y = np.clip(target_y,
-                             self._head_pos[1] - self.radius,
-                             self._head_pos[1] + self.radius)
+            block_y = np.clip(target_y, y_lo, y_hi)
+            self.last_reach_clamped = bool(
+                target_x > reach_x + 1e-6
+                or target_y < y_lo - 1e-6
+                or target_y > y_hi + 1e-6
+            )
             block_xy = np.array([block_x, block_y], dtype=np.float32)
             to_block = block_xy - world_xy
             d = float(np.linalg.norm(to_block))
@@ -188,8 +225,9 @@ class G1VirtualHand:
                 self._local_xy = self._local_xy + 0.3 * (target_xy - self._head_pos[:2] - self._local_xy)
                 self._vel = 0.3 * self._vel + self._rng.uniform(-0.02, 0.02, 2)
                 dist = float(np.linalg.norm(self._local_xy))
-                if dist > self.radius:
-                    self._local_xy *= self.radius / dist
+                if dist > r:
+                    self._local_xy *= r / dist
+                    self.last_reach_clamped = True
                 self._world_pos[:2] = self._head_pos[:2] + self._local_xy
                 if self.height_mode == "table":
                     self._world_pos[2] = self._target_z
@@ -236,13 +274,14 @@ class G1VirtualHand:
         # --- Integrate ---
         self._local_xy = self._local_xy + self._vel * dt
 
-        # --- Clamp to sphere ---
+        # --- Clamp to reach sphere (not proxy envelope) ---
         dist = float(np.linalg.norm(self._local_xy))
-        if dist > self.radius:
-            self._local_xy *= self.radius / dist
+        if dist > r:
+            self._local_xy *= r / dist
             radial = self._local_xy / dist
             radial_vel = np.dot(self._vel, radial) * radial
             self._vel = self._vel - 1.8 * radial_vel
+            self.last_reach_clamped = True
 
         # --- World position ---
         self._world_pos[:2] = self._head_pos[:2] + self._local_xy
@@ -289,9 +328,10 @@ class G1VirtualHand:
         local_x = pushed_x - self._head_pos[0]
         local_y = pushed_y - self._head_pos[1]
         dist = np.sqrt(local_x * local_x + local_y * local_y)
-        if dist > self.radius:
-            local_x *= self.radius / dist
-            local_y *= self.radius / dist
+        r = self.reach_radius
+        if dist > r:
+            local_x *= r / dist
+            local_y *= r / dist
             pushed_x = local_x + self._head_pos[0]
             pushed_y = local_y + self._head_pos[1]
 

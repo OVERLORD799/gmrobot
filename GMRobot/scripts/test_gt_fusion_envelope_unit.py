@@ -56,11 +56,17 @@ def test_fusion_tier0_ee_only_when_gating_off():
 
 
 def test_fusion_tier1_static_far_downgrade():
-    """Static bubble STOP while EE beyond warn → ALLOW even if g_ml=STOP."""
+    """Static bubble STOP while EE beyond warn → ALLOW when ML confidence below theta.
+
+    Design truth (2026-07-18): F2 fix (§5.3) — ML STOP with confidence above
+    ml_override_theta must NOT be silently overridden.  The downgrade only applies
+    when ML confidence is below the threshold (0.60 < 0.65), i.e. the ML is
+    uncertain enough to defer to the geometric distance check.
+    """
     fusion = compute_fusion(
         g_rule=int(GateDecision.STOP),
         g_ml=int(GateDecision.STOP),
-        g_ml_confidence=0.705,
+        g_ml_confidence=0.60,  # below theta (0.65) — ML is uncertain, downgrade allowed
         dist_ee_human=0.25,
         safe_dist_hard_stop=0.13,
         safe_dist_warn=0.19,

@@ -1,6 +1,7 @@
 name: "arm_collision_safety"
 description: "arm_collision scripted scenario + safety_fusion (STOP stress test)"
 mode: "scripted"
+scenario: "arm_collision"
 safety:
   config_path: "configs/safety_fusion.yaml"
   enable_envelope: true

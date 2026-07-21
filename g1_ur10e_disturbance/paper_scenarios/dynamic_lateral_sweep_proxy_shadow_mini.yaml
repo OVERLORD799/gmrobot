@@ -1,0 +1,53 @@
+# B4-Dynamic: shadow pairing with B2 — same trajectory, no actual gate/replan/retreat
+name: "dynamic_lateral_sweep_proxy_shadow_mini"
+description: "B4-Dynamic shadow unit — evaluate+log only, identical sweep definition to B2"
+mode: "constrained_wander"
+scenario: "constrained_wander"
+
+per_part_protocol: true
+
+dynamic_sweep:
+  enabled: true
+  start_xyz: [-0.30, -0.65, 0.45]
+  end_xyz: [0.62, 0.32, 0.45]
+  duration_steps: 60
+  retreat_duration_steps: 50
+  trigger_phase: transit
+
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+  enable_replan: true
+  enforcement_mode: shadow
+  replan:
+    held_critical_replan_enabled: false
+
+virtual_hand:
+  reach_radius: 0.55
+  transit_proxy_radius: 0.40
+  pick_place_proxy_radius: 0.08
+  reset_proxy_radius: 0.30
+  speed: 0.12
+  height_mode: "table"
+  retreat_steps: 200
+
+episode:
+  max_steps: 3000
+  num_parts: 1
+
+disturbance:
+  workspace_x: [0.00, 0.15]
+  workspace_y: [-0.5, 0.5]
+  cautious_threshold: 0.15
+  moderate_threshold: 0.55
+  g1_spawn_x: -1.45
+  g1_spawn_y: 0.0
+  g1_spawn_yaw: 0.0
+  g1_spawn_jitter_xy: 0.0
+
+batch:
+  max_steps: 3000
+  output_csv: ""
+
+seed: 42
+repeat: 1

@@ -14,19 +14,20 @@
 #   GHCR_REPO       — ghcr.io target, e.g. overlord799/gmrobot
 set -euo pipefail
 
-TAG="gmdisturb:latest"
+TAG="gmdisturb:paper-demo-20260718"
 SKIP_ASSETS=false
 PUSH=false
+BASE_IMAGE="nvcr.io/nvidia/isaac-sim:5.1.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 WORKSPACE_ROOT="$(cd "${SCRIPT_DIR}/../.." && pwd)"
 CONTEXT="${WORKSPACE_ROOT}/.docker_build_context"
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --tag)       TAG="$2"; shift 2 ;;
-    --no-assets) SKIP_ASSETS=true; shift ;;
-    --push)      PUSH=true; shift ;;
-    *)           echo "Unknown: $1"; exit 1 ;;
+    --tag)              TAG="$2"; shift 2 ;;
+    --no-assets|--no-assets-copy) SKIP_ASSETS=true; shift ;;
+    --push)             PUSH=true; shift ;;
+    *)                  echo "Unknown: $1"; exit 1 ;;
   esac
 done
 
@@ -77,6 +78,20 @@ if [ "${SKIP_ASSETS}" = false ]; then
   echo "  g1_assets: $(find "${CONTEXT}/g1_assets" -type f | wc -l) files"
 fi
 
+# ── Resolve base image digest for reproducibility ──
+BASE_IMAGE_DIGEST="unknown"
+if docker image inspect "${BASE_IMAGE}" >/dev/null 2>&1; then
+  BASE_IMAGE_DIGEST="$(docker image inspect --format='{{index .RepoDigests 0}}' "${BASE_IMAGE}" 2>/dev/null || true)"
+  if [[ -z "${BASE_IMAGE_DIGEST}" || "${BASE_IMAGE_DIGEST}" == "<no value>" ]]; then
+    BASE_IMAGE_DIGEST="$(docker image inspect --format='{{.Id}}' "${BASE_IMAGE}" 2>/dev/null || echo unknown)"
+  fi
+else
+  echo "WARNING: base image ${BASE_IMAGE} not present locally; digest will be 'unknown'"
+  echo "         Pull first: docker pull ${BASE_IMAGE}"
+fi
+echo "Base image: ${BASE_IMAGE}"
+echo "Base digest/id: ${BASE_IMAGE_DIGEST}"
+
 # ── Build ──────────────────────────────────────
 echo "Building ${TAG}..."
 # Named contexts avoid BuildKit refusing absolute symlinks outside the main context.
@@ -101,7 +116,22 @@ docker build \
   --build-arg HTTPS_PROXY="${HTTPS_PROXY:-}" \
   --build-arg http_proxy="${http_proxy:-}" \
   --build-arg https_proxy="${https_proxy:-}" \
+  --build-arg BASE_IMAGE="${BASE_IMAGE}" \
+  --build-arg BASE_IMAGE_DIGEST="${BASE_IMAGE_DIGEST}" \
   "${CONTEXT}"
+
+# Persist host-side build metadata next to the image tag
+META_DIR="${GMDISTURB_ROOT}/docker/image_meta"
+mkdir -p "${META_DIR}"
+IMAGE_ID="$(docker image inspect --format='{{.Id}}' "${TAG}" 2>/dev/null || echo unknown)"
+{
+  echo "tag=${TAG}"
+  echo "image_id=${IMAGE_ID}"
+  echo "base_image=${BASE_IMAGE}"
+  echo "base_image_digest=${BASE_IMAGE_DIGEST}"
+  echo "built_at=$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+} > "${META_DIR}/${TAG##*:}.txt"
+echo "Wrote build metadata: ${META_DIR}/${TAG##*:}.txt"
 
 # ── Push (optional) ────────────────────────────
 if [ "${PUSH}" = true ]; then

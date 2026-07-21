@@ -89,3 +89,10 @@ venv/
 
 # === Tests (from GMRobot legacy) ===
 # tests/ kept if present under subdirs intentionally
+
+# === Paper-demo local experiment trees (do not push tuning dumps) ===
+g1_ur10e_disturbance/results_b1_*/
+g1_ur10e_disturbance/results_smoke_*/
+g1_ur10e_disturbance/results_paper_demo_r040/
+# full episode dumps under results/ remain ignored via **/results/
+# machine summaries are force-added when needed

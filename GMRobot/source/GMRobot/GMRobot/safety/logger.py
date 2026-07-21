@@ -230,6 +230,7 @@ def vlm_log_fields_from_result(
             "vlm_keywords": "",
             "vlm_risk_type": "error",
             "vlm_risk_confidence": "",
+            "vlm_parse_ok": "0",
         }
 
     # Structured fields — prefer server-returned keys, fall back to text.

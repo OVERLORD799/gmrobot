@@ -1,0 +1,52 @@
+{
+  "run_id": "baseline_safe_r2_s44_062605",
+  "config_source": "/opt/projects/g1_ur10e_disturbance/paper_scenarios_b0b1/baseline_safe.yaml",
+  "config_yaml_snapshot": {
+    "name": "baseline_safe",
+    "description": "B0 safety baseline \u2014 G1 safe wander, no UR10e interference, no virtual hand",
+    "mode": "constrained_wander",
+    "scenario": "constrained_wander",
+    "safety": {
+      "config_path": "configs/safety_layer1.yaml",
+      "enable_envelope": true
+    },
+    "episode": {
+      "max_steps": 10000,
+      "num_parts": 20
+    },
+    "disturbance": {
+      "workspace_x": [
+        -0.5,
+        0.0
+      ],
+      "workspace_y": [
+        -0.3,
+        0.3
+      ],
+      "cautious_threshold": 0.1,
+      "moderate_threshold": 0.3
+    },
+    "batch": {
+      "max_steps": 10000,
+      "output_csv": ""
+    },
+    "seed": 42,
+    "repeat": 3
+  },
+  "cli_command": "/isaac-sim/kit/python/bin/python3 -u /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py --max_steps 10000 --output_csv /opt/projects/g1_ur10e_disturbance/results/final_six_ordered/baseline_safe_r2_s44_062605/baseline_safe_r2_s44_062605.csv --config /opt/projects/g1_ur10e_disturbance/paper_scenarios_b0b1/baseline_safe.yaml --safety-config /opt/projects/GMRobot/configs/safety_layer1.yaml --num-parts 20 --seed 44 --disturbance-scenario-label baseline_safe",
+  "seed": 44,
+  "seeds": {
+    "cli_seed": 44,
+    "env_seed": 44,
+    "controller_seed": 44,
+    "virtual_hand_seed": 44,
+    "physx_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit."
+  },
+  "physx_reproducibility_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit.",
+  "git_dirty": false,
+  "python_version": "3.11.13 (tags/v3.11.13-dirty:498b971, Jun  9 2025, 16:37:36) [GCC 7.3.1 20180303 (Red Hat 7.3.1-5)]",
+  "torch_version": "2.7.0+cu128",
+  "cuda_available": true,
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA GeForce RTX 5090 Laptop GPU"
+}

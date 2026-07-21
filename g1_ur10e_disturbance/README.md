@@ -8,8 +8,8 @@ motion replan, VLM guidance) to measure and improve grasp-knock-off defense.
 
 ```
                          ┌──────────────────────┐
-                         │   Isaac Lab 1.3.0    │
-                         │   (Isaac Sim 4.2.0)   │
+                         │   Isaac Lab 2.3.2    │
+                         │   (Isaac Sim 5.1.0)   │
                          └──────┬───────────────┘
                                 │
               ┌─────────────────┴─────────────────┐
@@ -85,23 +85,25 @@ motion replan, VLM guidance) to measure and improve grasp-knock-off defense.
 
 | Requirement | Version / Path |
 |-------------|---------------|
-| NVIDIA GPU | RTX 4090 or better recommended |
-| NVIDIA driver | >= 535 |
-| Isaac Sim | 4.2.0 (bare-metal) or 4.5.0 (Docker via `nvcr.io`) |
-| Isaac Lab | 1.3.0 (bare-metal) or 2.x (Docker) |
-| [GMRobot](https://github.com/example/GMRobot) | `/root/GMRobot` -- safety layer, UR10e assets, pick-and-place |
-| [pressure_mat_repro](https://github.com/example/pressure_mat_repro) | `/root/pressure_mat_repro` -- G1 USD, walk policy, tactile mat |
-| Conda | `env_isaaclab` environment |
+| NVIDIA GPU | RTX 4090+ recommended; RTX 5090 (Blackwell) supported via Isaac Sim ≥ 5.1 |
+| NVIDIA driver | ≥ 535 (RTX 50-series: use a driver that supports the installed CUDA runtime, e.g. 580.x) |
+| Isaac Sim | **5.1.0** (Docker: `nvcr.io/nvidia/isaac-sim:5.1.0`) |
+| Isaac Lab | **2.3.2** (`isaaclab`, `isaaclab_assets`, `isaaclab_tasks`) |
+| [GMRobot](https://github.com/example/GMRobot) | sibling checkout — safety layer, UR10e assets, pick-and-place |
+| [pressure_mat_repro](https://github.com/example/pressure_mat_repro) | sibling checkout — G1 USD, walk policy, tactile mat |
+| Python (sim) | Isaac Kit Python 3.11 via `/isaac-sim/python.sh` (set `ISAAC_PYTHON`) |
 
 ### Environment variables
 
 Set these or rely on `paths.py` defaults:
 
 ```bash
-export GMDISTURB_ROOT=/root/g1_ur10e_disturbance
-export GMROBOT_ROOT=/root/GMRobot
-export ISAACLAB_ROOT=/root/gpufree-data/IsaacLab
-export PRESSURE_MAT_ROOT=/root/pressure_mat_repro
+export GMDISTURB_ROOT=/path/to/g1_ur10e_disturbance
+export GMROBOT_ROOT=/path/to/GMRobot
+export ISAACLAB_ROOT=/path/to/IsaacLab
+export PRESSURE_MAT_ROOT=/path/to/pressure_mat_repro
+# Docker / Isaac Kit interpreter (preferred over conda fallback)
+export ISAAC_PYTHON=/isaac-sim/kit/python/bin/python3
 ```
 
 ## Quick Start (Docker — recommended)
@@ -110,25 +112,27 @@ export PRESSURE_MAT_ROOT=/root/pressure_mat_repro
 
 - **Docker** ≥ 24.x with `nvidia-container-toolkit` (`docker run --gpus all` must work)
 - **≥ 80 GB** free disk space for build (image ≈ 41 GB + build cache)
-- **nvcr.io** accessible (Isaac Sim base image, no login needed for public access)
-- **NVIDIA GPU** with driver ≥ 535
+- **nvcr.io** accessible (Isaac Sim base image)
+- **NVIDIA GPU** with a driver compatible with Isaac Sim 5.1
 
 > **If you don't want to build**, skip to [Pull pre-built image](#pull-pre-built-image) below.
 
 ### Build
 
-The build fetches `nvcr.io/nvidia/isaac-sim:4.5.0` (~35 GB), installs Isaac Lab 2.x,
-Miniconda (for pressure-mat training), GMRobot, and copies all three projects + USD assets.
+The build fetches `nvcr.io/nvidia/isaac-sim:5.1.0`, repairs the Torch vendor packaging
+symlink, installs Isaac Lab 2.3.2 (`isaaclab` + `isaaclab_assets` + `isaaclab_tasks`),
+pins `h5py` into Isaac Python, and copies all three projects + USD assets.
+
+Default image tag: **`gmdisturb:paper-demo-20260718`**.
 
 ```bash
-git clone https://github.com/OVERLORD799/g1_ur10e_disturbance.git
 cd g1_ur10e_disturbance/docker
 
-# Full build (30–60 min depending on network)
+# Full build (30–60 min depending on network); records base-image digest
 ./build.sh
 
 # Custom tag
-./build.sh --tag gmdisturb:v3.0
+./build.sh --tag gmdisturb:dev
 
 # Build + push to ghcr.io in one step
 GHCR_REPO=overlord799/gmdisturb ./build.sh --push
@@ -136,35 +140,62 @@ GHCR_REPO=overlord799/gmdisturb ./build.sh --push
 
 **What the build script does:**
 
-1. Sets up a build context with symlinks to the three repos
-2. Copies git-ignored USD assets (robot `.usd`, walk policy `.pt`, tactile mat `.usd`)
-3. Runs `docker build` from the Dockerfile — all layers cached on rebuild
+1. Sets up a build context with USD / policy assets from the sibling repos
+2. Resolves the base image digest (not just the `5.1.0` tag) into build metadata
+3. Runs `docker build` from the Dockerfile — layers cached on rebuild
+4. Writes host-side metadata under `docker/image_meta/`
+
+Locked dependency lists inside the image:
+
+- `/opt/locks/isaac-python-requirements.txt`
+- `/opt/locks/image-build-info.txt`
 
 **Environment variables for CI / custom paths:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `GMDISTURB_ROOT` | `/root/g1_ur10e_disturbance` | Path to this repo |
-| `GMROBOT_ROOT` | `/root/GMRobot` | Path to GMRobot checkout |
-| `PRESSURE_MAT` | `/root/pressure_mat_repro` | Path to pressure_mat_repro checkout |
+| `GMDISTURB_ROOT` | `<workspace>/g1_ur10e_disturbance` | Path to this repo |
+| `GMROBOT_ROOT` | `<workspace>/GMRobot` | Path to GMRobot checkout |
+| `PRESSURE_MAT` | `<workspace>/pressure_mat_repro` | Path to pressure_mat_repro checkout |
 | `GHCR_REPO` | (none) | `owner/repo` to push to ghcr.io |
 
 ### Run
 
+Prefer `docker/run.sh` so `results/` and Isaac caches persist on the host:
+
 ```bash
-# Interactive shell (explore the container)
-docker run --gpus all -it --entrypoint bash gmdisturb:latest
+cd g1_ur10e_disturbance/docker
 
-# Smoke test
-docker run --gpus all gmdisturb:latest
+# Interactive shell
+./run.sh shell
 
-# Single episode with scenario hand + replan
-docker run --gpus all gmdisturb:latest \
-    --scenario-hand transit_block --virtual-hand 0.4 --replan --max-steps 3000
+# 1-step headless smoke
+./run.sh smoke
+# or:
+./run.sh phase3 --headless --max_steps 1
 
-# Headless + output CSV mounted to host
-docker run --gpus all gmdisturb:latest \
-    --headless --max-steps 10000 --output-csv /tmp/results.csv
+# Batch paper scenarios (results → ./results on host)
+./run.sh batch paper_scenarios/
+
+# Equivalent raw docker (must mount results/)
+docker run --gpus all --rm \
+  -v "$(pwd)/../results:/opt/projects/g1_ur10e_disturbance/results" \
+  gmdisturb:paper-demo-20260718 \
+  phase3 --headless --max_steps 1
+```
+
+Entrypoint commands: `phase3`, `batch`, `smoke`, `shell`, `python`.
+Passing flags directly (e.g. `--headless ...`) still runs `run_phase3.py` for backward compatibility.
+
+Override entrypoint only when needed:
+
+```bash
+docker run --gpus all --rm \
+  --entrypoint /isaac-sim/python.sh \
+  -v "$(pwd)/../results:/opt/projects/g1_ur10e_disturbance/results" \
+  gmdisturb:paper-demo-20260718 \
+  /opt/projects/g1_ur10e_disturbance/batch_runner.py \
+  /opt/projects/g1_ur10e_disturbance/paper_scenarios/
 ```
 
 ### Pull pre-built image
@@ -172,23 +203,22 @@ docker run --gpus all gmdisturb:latest \
 If an image has been pushed to **GitHub Container Registry** (ghcr.io):
 
 ```bash
-docker pull ghcr.io/OVERLORD799/gmdisturb:latest
-docker tag ghcr.io/OVERLORD799/gmdisturb:latest gmdisturb:latest
+docker pull ghcr.io/OVERLORD799/gmdisturb:paper-demo-20260718
+docker tag ghcr.io/OVERLORD799/gmdisturb:paper-demo-20260718 gmdisturb:paper-demo-20260718
 ```
 
 ### Export / import (offline machines)
 
 ```bash
 # On the build machine — export as tar (~41 GB)
-./docker/export.sh                # → gmdisturb_latest.tar
-./docker/export.sh --tag v3.0     # → gmdisturb_v3.0.tar
+./docker/export.sh --tag gmdisturb:paper-demo-20260718
 
 # Transfer
-scp gmdisturb_latest.tar user@offline-machine:/path/
+scp gmdisturb_gmdisturb_paper-demo-20260718.tar user@offline-machine:/path/
 
 # On the offline machine — load directly
-docker load < /path/to/gmdisturb_latest.tar
-docker run --gpus all gmdisturb:latest
+docker load < /path/to/gmdisturb_gmdisturb_paper-demo-20260718.tar
+./docker/run.sh smoke
 ```
 
 ### CI / GitHub Actions
@@ -205,8 +235,8 @@ Set the following secrets on the repo:
 ## Quick Start (bare-metal -- alternative)
 
 ```bash
-# Activate Isaac Lab conda env
-conda activate env_isaaclab
+# Use Isaac Lab / Isaac Sim Python (prefer ISAAC_PYTHON over conda fallback)
+export ISAAC_PYTHON=/path/to/isaac-sim/kit/python/bin/python3
 
 # Smoke test (single episode, 2000 steps)
 bash scripts/smoke_test.sh
@@ -214,7 +244,7 @@ bash scripts/smoke_test.sh
 # Single episode, headless, with replan + virtual hand
 python scripts/run_phase3.py \
     --headless \
-    --max-steps 10000 \
+    --max_steps 10000 \
     --replan \
     --virtual-hand \
     --output_csv /tmp/run.csv
@@ -238,9 +268,9 @@ python scripts/plot_trajectory.py /tmp/run.csv
 
 | Flag | Default | Description |
 |------|---------|-------------|
-| `--max-steps` | 10000 | Sim steps per episode |
-| `--progress-interval` | 200 | Steps between progress prints |
-| `--output-csv PATH` | `/tmp/gmdisturb_phase3.csv` | Per-step CSV output |
+| `--max_steps` | 10000 | Sim steps per episode |
+| `--progress_interval` | 200 | Steps between progress prints |
+| `--output_csv PATH` | `/tmp/gmdisturb_phase3.csv` | Per-step CSV output |
 | `--config PATH` | `config/default.yaml` | YAML config path |
 
 ### Disturbance mode

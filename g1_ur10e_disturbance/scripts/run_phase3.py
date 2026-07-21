@@ -157,6 +157,14 @@ parser.add_argument(
          "during Transit, retreats during Reset.  Requires --virtual-hand.",
 )
 parser.add_argument(
+    "--num-parts",
+    type=int,
+    default=None,
+    metavar="N",
+    help="Truncate the pick-and-place command list to the first N parts "
+         "(for mini B1 validation).  Default: use full policy command list.",
+)
+parser.add_argument(
     "--scenario-hand",
     type=str,
     default=None,
@@ -181,14 +189,87 @@ parser.add_argument(
     metavar="PATH",
     help="Path to YAML config (default: config/default.yaml).",
 )
+parser.add_argument(
+    "--seed",
+    type=int,
+    default=None,
+    help="Episode RNG seed for Python/NumPy/Torch, Isaac env_cfg.seed, "
+         "G1DisturbanceController, and G1VirtualHand (default: 42). "
+         "GPU PhysX may still be non-deterministic — see *_seeds.json sidecar.",
+)
+parser.add_argument(
+    "--disturbance-scenario-label",
+    type=str,
+    default="",
+    help="Canonical scenario name for CSV disturbance_scenario field (set by batch_runner).",
+)
+parser.add_argument(
+    "--dynamic-sweep",
+    action="store_true",
+    help="Enable B2 world-coordinate lateral sweep proxy (from YAML dynamic_sweep).",
+)
+parser.add_argument(
+    "--enforcement-mode",
+    type=str,
+    default=None,
+    choices=[None, "active", "shadow", "off"],
+    help="Safety enforcement: active (gate+replan), shadow (evaluate+log only), "
+         "off (same as --no-safety when combined).  Default: active.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
+
+# Load config early for YAML-driven flags (before validation).
+_PROJ_ROOT_EARLY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+if _PROJ_ROOT_EARLY not in sys.path:
+    sys.path.insert(0, _PROJ_ROOT_EARLY)
+from config_loader import load_config as _load_config_early
+_cfg_early = _load_config_early(args_cli.config)
+if _cfg_early.per_part_protocol:
+    args_cli.per_part_protocol = True
+if _cfg_early.dynamic_sweep.enabled:
+    args_cli.dynamic_sweep = True
+if args_cli.enforcement_mode is None:
+    args_cli.enforcement_mode = _cfg_early.safety.enforcement_mode
+else:
+    args_cli.enforcement_mode = str(args_cli.enforcement_mode).lower()
+if args_cli.enforcement_mode == "off":
+    args_cli.no_safety = True
+
+# §5.2 enforcement: --per-part-protocol and --scenario-hand require --virtual-hand
+if args_cli.per_part_protocol and args_cli.virtual_hand is None:
+    parser.error("--per-part-protocol requires --virtual-hand RADIUS")
+if args_cli.dynamic_sweep and args_cli.virtual_hand is None:
+    parser.error("--dynamic-sweep requires --virtual-hand RADIUS")
+if args_cli.scenario_hand is not None and args_cli.virtual_hand is None:
+    parser.error("--scenario-hand requires --virtual-hand RADIUS")
+# §5.2 enforcement: --replan requires an obstacle source (virtual hand, stress,
+# scenario-hand, or per-part-protocol) and enabled safety.
+if args_cli.replan:
+    if args_cli.no_safety:
+        parser.error("--replan requires safety to be enabled (cannot use with --no-safety)")
+    _has_obstacle = (
+        args_cli.virtual_hand is not None
+        or args_cli.stress
+        or args_cli.scenario_hand is not None
+        or args_cli.per_part_protocol
+        or args_cli.dynamic_sweep
+    )
+    if not _has_obstacle:
+        parser.error("--replan requires an obstacle source: "
+                     "--virtual-hand, --stress, --scenario-hand, or --per-part-protocol")
 
 # Ensure project root is on sys.path before importing local modules.
 _PROJ_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _PROJ_ROOT not in sys.path:
     sys.path.insert(0, _PROJ_ROOT)
 
+from dynamic_audit_csv import (
+    DYNAMIC_AUDIT_HEADER,
+    build_dynamic_audit_row,
+    format_dynamic_audit_row,
+)
+from event_csv import EVENT_CSV_HEADER, build_event_row, format_event_row
 from config_loader import load_config, Phase3Config
 
 # Load config (CLI --config overrides the default YAML path)
@@ -237,6 +318,8 @@ from g1_virtual_hand import G1VirtualHand
 from g1_vlm_client import G1VLMClient, _ensure_tunnel, init_vlm_config
 from ur10e_controller import UR10eController
 from safety_adapter import G1EnvelopeAdapter
+from seed_utils import apply_episode_seeds, seed_manifest, write_seed_sidecar
+from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
 from mat_event_detector import MatEventDetector
 from g1_disturbance_controller import (
     G1DisturbanceController,
@@ -245,6 +328,27 @@ from g1_disturbance_controller import (
 )
 from test_metrics import EpisodeMetrics, MetricsWriter
 from per_part_state import PerPartTester, Phase
+from protocol_vhand import (
+    attempt_needs_canonical_redeploy,
+    dynamic_sweep_redeploy_edge,
+    find_open_attempt_id,
+    is_b2_proactive_trigger_rule,
+    policy_clock_should_advance,
+    resolve_effective_gate_name,
+    snapshot_parts_placed,
+    protocol_retreat_transition,
+    resolve_per_part_attractor,
+    per_part_radius,
+    ReplanAttribution,
+)
+from dynamic_sweep_proxy import (
+    DynamicLateralSweepProxy,
+    DynamicSweepSpec,
+    PhaseProxyRadii,
+    commanded_trajectory_row,
+    sweep_geometry_precheck,
+    time_to_risk_steps_from_ttc,
+)
 from scenarios import ScenarioHand, SCENARIOS as HAND_SCENARIOS
 
 # GMRobot replan module — lazy-loaded via safety_adapter (same importlib pattern
@@ -387,13 +491,81 @@ def _target_direction(name: str, ee_pos: np.ndarray) -> np.ndarray:
     return (d / n).astype(np.float32) if n > 1e-6 else np.array([-1.0, 0.0], dtype=np.float32)
 
 
+def _resolve_disturbance_source(cli_args, virtual_hand) -> str:
+    """Return the canonical disturbance_source label per §6.1.
+
+    Mapping:
+      - virtual hand active            → scripted_virtual_hand
+      - arm_collision / arm_wave       → g1_body (walking velocity patterns only)
+      - stress mode (simulated arm)    → g1_attached_proxy
+      - default wander                 → g1_body
+    """
+    if virtual_hand is not None:
+        return "scripted_virtual_hand"
+    if cli_args.stress:
+        return "g1_attached_proxy"
+    # arm_collision / arm_wave are scripted G1 velocity phases — no proxy hand.
+    return "g1_body"
+
+
+def _park_g1_at_workspace(env, workspace_x, workspace_y) -> None:
+    """DEBUG ONLY — post-reset ``write_root_state_to_sim`` teleport.
+
+    Do **not** call from paper B1 paths.  Prefer ``apply_g1_spawn_to_env_cfg``
+    before ``gym.make`` so PhysX / obs history stay consistent.  Kept only for
+    interactive debugging of workspace geometry.
+    """
+    raise RuntimeError(
+        "_park_g1_at_workspace is deprecated for paper runs; "
+        "set disturbance.g1_spawn_x/y/yaw before gym.make instead"
+    )
+
+
 def main():
     from isaaclab_tasks.utils import parse_env_cfg
 
     task_id = "G1-UR10e-Disturbance-v0"
     env_cfg = parse_env_cfg(task_id, num_envs=1)
+    # Keep PhysX/Isaac episode horizon >= CLI max_steps.  Default
+    # episode_length_s=200s truncates at 10000 steps @ 50 Hz and silently
+    # ends B1 before 20 parts complete ("Episode ended at step 9999").
+    _step_dt = float(env_cfg.decimation) * float(env_cfg.sim.dt)
+    _needed_s = float(args_cli.max_steps) * _step_dt + _step_dt
+    if float(getattr(env_cfg, "episode_length_s", 0.0) or 0.0) < _needed_s:
+        env_cfg.episode_length_s = _needed_s
+    print(
+        f"[phase3] episode_length_s={env_cfg.episode_length_s:.1f}s "
+        f"(max_steps={args_cli.max_steps}, step_dt={_step_dt:.4f}s)"
+    )
+
+    # P0: close the seed loop before env construction / controller init.
+    _episode_seed = int(args_cli.seed if args_cli.seed is not None else 42)
+    _seed_applied = apply_episode_seeds(_episode_seed, env_cfg=env_cfg)
+
+    # P0: B1 spawn pose — mutate env_cfg *before* gym.make (not post-reset park).
+    _spawn_record: dict = {}
+    if cfg.disturbance.g1_spawn_x is not None:
+        _spawn_record = apply_g1_spawn_to_env_cfg(
+            env_cfg,
+            spawn_x=float(cfg.disturbance.g1_spawn_x),
+            spawn_y=float(cfg.disturbance.g1_spawn_y),
+            spawn_yaw=float(cfg.disturbance.g1_spawn_yaw),
+            spawn_jitter_xy=float(cfg.disturbance.g1_spawn_jitter_xy),
+        )
+        print(
+            f"[phase3] G1 spawn (pre-make): "
+            f"x={_spawn_record['g1_spawn_requested_x']:.3f} "
+            f"y={_spawn_record['g1_spawn_requested_y']:.3f} "
+            f"yaw={_spawn_record['g1_spawn_requested_yaw']:.3f} "
+            f"jitter_xy={_spawn_record['g1_spawn_jitter_xy']:.3f} "
+            f"pose_range={_spawn_record['reset_g1_pose_range']}"
+        )
+    else:
+        print("[phase3] G1 spawn: using dual_env_cfg default init_state "
+              "(no disturbance.g1_spawn_x)")
+
     env = gym.make(task_id, cfg=env_cfg)
-    obs, info = env.reset()
+    obs, info = env.reset(seed=_episode_seed)
     device = env.unwrapped.device
 
     # R7 H3 fix: ensure cleanup runs even on unhandled exception.
@@ -409,16 +581,64 @@ def main():
     detector = MatEventDetector()
     arm_ctrl = G1ArmController()
     virtual_hand = G1VirtualHand(
-        radius=args_cli.virtual_hand if args_cli.virtual_hand else cfg.virtual_hand.default_radius,
+        reach_radius=(
+            float(args_cli.virtual_hand)
+            if args_cli.virtual_hand is not None
+            else float(cfg.virtual_hand.reach_radius)
+        ),
+        proxy_radius=float(cfg.virtual_hand.transit_proxy_radius),
         speed=args_cli.virtual_hand_speed,
         height_mode=cfg.virtual_hand.height_mode,
-        pursuit_mode=args_cli.replan,
+        seed=_episode_seed,
+        pursuit_mode=bool(args_cli.replan and not args_cli.dynamic_sweep),
         retreat_steps=max(0, args_cli.vhand_retreat),
     ) if args_cli.virtual_hand is not None else None
     # Warmup: let hand start blocking immediately — dynamic block point
-    # (min(0.75, head_x + radius)) ensures hand only reaches as far as G1 allows.
+    # (min(0.75, head_x + reach_radius)) ensures centre only reaches as far as G1 allows.
     if virtual_hand is not None and args_cli.replan:
         virtual_hand._retreat_steps = 0
+
+    _seed_record = seed_manifest(
+        seed=_episode_seed,
+        env_seed=getattr(env_cfg, "seed", _episode_seed),
+        controller_seed=_episode_seed,
+        virtual_hand_seed=(
+            int(virtual_hand.seed) if virtual_hand is not None else None
+        ),
+        applied=_seed_applied,
+    )
+    if _spawn_record:
+        _seed_record["g1_spawn"] = _spawn_record
+    # Measured root pose after reset (validates spawn, not just requested).
+    _g10 = env.unwrapped.scene["robot_g1"]
+    _root0 = _g10.data.root_pos_w[0].detach().cpu().numpy()
+    _quat0 = _g10.data.root_quat_w[0].detach().cpu().numpy()
+    _seed_record["g1_root_initial"] = {
+        "x": float(_root0[0]),
+        "y": float(_root0[1]),
+        "z": float(_root0[2]),
+        "quat_wxyz": [float(v) for v in _quat0],
+    }
+    if _spawn_record:
+        _err0 = spawn_pose_error(
+            (_root0[0], _root0[1]),
+            requested_x=_spawn_record["g1_spawn_requested_x"],
+            requested_y=_spawn_record["g1_spawn_requested_y"],
+        )
+        _seed_record["spawn_pose_error"] = _err0
+        print(
+            f"[phase3] G1 root after reset: "
+            f"({_root0[0]:.3f},{_root0[1]:.3f},{_root0[2]:.3f}) "
+            f"spawn_pose_error={_err0:.4f}m"
+        )
+    _seed_path = write_seed_sidecar(args_cli.output_csv, _seed_record)
+    print(
+        f"[phase3] seeds: env={_seed_record['env_seed']} "
+        f"controller={_seed_record['controller_seed']} "
+        f"vhand={_seed_record['virtual_hand_seed']} "
+        f"(sidecar={_seed_path})"
+    )
+    print(f"[phase3] {_seed_record['physx_note']}")
 
     # ── Workspace + bias defaults (scenario/protocol may override) ──────
     _ws_x = cfg.disturbance.workspace_x
@@ -438,23 +658,105 @@ def main():
     # ── Per-part protocol (R7) ─────────────────────────────────────────
     per_part: PerPartTester | None = None
     if args_cli.per_part_protocol and virtual_hand is not None and scen_hand is None:
+        # Truncate command list for mini B1 (--num-parts / batch episode.num_parts).
+        if args_cli.num_parts is not None and args_cli.num_parts > 0:
+            cmds = list(ur10e._policy.user_commands[: int(args_cli.num_parts)])
+            ur10e._policy.user_commands = cmds
+            print(f"[phase3] Truncated task to {len(cmds)} parts (--num-parts)")
         # Read user_commands from the UR10e policy (lazy-init after reset).
-        per_part = PerPartTester(ur10e._policy.user_commands)
+        per_part = PerPartTester(
+            ur10e._policy.user_commands,
+            prefer_replan=bool(args_cli.replan),
+        )
         print(f"[phase3] Per-part protocol enabled: {per_part.parts_total} parts, "
-              f"4-phase cycle (Pick→Transit→Place→Reset)")
-        # Protocol: G1 body stays back, hand reaches containers.
-        # G1 at x∈[-0.1,0.2] keeps body ≥0.65m from table edge (x=0.15).
-        # Hand radius 0.45 from x=0.2 reaches x=0.65, surface at x=1.10
-        # covers containers at x=0.75.
-        _ws_x = (0.0, 0.15)   # G1 stays near table edge, hand can reach containers
-        _ws_y = (-0.5, 0.5)
+              f"4-phase cycle (Pick→Transit→Place→Reset)"
+              f"{' [prefer_replan]' if args_cli.replan else ''}")
+        # Keep YAML disturbance.workspace_* — do not hardcode G1 pose here.
+        # B1 corridor reachability is tuned via workspace + reach_radius using
+        # measured g1_head_* telemetry, not comment-assumed head positions.
         _vx_b = 0.0
         _vy_b = 0.0
-        # Increase hand radius — protocol controls it per-phase.
-        if args_cli.virtual_hand <= 0.45:
-            virtual_hand.radius = 0.45  # TRANSIT default; PICK/PLACE override to 0.12
-            print(f"[phase3] Protocol: G1 workspace x∈[0.0,0.15], "
-                  f"hand radius per-phase (TRANSIT=0.30, PICK/PLACE=0.08)")
+        virtual_hand.proxy_radius = float(cfg.virtual_hand.transit_proxy_radius)
+        print(
+            f"[phase3] Protocol: workspace from YAML "
+            f"x∈[{_ws_x[0]:.2f},{_ws_x[1]:.2f}] y∈[{_ws_y[0]:.2f},{_ws_y[1]:.2f}]; "
+            f"reach_radius={virtual_hand.reach_radius:.2f}; "
+            f"proxy per-phase "
+            f"(TRANSIT={cfg.virtual_hand.transit_proxy_radius:.2f}, "
+            f"PICK/PLACE={cfg.virtual_hand.pick_place_proxy_radius:.2f}, "
+            f"RESET={cfg.virtual_hand.reset_proxy_radius:.2f})"
+        )
+        if bool(getattr(cfg.disturbance, "park_g1_at_workspace", False)):
+            print(
+                "[phase3] WARNING: park_g1_at_workspace is deprecated and ignored; "
+                "use disturbance.g1_spawn_x before gym.make"
+            )
+    _vh_phase_radii = {
+        "transit_proxy_radius": float(cfg.virtual_hand.transit_proxy_radius),
+        "pick_place_proxy_radius": float(cfg.virtual_hand.pick_place_proxy_radius),
+        "reset_proxy_radius": float(cfg.virtual_hand.reset_proxy_radius),
+        # Legacy kw aliases accepted by per_part_radius().
+        "transit_radius": float(cfg.virtual_hand.transit_proxy_radius),
+        "pick_place_radius": float(cfg.virtual_hand.pick_place_proxy_radius),
+        "reset_radius": float(cfg.virtual_hand.reset_proxy_radius),
+    }
+
+    # ── B2 dynamic lateral sweep (world-coordinate scripted proxy) ───────
+    dynamic_sweep: DynamicLateralSweepProxy | None = None
+    _enforcement_mode = str(args_cli.enforcement_mode or "active").lower()
+    if args_cli.dynamic_sweep and virtual_hand is not None and scen_hand is None:
+        if per_part is None:
+            print("[phase3] WARNING: --dynamic-sweep without per-part-protocol; "
+                  "phase triggers may not fire")
+        _ds = cfg.dynamic_sweep
+        _sweep_spec = DynamicSweepSpec(
+            start_xyz=tuple(float(x) for x in _ds.start_xyz),
+            end_xyz=tuple(float(x) for x in _ds.end_xyz),
+            duration_steps=int(_ds.duration_steps),
+            retreat_duration_steps=int(_ds.retreat_duration_steps),
+            trigger_phase=str(_ds.trigger_phase),
+            proxy_radius=float(cfg.virtual_hand.transit_proxy_radius),
+            ee_radius=0.08,
+            seed=int(_episode_seed),
+        )
+        dynamic_sweep = DynamicLateralSweepProxy(
+            spec=_sweep_spec,
+            control_dt=float(cfg.safety.control_dt),
+        )
+        _phase_radii_obj = PhaseProxyRadii.from_mapping(_vh_phase_radii)
+        _hard_stop_m = 0.25
+        _warn_m = 0.28
+        if not args_cli.no_safety:
+            try:
+                adapter._init_safety_layer()
+                if adapter._safety_config is not None:
+                    _hard_stop_m = float(adapter._safety_config.safe_dist_hard_stop)
+                    _warn_m = float(adapter._safety_config.safe_dist_warn)
+            except Exception as _geom_e:
+                print(f"[phase3] WARNING: safety init for geometry precheck failed: {_geom_e}")
+        print(
+            f"[phase3] Dynamic sweep proxy: "
+            f"start={_sweep_spec.start_xyz} end={_sweep_spec.end_xyz} "
+            f"dur={_sweep_spec.duration_steps} "
+            f"trajectory_id={dynamic_sweep.disturbance_trajectory_id[:16]}… "
+            f"enforcement={_enforcement_mode}"
+        )
+        _geom_report = sweep_geometry_precheck(
+            _sweep_spec,
+            phase_radii=_phase_radii_obj,
+            hard_stop_m=_hard_stop_m,
+            warn_m=_warn_m,
+        )
+        for _line in _geom_report.summary_lines():
+            print(f"[phase3] sweep_geometry: {_line}")
+        _geom_errors = _geom_report.startup_errors()
+        if _geom_errors:
+            for _ge in _geom_errors:
+                print(f"[phase3] FATAL sweep_geometry: {_ge}")
+            env.close()
+            simulation_app.close()
+            raise SystemExit(1)
+
     scripted_phases = SCENARIOS.get(args_cli.scenario) if args_cli.scenario else None
 
     # ── Approach-side presets: only when no protocol/scenario active ─────
@@ -483,16 +785,310 @@ def main():
         speed_moderate=cfg.disturbance.speed_moderate,
         speed_cautious=cfg.disturbance.speed_cautious,
         resample_interval=cfg.disturbance.resample_interval,
-        seed=42,
+        seed=_episode_seed,
         control_dt=cfg.safety.control_dt,
         vy_scale=cfg.disturbance.vy_scale,  # F1 fix: lateral exploration
         vy_bias=_vy_b,
         vx_bias=_vx_b,
     )
     metrics = EpisodeMetrics(episode_id=0)
+    metrics.safety_enforcement_mode = _enforcement_mode
+    if dynamic_sweep is not None:
+        metrics.disturbance_trajectory_id = dynamic_sweep.disturbance_trajectory_id
+        metrics.disturbance_source = "scripted_virtual_hand"
+    metrics.parts_total = ur10e.total_parts
+    if _spawn_record:
+        metrics.g1_spawn_requested_x = float(_spawn_record["g1_spawn_requested_x"])
+        metrics.g1_spawn_requested_y = float(_spawn_record["g1_spawn_requested_y"])
+        metrics.g1_spawn_requested_yaw = float(_spawn_record["g1_spawn_requested_yaw"])
+        metrics.spawn_pose_error = float(_seed_record.get("spawn_pose_error", float("nan")))
+    metrics.g1_root_initial_x = float(_root0[0])
+    metrics.g1_root_initial_y = float(_root0[1])
+    metrics.g1_root_initial_z = float(_root0[2])
+    metrics.g1_root_x = float(_root0[0])
+    metrics.g1_root_y = float(_root0[1])
+    metrics.g1_root_z = float(_root0[2])
     writer = MetricsWriter(args_cli.output_csv)
 
     # ── Per-step tracking CSV (R7: for replan strategy comparison) ────────
+    # §6.1: independent event CSV — written immediately on replan events, not on progress interval.
+    _event_path = args_cli.output_csv.replace(".csv", "_events.csv")
+    _event_fh = open(_event_path, "w")
+    _event_fh.write(EVENT_CSV_HEADER)
+    _trajectory_path = args_cli.output_csv.replace(".csv", "_trajectory.csv")
+    _trajectory_fh = open(_trajectory_path, "w") if dynamic_sweep is not None else None
+    _dynamic_audit_path = args_cli.output_csv.replace(".csv", "_dynamic_audit.csv")
+    _dynamic_audit_fh = (
+        open(_dynamic_audit_path, "w") if dynamic_sweep is not None else None
+    )
+    if _dynamic_audit_fh is not None:
+        _dynamic_audit_fh.write(DYNAMIC_AUDIT_HEADER)
+    if _trajectory_fh is not None:
+        _trajectory_fh.write(
+            "sim_step,disturbance_trajectory_id,sweep_attempt_id,sweep_progress,"
+            "proxy_center_x,proxy_center_y,proxy_center_z,"
+            "proxy_surface_x,proxy_surface_y,proxy_surface_z,"
+            "sweep_velocity_x,sweep_velocity_y,sweep_velocity_z\n"
+        )
+
+    def _gate_distance_audit() -> dict[str, str]:
+        """Distances / thresholds RuleEngine actually used (not proxy-only)."""
+        empty = {
+            "dist_m": "",
+            "warn_threshold": "",
+            "dist_min_for_gating": "",
+            "dist_min_envelope": "",
+            "dist_min_held": "",
+            "safe_dist_hard_stop_active": "",
+            "safe_dist_warn_active": "",
+        }
+        try:
+            gr = gate_result  # set each safety step
+        except NameError:
+            gr = None
+        meta = getattr(gr, "metadata", None) if gr is not None else None
+        if not isinstance(meta, dict):
+            meta = {}
+        out = dict(empty)
+
+        def _fmt(key: str, fallback=None) -> str:
+            val = meta.get(key, fallback)
+            if val is None or val == "":
+                return ""
+            try:
+                return f"{float(val):.4f}"
+            except (TypeError, ValueError):
+                return ""
+
+        out["dist_min_for_gating"] = _fmt("dist_min_for_gating")
+        out["dist_min_envelope"] = _fmt("dist_min_envelope")
+        out["dist_min_held"] = _fmt("dist_min_held")
+        out["safe_dist_hard_stop_active"] = _fmt("safe_dist_hard_stop_active")
+        out["safe_dist_warn_active"] = _fmt("safe_dist_warn_active")
+        # Canonical event distance = gating distance; fall back to adapter surface.
+        if out["dist_min_for_gating"]:
+            out["dist_m"] = out["dist_min_for_gating"]
+        else:
+            try:
+                if adapter is not None:
+                    out["dist_m"] = f"{float(adapter.closest_body_distance):.4f}"
+            except Exception:
+                pass
+        if out["safe_dist_warn_active"]:
+            out["warn_threshold"] = out["safe_dist_warn_active"]
+        else:
+            try:
+                if adapter is not None and adapter._safety_config is not None:
+                    out["warn_threshold"] = (
+                        f"{float(adapter._safety_config.safe_dist_warn):.4f}"
+                    )
+            except Exception:
+                pass
+        # Fill active thresholds from config if RuleEngine omitted them.
+        if not out["safe_dist_hard_stop_active"]:
+            try:
+                if adapter is not None and adapter._safety_config is not None:
+                    out["safe_dist_hard_stop_active"] = (
+                        f"{float(adapter._safety_config.safe_dist_hard_stop):.4f}"
+                    )
+            except Exception:
+                pass
+        return out
+
+    def _geom_snapshot() -> dict[str, str]:
+        """Best-effort geometry fields for event / step CSV audit rows."""
+        empty = {
+            "ee_x": "", "ee_y": "", "ee_z": "",
+            "proxy_center_x": "", "proxy_center_y": "", "proxy_center_z": "",
+            "proxy_surface_x": "", "proxy_surface_y": "", "proxy_surface_z": "",
+            "attractor_x": "", "attractor_y": "", "attractor_z": "",
+            "g1_head_x": "", "g1_head_y": "", "g1_head_z": "",
+            "reach_clamped": "",
+            "reach_radius_active": "", "proxy_radius_active": "",
+            "head_to_attractor_distance": "", "reach_margin": "",
+        }
+        try:
+            ee = ur10e_ee  # set each loop iteration
+        except NameError:
+            return empty
+        out = dict(empty)
+        out["ee_x"] = f"{float(ee[0]):.4f}"
+        out["ee_y"] = f"{float(ee[1]):.4f}"
+        out["ee_z"] = f"{float(ee[2]):.4f}"
+        try:
+            if adapter is not None:
+                surf = adapter.human_hand_pos
+                out["proxy_surface_x"] = f"{float(surf[0]):.4f}"
+                out["proxy_surface_y"] = f"{float(surf[1]):.4f}"
+                out["proxy_surface_z"] = f"{float(surf[2]):.4f}"
+        except Exception:
+            pass
+        if virtual_hand is not None:
+            ctr = virtual_hand.position
+            out["proxy_center_x"] = f"{float(ctr[0]):.4f}"
+            out["proxy_center_y"] = f"{float(ctr[1]):.4f}"
+            out["proxy_center_z"] = f"{float(ctr[2]):.4f}"
+            if dynamic_sweep is None:
+                attr = virtual_hand._attractor
+                out["attractor_x"] = f"{float(attr[0]):.4f}"
+                out["attractor_y"] = f"{float(attr[1]):.4f}"
+                out["attractor_z"] = "0.0000"
+                head = virtual_hand.head_position
+                out["g1_head_x"] = f"{float(head[0]):.4f}"
+                out["g1_head_y"] = f"{float(head[1]):.4f}"
+                out["g1_head_z"] = f"{float(head[2]):.4f}"
+                out["reach_clamped"] = "1" if virtual_hand.last_reach_clamped else "0"
+                out["reach_radius_active"] = f"{float(virtual_hand.reach_radius):.4f}"
+                out["proxy_radius_active"] = f"{float(virtual_hand.proxy_radius):.4f}"
+                out["head_to_attractor_distance"] = (
+                    f"{virtual_hand.head_to_attractor_distance():.4f}"
+                )
+                out["reach_margin"] = f"{virtual_hand.reach_margin():.4f}"
+            else:
+                if _sweep_out is not None:
+                    out["proxy_radius_active"] = (
+                        f"{float(_sweep_out.active_proxy_radius):.4f}"
+                    )
+                else:
+                    out["proxy_radius_active"] = (
+                        f"{float(virtual_hand.proxy_radius):.4f}"
+                    )
+        return out
+
+    def _write_event(
+        sim_step: int,
+        event_type: str,
+        attempt_id: int,
+        event_id: str = "",
+        trigger_rule: str = "",
+        trigger_source: str = "",
+        applied_step: str = "",
+        slow_streak_length: int | str = "",
+        *,
+        sweep_attempt_id: str = "",
+        sweep_progress: str = "",
+        sweep_velocity_xyz: tuple[float, float, float] | list[float] | None = None,
+        safety_enforcement_mode: str = "",
+        shadow_gate_decision: str = "",
+        shadow_replan_would_trigger: bool | None = None,
+    ) -> None:
+        _phase = (
+            per_part.phase.value if per_part is not None else ""
+        )
+        _stage = ""
+        try:
+            _stage = ur10e.stage_name
+        except Exception:
+            _stage = ""
+        d = _gate_distance_audit()
+        g = _geom_snapshot()
+        _streak = (
+            "" if slow_streak_length == "" or slow_streak_length is None
+            else str(int(slow_streak_length))
+        )
+        try:
+            _gr = gate_result
+            _gate_meta = getattr(_gr, "metadata", None) if _gr is not None else None
+        except NameError:
+            _gate_meta = None
+        _mode = safety_enforcement_mode or _enforcement_mode
+        _shadow_dec = shadow_gate_decision
+        if not _shadow_dec:
+            try:
+                _shadow_dec = _shadow_gate_decision_this_step or ""
+            except NameError:
+                _shadow_dec = ""
+        _shadow_would = shadow_replan_would_trigger
+        if _shadow_would is None:
+            try:
+                _shadow_would = bool(_shadow_replan_would_this_step)
+            except NameError:
+                _shadow_would = False
+        _sw_id = sweep_attempt_id
+        _sw_prog = sweep_progress
+        _sw_vel = sweep_velocity_xyz
+        if not _sw_id and dynamic_sweep is not None:
+            try:
+                if _sweep_out is not None and _sweep_out.sweep_attempt_id > 0:
+                    _sw_id = str(_sweep_out.sweep_attempt_id)
+                    _sw_prog = f"{_sweep_out.sweep_progress:.6f}"
+                    _sw_vel = tuple(float(x) for x in _sweep_out.surface_vel_xyz)
+            except NameError:
+                pass
+        row = build_event_row(
+            sim_step=sim_step,
+            event_type=event_type,
+            attempt_id=attempt_id,
+            event_id=event_id,
+            trigger_rule=trigger_rule,
+            trigger_source=trigger_source,
+            applied_step=applied_step,
+            protocol_phase=_phase,
+            stage_name=_stage,
+            gate_audit=d,
+            geom=g,
+            slow_streak_length=_streak,
+            gate_metadata=_gate_meta if isinstance(_gate_meta, dict) else None,
+            control_dt=float(cfg.safety.control_dt),
+            sweep_attempt_id=_sw_id,
+            sweep_progress=_sw_prog,
+            sweep_velocity_xyz=_sw_vel,
+            safety_enforcement_mode=_mode,
+            shadow_gate_decision=_shadow_dec,
+            shadow_replan_would_trigger=bool(_shadow_would),
+        )
+        _event_fh.write(format_event_row(row))
+        _event_fh.flush()
+
+    def _write_dynamic_audit(sim_step: int) -> None:
+        """Per-TRANSIT-step sweep audit using post-gate values."""
+        if _dynamic_audit_fh is None or dynamic_sweep is None or _sweep_out is None:
+            return
+        if per_part is None or per_part.phase.value != "transit":
+            return
+        _meta = getattr(gate_result, "metadata", {}) if gate_result is not None else {}
+        if not isinstance(_meta, dict):
+            _meta = {}
+        _gate_audit = _gate_distance_audit()
+        _phase = per_part.phase.value
+        _trigger_rule = str(_meta.get("trigger_rule", "") or "")
+        _speed = float(np.linalg.norm(adapter.human_hand_vel)) if adapter is not None else 0.0
+        row = build_dynamic_audit_row(
+            sim_step=sim_step,
+            policy_step=ur10e.time_step,
+            protocol_phase=_phase,
+            stage_name=ur10e.stage_name,
+            disturbance_attempt_id=_disturbance_attempt_id,
+            disturbance_trajectory_id=dynamic_sweep.disturbance_trajectory_id,
+            gate_decision=gate_decision.name if gate_decision is not None else "NONE",
+            trigger_rule=_trigger_rule,
+            sweep_progress=_sweep_out.sweep_progress,
+            ee_x=ur10e_ee[0],
+            ee_y=ur10e_ee[1],
+            ee_z=ur10e_ee[2],
+            proxy_center_x=_sweep_out.center_xyz[0],
+            proxy_center_y=_sweep_out.center_xyz[1],
+            proxy_center_z=_sweep_out.center_xyz[2],
+            proxy_surface_x=_sweep_out.surface_xyz[0],
+            proxy_surface_y=_sweep_out.surface_xyz[1],
+            proxy_surface_z=_sweep_out.surface_xyz[2],
+            surface_velocity_x=_sweep_out.surface_vel_xyz[0],
+            surface_velocity_y=_sweep_out.surface_vel_xyz[1],
+            surface_velocity_z=_sweep_out.surface_vel_xyz[2],
+            hand_speed=_speed,
+            dist_min_proxy=adapter.closest_body_distance if adapter is not None else float("inf"),
+            dist_min_for_gating=_gate_audit["dist_min_for_gating"],
+            dist_min_envelope=_gate_audit["dist_min_envelope"],
+            dist_min_held=_gate_audit["dist_min_held"],
+            hard_stop_active=_gate_audit["safe_dist_hard_stop_active"],
+            warn_active=_gate_audit["safe_dist_warn_active"],
+            ttc_s=_meta.get("ttc"),
+            ttc_forecast_s=_meta.get("ttc_forecast_s"),
+            approach_rate=_meta.get("approach_rate"),
+        )
+        _dynamic_audit_fh.write(format_dynamic_audit_row(row))
+        _dynamic_audit_fh.flush()
+
     _track_path = args_cli.output_csv.replace(".csv", "_steps.csv")
     _track_fh = open(_track_path, "w")
     _track_fh.write("step,ee_x,ee_y,ee_z,hand_x,hand_y,hand_z,hand_dist_surface,"
@@ -501,7 +1097,24 @@ def main():
                     "grasp_rewinds,carry_aborted,"
                     "min_part_z,parts_below_table,"
                     "deadlock_tier,vhand_retreated,vhand_block_active,"
-                    "sphere_x,sphere_y,sphere_z,protocol_phase,protocol_part\n")
+                    "sphere_x,sphere_y,sphere_z,protocol_phase,protocol_part,"
+                    "disturbance_source,disturbance_scenario,disturbance_attempt_id,"
+                    "gate_trigger_source,replan_trigger_source,"
+                    "replan_trigger_step,replan_event_id,replan_applied_step,"
+                    "closest_g1_body,dist_min_g1_body,dist_min_proxy,"
+                    "warn_threshold_active,"
+                    "dist_min_for_gating,dist_min_envelope,dist_min_held,"
+                    "safe_dist_hard_stop_active,safe_dist_warn_active,"
+                    "proxy_center_x,proxy_center_y,proxy_center_z,"
+                    "proxy_surface_x,proxy_surface_y,proxy_surface_z,"
+                    "attractor_x,attractor_y,attractor_z,"
+                    "g1_head_x,g1_head_y,g1_head_z,"
+                    "reach_clamped,slow_streak_length,"
+                    "reach_radius_active,proxy_radius_active,"
+                    "head_to_attractor_distance,reach_margin,"
+                    "g1_root_x,g1_root_y,g1_root_z,g1_tilt_rad,"
+                    "g1_spawn_requested_x,g1_spawn_requested_y,g1_spawn_requested_yaw,"
+                    "spawn_pose_error\n")
 
     # ── VLM navigation (Phase 6) ──────────────────────────────────────────
     vlm_client: G1VLMClient | None = None
@@ -567,13 +1180,10 @@ def main():
             adapter._init_safety_layer()
             sc = adapter._safety_config
             sc.envelope.gating_enabled = True
-            # R7 aggressive thresholds: simulation has no real human — shrink
-            # STOP zone so UR10e spends more time in SLOW_DOWN (replan) vs STOP (freeze).
-            sc.safe_dist_hard_stop = 0.05    # was 0.13 — only STOP when nearly touching
-            sc.safe_dist_warn = 0.25         # was 0.16 — 0.20m warn band for replan accumulation
-            sc.ttc.ttc_threshold = 0.2       # was 0.5s — only STOP on very fast approaches
-            sc.ttc.ttc_warn_threshold = 0.8  # was 1.5s — warn earlier for replan
-            print(f"[phase3] Aggressive safety thresholds: "
+            # Use YAML config values directly (no hidden overrides).
+            # The --config YAML controls safety thresholds; paper scenarios
+            # use explicit config_path to safety_fusion.yaml or safety_layer1.yaml.
+            print(f"[phase3] Safety thresholds from config: "
                   f"hard_stop={sc.safe_dist_hard_stop:.2f}m "
                   f"warn={sc.safe_dist_warn:.2f}m "
                   f"TTC_stop={sc.ttc.ttc_threshold:.1f}s")
@@ -633,9 +1243,19 @@ def main():
                     detour_stage_duration=cfg.safety.replan.detour_duration,
                     replan_trigger_threshold=cfg.safety.replan.trigger_threshold,
                     ttc_replan_trigger_threshold=4,  # TTC replan triggers faster than static
+                    ttc_forecast_replan_threshold=(
+                        1.0 if cfg.dynamic_sweep.enabled else None
+                    ),
+                    held_critical_replan_enabled=bool(
+                        cfg.safety.replan.held_critical_replan_enabled
+                    ),
                 )
             )
-            print("[phase3] Motion replan enabled (GMRobot L1WarnReplanTrigger + GeometryReplanV0)")
+            print(
+                "[phase3] Motion replan enabled (GMRobot L1WarnReplanTrigger + "
+                f"GeometryReplanV0); held_critical_replan="
+                f"{bool(cfg.safety.replan.held_critical_replan_enabled)}"
+            )
         except Exception as e:
             print(f"[phase3] WARNING: --replan passed but replan init failed: {e}. "
                   "Replan disabled.")
@@ -651,9 +1271,18 @@ def main():
     consecutive_gate_count: int = 0        # F09 — consecutive non-ALLOW steps
     disturbance_active: bool = False       # D-group — G1 in CAUTIOUS/MODERATE
     disturbance_start_step: int = 0        # D-group — step when disturbance began
+    _disturbance_attempt_id: int = 0       # §6.1 — incremented on each new disturbance activation
     last_vlm_decision: dict = {}          # H-group — most recent VLM output
     replan_last_success: bool = False     # F07
     replan_last_failure_reason: str = ""  # F08
+    _replan_applied_this_step: bool = False  # §6.1 edge: True only on the step apply() succeeds
+    _replan_event_id: int = 0            # §6.1: unique per replan correlation chain
+    _pending_dynamic_retreat_event_id: int = 0  # B2: retreat next step shares trigger/applied id
+    _replan_trigger_step: int = -1       # §6.1: sim step when trigger fired
+    _replan_trigger_rule: str = ""       # §6.1: rule that triggered replan
+    _replan_applied_step: int = -1       # §6.1: sim step when replan was applied
+    _pending_replan_attr: object = None  # ReplanAttribution captured at trigger
+    _applied_replan_attr: object = None  # attribution consumed on successful apply
     _vlm_replan_strategy: str = ""        # R7: VLM-coordinated replan hint
     _last_replan_strategy: str = ""       # R7: for tracking CSV
     _last_replan_raise: float = 0.0
@@ -661,6 +1290,8 @@ def main():
 
     # ── Virtual-hand retreat/re-deploy ──────────────────────────────────
     vhand_retreated: bool = False              # hand currently pulled back
+    retreat_event_this_step: bool = False
+    redeploy_event_this_step: bool = False
     vhand_retreat_steps: int = max(0, args_cli.vhand_retreat)  # STOP timeout (0=never)
     vhand_last_stage_key: str = ""             # detect stage transitions
     # R7 deadlock fix: after re-deploy, block another retreat for N steps so
@@ -696,6 +1327,18 @@ def main():
               "permanently — there is no other escape path.")
     vhand_smoothed: np.ndarray | None = None   # R5 M3: lag-filtered attractor (was main._vhand_smoothed)
     tilt_warned: bool = False                  # R5 M3: tilt warning already emitted (was main._tilt_warned)
+    _prev_protocol_phase: str = ""             # detect per-part phase transitions for retreat events
+    _safety_sc: object = None                  # P1: cached safety config for step CSV warn threshold
+    retreat_event_this_step: bool = False      # P0-2: one-shot edge for metrics (not long-lived latch)
+    _in_transit_prev: bool = False             # TRANSIT SLOW-streak telemetry
+    _shadow_gate_decision_this_step: str = ""
+    _shadow_replan_would_this_step: bool = False
+    _replan_dist_at_trigger: float = float("inf")
+    _replan_hard_at_trigger: float = float("inf")
+    _replan_gate_at_trigger: str = ""
+    _replan_rule_at_trigger: str = ""
+    _sweep_out = None
+    _prev_sweep_retreating: bool = False  # P0-10: lifecycle RETREATING edge
 
     # ── Mode override ────────────────────────────────────────────────────
     mode_override: DisturbanceMode | None = None
@@ -722,7 +1365,18 @@ def main():
     _safety_import_error: str = ""
 
     gate_decision = None  # initialised before first use (deadlock check)
+    _g1_root_now = np.asarray(_root0, dtype=np.float64).copy()
+    g1_tilt = 0.0
     for step in range(max_steps):
+        # §6.1: unconditionally clear replan edge at start of each step.
+        _replan_applied_this_step = False
+        _replan_trigger_rule = ""
+        _applied_replan_attr = None
+        _shadow_gate_decision_this_step = ""
+        _shadow_replan_would_this_step = False
+        _sweep_out = None
+        retreat_event_this_step = False
+        redeploy_event_this_step = False
         # ── 1. Read robot state ───────────────────────────────────────
         g1_root = g1.data.root_pos_w[0].cpu().numpy()
         ur10e_ee = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
@@ -930,6 +1584,9 @@ def main():
         # Caveat: in scenario-hand mode the scenario hand IS the obstacle that
         # matters — update after the scenario handler writes closest_body_distance.
         _body_distance_for_grasp = adapter.closest_body_distance
+        # §6.1: cache the real G1 body name BEFORE virtual hand overrides it.
+        _g1_closest_body_name = adapter.closest_body_name
+        _g1_closest_body_dist = adapter.closest_body_distance
 
         # R7: permanent virtual-hand removal after N steps.
         # Lets the UR10e finish its pick-and-place cycle undisturbed.
@@ -1002,121 +1659,257 @@ def main():
 
         if virtual_hand is not None and scen_hand is None:
             head_pos = g1.data.body_link_pos_w[0, _d435_body_idx].cpu().numpy()
-            # ── Per-part protocol: phase-driven attractor + radius ─────
-            if per_part is not None:
-                stage = ur10e.stage_name
-                per_part.update(stage, ur10e_ee, head_pos, ur10e.is_grasping)
-                attr = per_part.attractor_xy
-                if attr is not None:
-                    virtual_hand._attractor = attr.astype(np.float32)
-                else:
-                    # RESET phase — retreat hand to G1 head.
-                    virtual_hand._attractor = head_pos[:2].copy()
-                # Phase-dependent radius: small during PICK/PLACE (hand near
-                # EE must not engulf it), medium during TRANSIT (block path).
-                if per_part.phase == Phase.TRANSIT:
-                    virtual_hand.radius = 0.30   # R7: from G1 at x∈[0,0.15], hand reaches x=0.30-0.45
-                    # Attractor: fixed offset from G1 head toward containers.
-                    # head_x+0.12 keeps hand surface in warn band (0.13-0.40m)
-                    # regardless of G1's exact position.
-                    virtual_hand._attractor = np.array(
-                        [head_pos[0] + 0.12, virtual_hand._attractor[1]], dtype=np.float32)
-                elif per_part.phase in (Phase.PICK, Phase.PLACE):
-                    virtual_hand.radius = 0.08   # minimal — hand present but can't engulf EE
-                # RESET: keep current radius (hand is retreated anyway)
-                # G1 positioning: let the disturbance controller's boundary
-                # steer handle workspace limits naturally.  The workspace
-                # x∈[-0.1,0.2] already keeps G1 at a safe distance.
-                # R7: hand velocity for TTC.  Zero during static phases
-                # (approach/hold/retreat/home) so SLOW_DOWN accumulates for
-                # replan without TTC jumping to STOP.  Inject real velocity
-                # only during track_ee/strike for speed-aware rule testing.
-                _zero_vel = True
-                if scen_hand is not None:
-                    _act = scen_hand._lookup(scen_hand._sim_time)[0]
-                    _zero_vel = _act in ("approach", "hold", "retreat", "home")
-                if hasattr(virtual_hand, '_prev_world_pos') and not _zero_vel:
-                    adapter.human_hand_vel = (
-                        (virtual_hand._world_pos - virtual_hand._prev_world_pos)
-                        / cfg.safety.control_dt
-                    ).astype(np.float32)
-                else:
+            if dynamic_sweep is not None:
+                # ── B2: world-coordinate scripted lateral sweep ─────────
+                _cur_phase = "reset"
+                if per_part is not None:
+                    stage = ur10e.stage_name
+                    per_part.update(stage, ur10e_ee, head_pos, ur10e.is_grasping)
+                    _cur_phase = per_part.phase.value
+                    _was_retreated = vhand_retreated
+                    _attempt_has_retreat = (
+                        _disturbance_attempt_id > 0
+                        and _disturbance_attempt_id in metrics._attempt_recoveries
+                        and metrics._attempt_recoveries[_disturbance_attempt_id].retreat_step >= 0
+                    )
+                    vhand_retreated, _proto_retreat_edge = protocol_retreat_transition(
+                        _prev_protocol_phase, _cur_phase, vhand_retreated,
+                        prefer_replan=True,
+                        timed_out=bool(per_part.phase_entered_via_timeout),
+                        attempt_already_retreated=_attempt_has_retreat,
+                    )
+                    if _proto_retreat_edge and _enforcement_mode == "active":
+                        retreat_event_this_step = True
+                        _write_event(
+                            step, "retreat", _disturbance_attempt_id,
+                            trigger_rule="protocol",
+                            trigger_source="scripted_virtual_hand",
+                        )
+                    elif (
+                        _was_retreated
+                        and not vhand_retreated
+                        and _enforcement_mode == "active"
+                        and attempt_needs_canonical_redeploy(
+                            metrics._attempt_recoveries, _disturbance_attempt_id
+                        )
+                    ):
+                        # Protocol latch clear only if this attempt has no
+                        # canonical redeploy yet (RETREATING→IDLE is preferred).
+                        redeploy_event_this_step = True
+                        _write_event(
+                            step, "redeploy", _disturbance_attempt_id,
+                            trigger_rule="protocol",
+                            trigger_source="scripted_virtual_hand",
+                        )
+                    _prev_protocol_phase = _cur_phase
+                _sweep_out = dynamic_sweep.step(
+                    protocol_phase=_cur_phase,
+                    ee_pos=ur10e_ee,
+                    enforcement_mode=_enforcement_mode,
+                    replan_applied_this_step=bool(
+                        _replan_applied_this_step and _enforcement_mode == "active"
+                    ),
+                    phase_radii=_phase_radii_obj,
+                )
+                if _sweep_out.attempt_started:
+                    _disturbance_attempt_id = max(
+                        _disturbance_attempt_id, _sweep_out.sweep_attempt_id
+                    )
+                from dynamic_sweep_proxy import SweepLifecycle
+                # Canonical recovery redeploy: lifecycle RETREATING→IDLE only.
+                # Do not key off the protocol latch — PLACE→RESET may re-assert
+                # retreated when attempt_already_retreated (would double-count).
+                _sweep_retreating = (
+                    _sweep_out.lifecycle == SweepLifecycle.RETREATING
+                )
+                if (
+                    dynamic_sweep_redeploy_edge(
+                        _prev_sweep_retreating,
+                        _sweep_retreating,
+                        already_emitted=redeploy_event_this_step,
+                    )
+                    and _enforcement_mode == "active"
+                ):
+                    _open_aid = find_open_attempt_id(metrics._attempt_recoveries)
+                    _redeploy_aid = (
+                        _open_aid if _open_aid > 0 else _disturbance_attempt_id
+                    )
+                    if attempt_needs_canonical_redeploy(
+                        metrics._attempt_recoveries, _redeploy_aid
+                    ):
+                        redeploy_event_this_step = True
+                        _write_event(
+                            step, "redeploy", _redeploy_aid,
+                            trigger_rule="protocol",
+                            trigger_source="scripted_virtual_hand",
+                        )
+                _prev_sweep_retreating = _sweep_retreating
+                vhand_retreated = _sweep_retreating
+                if _sweep_out.retreat_started and _enforcement_mode == "active":
+                    retreat_event_this_step = True
+                    metrics.note_transit_replan()
+                    metrics.note_retreat(
+                        attempt_id=_disturbance_attempt_id,
+                        sim_step=step,
+                        policy_step=ur10e.time_step,
+                        parts_placed=ur10e.parts_placed,
+                    )
+                    _write_event(
+                        step, "retreat", _disturbance_attempt_id,
+                        event_id=(
+                            str(_pending_dynamic_retreat_event_id)
+                            if _pending_dynamic_retreat_event_id > 0
+                            else ""
+                        ),
+                        trigger_rule="replan",
+                        trigger_source="scripted_virtual_hand",
+                        applied_step=str(step),
+                    )
+                    _pending_dynamic_retreat_event_id = 0
+                virtual_hand._world_pos = _sweep_out.center_xyz.copy()
+                virtual_hand.proxy_radius = float(_sweep_out.active_proxy_radius)
+                adapter.human_hand_pos = _sweep_out.surface_xyz.astype(np.float32)
+                adapter.human_hand_vel = _sweep_out.surface_vel_xyz.astype(np.float32)
+                adapter.closest_body_distance = float(_sweep_out.surface_distance)
+                adapter.closest_body_name = "scripted_virtual_hand"
+                if per_part is not None and per_part.phase == Phase.RESET:
+                    adapter.human_hand_pos = np.array([0.0, 0.0, 2.0], dtype=np.float32)
                     adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
-                virtual_hand._prev_world_pos = virtual_hand._world_pos.copy()
-                # Log phase transitions.
-                if step % ival == 0:
-                    p = per_part
-                    print(f"  [protocol] part={p.part_index+1}/{p.parts_total} "
-                          f"phase={p.phase.value:7s} "
-                          f"step_in_phase={p.state.step_in_phase} "
-                          f"attr={attr}")
-            # Attractor with optional lag.
-            if args_cli.vhand_lag > 0:
-                if vhand_smoothed is None:
-                    vhand_smoothed = ur10e_ee[:2].copy()
-                alpha = 1.0 - args_cli.vhand_lag
-                vhand_smoothed = (alpha * ur10e_ee[:2] +
-                                  (1.0 - alpha) * vhand_smoothed)
-                virtual_hand._attractor = vhand_smoothed.copy()
+                    adapter.closest_body_distance = 999.0
+                    adapter.closest_body_name = "protocol_reset"
+                if _trajectory_fh is not None and _sweep_out.sweep_attempt_id > 0:
+                    _log_traj = (
+                        dynamic_sweep.first_intervention_step is None
+                        or step <= dynamic_sweep.first_intervention_step
+                    )
+                    if _log_traj:
+                        row = commanded_trajectory_row(
+                            sim_step=step,
+                            output=_sweep_out,
+                            disturbance_trajectory_id=dynamic_sweep.disturbance_trajectory_id,
+                        )
+                        _trajectory_fh.write(
+                            ",".join(row[c] for c in (
+                                "sim_step", "disturbance_trajectory_id", "sweep_attempt_id",
+                                "sweep_progress", "proxy_center_x", "proxy_center_y",
+                                "proxy_center_z", "proxy_surface_x", "proxy_surface_y",
+                                "proxy_surface_z", "sweep_velocity_x", "sweep_velocity_y",
+                                "sweep_velocity_z",
+                            )) + "\n"
+                        )
+                        _trajectory_fh.flush()
             else:
-                virtual_hand._attractor = ur10e_ee[:2].copy()
-            # R7 deadlock hysteresis: during cooldown, pull attractor away from EE.
-            if _dl_hysteresis_steps > 0:
-                to_ee_xy = virtual_hand._attractor - ur10e_ee[:2]
-                d_xy = float(np.linalg.norm(to_ee_xy))
-                if d_xy < _DL_HYSTERESIS_DIST:
-                    if d_xy > 1e-6:
-                        virtual_hand._attractor = ur10e_ee[:2] + (to_ee_xy / d_xy) * _DL_HYSTERESIS_DIST
+                # ── Per-part protocol: phase-driven attractor + radius ─────
+                if per_part is not None:
+                    stage = ur10e.stage_name
+                    per_part.update(stage, ur10e_ee, head_pos, ur10e.is_grasping)
+                    _cur_phase = per_part.phase.value
+                    virtual_hand._attractor = resolve_per_part_attractor(
+                        phase=_cur_phase,
+                        protocol_attractor_xy=per_part.attractor_xy,
+                        head_xy=head_pos[:2],
+                        ee_xy=ur10e_ee[:2],
+                    )
+                    virtual_hand.proxy_radius = per_part_radius(_cur_phase, **_vh_phase_radii)
+                    adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
+                    virtual_hand._prev_world_pos = virtual_hand._world_pos.copy()
+                    _was_retreated = vhand_retreated
+                    _attempt_has_retreat = (
+                        _disturbance_attempt_id > 0
+                        and _disturbance_attempt_id in metrics._attempt_recoveries
+                        and metrics._attempt_recoveries[_disturbance_attempt_id].retreat_step >= 0
+                    )
+                    vhand_retreated, _proto_retreat_edge = protocol_retreat_transition(
+                        _prev_protocol_phase, _cur_phase, vhand_retreated,
+                        prefer_replan=bool(args_cli.replan),
+                        timed_out=bool(per_part.phase_entered_via_timeout),
+                        attempt_already_retreated=_attempt_has_retreat,
+                    )
+                    if _proto_retreat_edge:
+                        retreat_event_this_step = True
+                        _write_event(
+                            step, "retreat", _disturbance_attempt_id,
+                            trigger_rule="protocol",
+                            trigger_source=_resolve_disturbance_source(args_cli, virtual_hand),
+                        )
+                        if step % ival == 0:
+                            print(f"  [protocol] RETREAT: {_prev_protocol_phase}→{_cur_phase} "
+                                  f"at step {step}, policy_step={ur10e.time_step}")
+                    elif _was_retreated and not vhand_retreated:
+                        redeploy_event_this_step = True
+                        _write_event(
+                            step, "redeploy", _disturbance_attempt_id,
+                            trigger_rule="protocol",
+                            trigger_source=_resolve_disturbance_source(args_cli, virtual_hand),
+                        )
+                        if step % ival == 0:
+                            print(f"  [protocol] RE-DEPLOY: {_prev_protocol_phase}→{_cur_phase} "
+                                  f"at step {step}")
+                    _prev_protocol_phase = _cur_phase
+                    if step % ival == 0:
+                        p = per_part
+                        print(f"  [protocol] part={p.part_index+1}/{p.parts_total} "
+                              f"phase={p.phase.value:7s} "
+                              f"step_in_phase={p.state.step_in_phase} "
+                              f"attr={virtual_hand._attractor} "
+                              f"retreated={vhand_retreated}")
+                if per_part is None:
+                    if args_cli.vhand_lag > 0:
+                        if vhand_smoothed is None:
+                            vhand_smoothed = ur10e_ee[:2].copy()
+                        alpha = 1.0 - args_cli.vhand_lag
+                        vhand_smoothed = (alpha * ur10e_ee[:2] +
+                                          (1.0 - alpha) * vhand_smoothed)
+                        virtual_hand._attractor = vhand_smoothed.copy()
                     else:
-                        virtual_hand._attractor = ur10e_ee[:2] + np.array([_DL_HYSTERESIS_DIST, 0.0])
-            virtual_hand.step(cfg.safety.control_dt, head_pos, ee_z=ur10e_ee[2])
+                        virtual_hand._attractor = ur10e_ee[:2].copy()
+                    if _dl_hysteresis_steps > 0:
+                        to_ee_xy = virtual_hand._attractor - ur10e_ee[:2]
+                        d_xy = float(np.linalg.norm(to_ee_xy))
+                        if d_xy < _DL_HYSTERESIS_DIST:
+                            if d_xy > 1e-6:
+                                virtual_hand._attractor = (
+                                    ur10e_ee[:2] + (to_ee_xy / d_xy) * _DL_HYSTERESIS_DIST
+                                )
+                            else:
+                                virtual_hand._attractor = (
+                                    ur10e_ee[:2] + np.array([_DL_HYSTERESIS_DIST, 0.0])
+                                )
+                virtual_hand.step(cfg.safety.control_dt, head_pos, ee_z=ur10e_ee[2])
 
-            # ── Retreat override (BEFORE safety gate) ──
-            # When retreated, the safety gate must see a safe hand position
-            # on the very next step — not one step later.  We override
-            # BEFORE evaluate_safety so there is zero delay.
-            if vhand_retreated:
-                head_pos_safe = head_pos.copy()
-                head_pos_safe[2] += _HEAD_Z_OFFSET
-                adapter.human_hand_pos = head_pos_safe
-                adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
-                adapter.closest_body_distance = float(
-                    np.linalg.norm(head_pos_safe - ur10e_ee)
-                )
-                adapter.closest_body_name = "virtual_hand_retreated"
-            else:
-                # R6 C1 fix: project hand position to the sphere SURFACE so
-                # the safety gate sees surface-to-surface distance, not
-                # centre-to-centre.  A 0.45 m radius sphere has its surface
-                # 0.45 m closer to the EE than its centre — without this
-                # projection, SLOW_DOWN only fires after the EE has already
-                # penetrated 0.23 m into the sphere.
-                sphere_center = virtual_hand.position
-                to_ee = ur10e_ee - sphere_center
-                center_dist = float(np.linalg.norm(to_ee))
-                if center_dist > 1e-6:
-                    surface_point = sphere_center + (to_ee / center_dist) * virtual_hand.radius
+                if vhand_retreated:
+                    head_pos_safe = head_pos.copy()
+                    head_pos_safe[2] += _HEAD_Z_OFFSET
+                    adapter.human_hand_pos = head_pos_safe
+                    adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
+                    adapter.closest_body_distance = float(
+                        np.linalg.norm(head_pos_safe - ur10e_ee)
+                    )
+                    adapter.closest_body_name = "virtual_hand_retreated"
                 else:
-                    surface_point = sphere_center
-                adapter.human_hand_pos = surface_point
-                adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
-                adapter.closest_body_distance = max(
-                    0.0,
-                    center_dist - virtual_hand.radius - adapter._ee_radius,
-                )
-                adapter.closest_body_name = "virtual_hand"
+                    sphere_center = virtual_hand.position
+                    _proxy_r = float(virtual_hand.proxy_radius)
+                    to_ee = ur10e_ee - sphere_center
+                    center_dist = float(np.linalg.norm(to_ee))
+                    if center_dist > 1e-6:
+                        surface_point = sphere_center + (to_ee / center_dist) * _proxy_r
+                    else:
+                        surface_point = sphere_center
+                    adapter.human_hand_pos = surface_point
+                    adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
+                    adapter.closest_body_distance = max(
+                        0.0,
+                        center_dist - _proxy_r - adapter._ee_radius,
+                    )
+                    adapter.closest_body_name = "virtual_hand"
 
-            # ── Protocol RESET: instant hand removal at safety-gate level ──
-            # The virtual hand sphere still drifts toward G1's head, but the
-            # safety gate sees the hand at a safe distance immediately.  This
-            # breaks the STOP deadlock without waiting for the sphere to move.
-            if per_part is not None and per_part.phase == Phase.RESET:
-                adapter.human_hand_pos = np.array([0.0, 0.0, 2.0], dtype=np.float32)
-                adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
-                adapter.human_torso_pos = np.array([0.0, 0.0, 2.0], dtype=np.float32)
-                adapter.human_torso_vel = np.zeros(3, dtype=np.float32)
-                adapter.closest_body_distance = 999.0
-                adapter.closest_body_name = "protocol_reset"
+                if per_part is not None and per_part.phase == Phase.RESET:
+                    adapter.human_hand_pos = np.array([0.0, 0.0, 2.0], dtype=np.float32)
+                    adapter.human_hand_vel = np.zeros(3, dtype=np.float32)
+                    adapter.human_torso_pos = np.array([0.0, 0.0, 2.0], dtype=np.float32)
+                    adapter.human_torso_vel = np.zeros(3, dtype=np.float32)
+                    adapter.closest_body_distance = 999.0
+                    adapter.closest_body_name = "protocol_reset"
 
         # ── Visual debug: sphere + stick at the hand position ──
         if step % 5 == 0:
@@ -1132,7 +1925,12 @@ def main():
         # Detects the positive-feedback deadlock: hand close → STOP → EE
         # frozen → hand stays near EE → STOP persists.  Three conditions
         # must ALL hold.  Escalation: jitter → repel → G1 retreat.
-        if virtual_hand is not None and gate_decision is not None:
+        # Shadow mode must not mutate proxy / protocol from evaluated STOP.
+        if (
+            virtual_hand is not None
+            and gate_decision is not None
+            and _enforcement_mode != "shadow"
+        ):
             # Update sliding windows.
             _DL_EE_HISTORY.append(ur10e_ee.copy())
             _DL_DIST_HISTORY.append(adapter.closest_body_distance)
@@ -1180,7 +1978,7 @@ def main():
                         adapter.human_hand_pos = adapter.human_hand_pos + jitter
                         adapter.closest_body_distance = max(0.0,
                             float(np.linalg.norm(adapter.human_hand_pos - ur10e_ee))
-                            - virtual_hand.radius - adapter._ee_radius)
+                            - virtual_hand.proxy_radius - adapter._ee_radius)
                         if step % ival == 0:
                             print(f"  [deadlock] L1 JITTER tier={_dl_escape_tier} "
                                   f"ee_var={ee_var:.6f} dist_var={dist_var:.6f}")
@@ -1192,7 +1990,7 @@ def main():
                             adapter.human_hand_pos = adapter.human_hand_pos - (to_ee / d) * 0.5
                         adapter.closest_body_distance = max(0.0,
                             float(np.linalg.norm(adapter.human_hand_pos - ur10e_ee))
-                            - virtual_hand.radius - adapter._ee_radius)
+                            - virtual_hand.proxy_radius - adapter._ee_radius)
                         _dl_hysteresis_steps = _DL_HYSTERESIS_STEPS_REQ
                         if step % ival == 0:
                             print(f"  [deadlock] L2 REPEL tier={_dl_escape_tier} pushed hand 0.5m away")
@@ -1229,7 +2027,7 @@ def main():
                             adapter.human_hand_pos = adapter.human_hand_pos - push
                             adapter.closest_body_distance = max(0.0,
                                 float(np.linalg.norm(adapter.human_hand_pos - ur10e_ee))
-                                - virtual_hand.radius - adapter._ee_radius)
+                                - virtual_hand.proxy_radius - adapter._ee_radius)
 
         # ── Arm length range clamp ──────────────────────────────────────
         # Clamp hand-to-head distance to [length_min, length_max] when
@@ -1292,43 +2090,77 @@ def main():
                     held_object_active=ur10e.is_grasping,
                     dist_for_gating=adapter.closest_body_distance,
                     proposed_ee_pos=ur10e_proposed[:3],
-                    # R7 H5 fix: pass dist_min_held to enable held-critical STOP
-                    # and held-aware replan trigger paths in the RuleEngine.
-                    # Uses EE-to-body surface distance as a conservative proxy
-                    # (the held object extends beyond the EE, so the true
-                    # held-object-to-body distance is ≥ this value).
-                    # TODO: compute true held-part FK position for accurate
-                    # knock-off detection during carry (needs part body index).
                     dist_min_held=(adapter.closest_body_distance
                                    if ur10e.is_grasping else None),
                 )
-                # Gate the UR10e EE action (dims 0-6)
-                ur10e_gated_ee = adapter.apply_safety_gate(
-                    gate_result,
-                    ur10e_proposed[:7],
-                    prev_ur10e_action,
-                )
-                ur10e_action = np.concatenate(
-                    [ur10e_gated_ee, ur10e_proposed[7:8]]
-                )
-
-                # Track safety interventions
-                gate_decision = gate_result.g_t
-                if gate_decision.name == "STOP":
-                    metrics.tier0_stop_count += 1
-                    consecutive_gate_count += 1   # F09
-                elif gate_decision.name == "SLOW_DOWN":
-                    metrics.slowdown_count += 1
-                    consecutive_gate_count += 1   # F09 — livelock includes sustained SLOW
+                if _enforcement_mode == "shadow":
+                    _shadow_gate_decision_this_step = gate_result.g_t.name
+                    ur10e_action = ur10e_proposed
                 else:
-                    consecutive_gate_count = max(0, consecutive_gate_count - 2)  # F09 decay
+                    ur10e_gated_ee = adapter.apply_safety_gate(
+                        gate_result,
+                        ur10e_proposed[:7],
+                        prev_ur10e_action,
+                    )
+                    ur10e_action = np.concatenate(
+                        [ur10e_gated_ee, ur10e_proposed[7:8]]
+                    )
 
-                # D-group: disturbance effect causal inference
-                # Record when G1 first enters MODERATE/CAUTIOUS (disturbance starts).
-                if disturb.mode in (DisturbanceMode.MODERATE, DisturbanceMode.CAUTIOUS):
+                # Track safety interventions (evaluation always runs).
+                gate_decision = gate_result.g_t
+                if _enforcement_mode != "shadow":
+                    if gate_decision.name == "STOP":
+                        metrics.tier0_stop_count += 1
+                        consecutive_gate_count += 1   # F09
+                    elif gate_decision.name == "SLOW_DOWN":
+                        metrics.slowdown_count += 1
+                        consecutive_gate_count += 1   # F09 — livelock includes sustained SLOW
+                    else:
+                        consecutive_gate_count = max(0, consecutive_gate_count - 2)  # F09 decay
+
+                # D-group: disturbance effect causal inference (§6.1).
+                # Attempt windows are created when:
+                #   a) G1 body enters MODERATE/CAUTIOUS zone, OR
+                #   b) Per-part protocol TRANSIT phase begins (B1 deterministic), OR
+                #   c) Virtual hand enters warn zone (fallback when no protocol).
+                _g1_active = disturb.mode in (DisturbanceMode.MODERATE, DisturbanceMode.CAUTIOUS)
+                from dynamic_sweep_proxy import SweepLifecycle as _SweepLifecycle
+                _sweep_disturbing = (
+                    dynamic_sweep is not None
+                    and _sweep_out is not None
+                    and _sweep_out.lifecycle == _SweepLifecycle.SWEEPING
+                )
+                _protocol_transit = (
+                    per_part is not None
+                    and per_part.phase.value == "transit"
+                    and virtual_hand is not None
+                    and not vhand_retreated
+                    and (dynamic_sweep is None or _sweep_disturbing)
+                )
+                _vhand_warn_threshold = (
+                    adapter._safety_config.safe_dist_warn
+                    if adapter is not None and adapter._safety_config is not None
+                    else 0.16
+                )
+                _vhand_active = (
+                    virtual_hand is not None
+                    and not vhand_retreated
+                    and not _protocol_transit  # don't double-count
+                    and adapter.closest_body_distance < _vhand_warn_threshold
+                )
+                _currently_disturbing = _g1_active or _protocol_transit or _vhand_active
+                if dynamic_sweep is not None and _sweep_out is not None:
+                    if _sweep_out.lifecycle == _SweepLifecycle.SWEEPING:
+                        disturbance_active = True
+                        if _sweep_out.sweep_attempt_id > 0:
+                            _disturbance_attempt_id = _sweep_out.sweep_attempt_id
+                    elif not _g1_active and not _vhand_active:
+                        disturbance_active = False
+                elif _currently_disturbing:
                     if not disturbance_active:
                         disturbance_active = True
                         disturbance_start_step = step
+                        _disturbance_attempt_id += 1  # §6.1: new disturbance attempt
                 else:
                     disturbance_active = False
             except ImportError as e:
@@ -1400,39 +2232,171 @@ def main():
                     sim_step_index=step,
                 )
                 if req is not None:
-                    # R7: inject VLM-coordinated strategy into replan hint.
+                    # B1 prefer_replan: only accept replan while the proxy still
+                    # occupies the corridor (TRANSIT).  Suppress stale TTC after
+                    # PLACE/RESET or after the hand has already retreated.
+                    if args_cli.replan and per_part is not None:
+                        _phase_now = per_part.phase.value
+                        _dist_now = float(adapter.closest_body_distance)
+                        _warn_now = (
+                            float(adapter._safety_config.safe_dist_warn)
+                            if adapter._safety_config is not None
+                            else 0.25
+                        )
+                        if (
+                            vhand_retreated
+                            or _phase_now != "transit"
+                            or _dist_now > max(1.0, _warn_now * 4.0)
+                        ):
+                            if step % ival == 0:
+                                print(
+                                    f"  [replan] suppressed at step {step}: "
+                                    f"phase={_phase_now} retreated={vhand_retreated} "
+                                    f"dist={_dist_now:.3f}"
+                                )
+                            req = None
+                if req is not None:
                     if _vlm_replan_strategy:
                         req.hint.detour_strategy = _vlm_replan_strategy
-                        _vlm_replan_strategy = ""  # consumed
+                        _vlm_replan_strategy = ""
                     if step % ival == 0 or metrics.replan_count == 0:
-                        print(f"  [replan] trigger fired at step {step}, rule={req.trigger_rule}, "
-                              f"strategy={req.hint.detour_strategy or 'auto'}, "
-                              f"dist={getattr(req, 'dist_ee_human', '?')}")
-                    replan_executor.submit(req)
-                    done = replan_executor.poll()
-                    if done is not None:
-                        if replan_executor.apply(done, ur10e._policy, runtime_state=replan_state):
-                            replan_trigger.on_replan_applied(step, done.resume_time_step)
-                            # R7: capture replan params for tracking CSV.
-                            _last_replan_strategy = req.hint.detour_strategy or "auto"
-                            _last_replan_raise = getattr(replan_state, 'cumulative_raise_m', 0.0)
-                            _last_replan_lateral = replan_state.cumulative_lateral_m if replan_state else 0.0
-                            # apply_result() is called inside apply() now (cumulative tracking)
-                            if hasattr(ur10e._policy, "on_replan_splice_applied"):
-                                ur10e._policy.on_replan_splice_applied(done.resume_time_step)
-                            metrics.replan_count += 1
-                            replan_last_success = True
-                            # Signal virtual hand to retreat — block-retreat-reblock cycle
-                            if virtual_hand is not None:
-                                virtual_hand.on_replan()
-                            replan_last_failure_reason = ""
-                            print(f"  [replan] detour APPLIED at step {step}, "
-                                  f"resume_ts={done.resume_time_step} "
-                                  f"cumul_lat={replan_state.cumulative_lateral_m:.3f}m")
+                        print(
+                            f"  [replan] trigger fired at step {step}, "
+                            f"rule={req.trigger_rule}, "
+                            f"strategy={req.hint.detour_strategy or 'auto'}, "
+                            f"dist_min={getattr(req, 'dist_min', getattr(req, 'dist_ee_human', '?'))}, "
+                            f"dist_held={getattr(req, 'dist_min_held', None)}"
+                        )
+                    _replan_trigger_rule = req.trigger_rule
+                    _replan_trigger_step = step
+                    _replan_applied_this_step = False
+                    _src = "scripted_virtual_hand" if dynamic_sweep is not None else _resolve_disturbance_source(args_cli, virtual_hand)
+                    if _disturbance_attempt_id <= 0:
+                        _disturbance_attempt_id = 1
+                    _pending_replan_attr = ReplanAttribution.from_trigger(
+                        attempt_id=_disturbance_attempt_id,
+                        trigger_rule=req.trigger_rule,
+                        trigger_source=_src,
+                        trigger_step=step,
+                    )
+                    _meta_trig = getattr(gate_result, "metadata", {}) or {}
+                    try:
+                        _replan_dist_at_trigger = float(
+                            _meta_trig.get("dist_min_for_gating", req.dist_min)
+                        )
+                    except (TypeError, ValueError):
+                        _replan_dist_at_trigger = float(adapter.closest_body_distance)
+                    _replan_hard_at_trigger = float(
+                        adapter._safety_config.safe_dist_hard_stop
+                    )
+                    _replan_gate_at_trigger = gate_decision.name if gate_decision else ""
+                    _replan_rule_at_trigger = str(req.trigger_rule or "")
+                    if dynamic_sweep is not None and is_b2_proactive_trigger_rule(req.trigger_rule):
+                        dynamic_sweep.note_first_intervention(step)
+                    if _enforcement_mode == "shadow":
+                        _write_event(
+                            step,
+                            "shadow_trigger",
+                            _disturbance_attempt_id,
+                            trigger_rule=req.trigger_rule,
+                            trigger_source=_src,
+                        )
+                        _shadow_replan_would_this_step = True
+                    else:
+                        _replan_event_id += 1
+                        _correlation_event_id = str(_replan_event_id)
+                        _write_event(
+                            step,
+                            "trigger",
+                            _disturbance_attempt_id,
+                            event_id=_correlation_event_id,
+                            trigger_rule=req.trigger_rule,
+                            trigger_source=_src,
+                        )
+                        replan_executor.submit(req)
+                        done = replan_executor.poll()
+                        if done is not None:
+                            if replan_executor.apply(done, ur10e._policy, runtime_state=replan_state):
+                                replan_trigger.on_replan_applied(step, done.resume_time_step)
+                                _last_replan_strategy = req.hint.detour_strategy or "auto"
+                                _last_replan_raise = getattr(replan_state, 'cumulative_raise_m', 0.0)
+                                _last_replan_lateral = replan_state.cumulative_lateral_m if replan_state else 0.0
+                                if hasattr(ur10e._policy, "on_replan_splice_applied"):
+                                    ur10e._policy.on_replan_splice_applied(done.resume_time_step)
+                                metrics.replan_count += 1
+                                replan_last_success = True
+                                _replan_applied_this_step = True
+                                _replan_applied_step = step
+                                _applied_replan_attr = _pending_replan_attr
+                                _pending_replan_attr = None
+                                _write_event(
+                                    step, "applied", _disturbance_attempt_id,
+                                    event_id=_correlation_event_id,
+                                    trigger_rule=_replan_trigger_rule,
+                                    trigger_source=_src,
+                                    applied_step=str(step),
+                                )
+                                if dynamic_sweep is not None:
+                                    dynamic_sweep.on_replan_applied_active()
+                                    _pending_dynamic_retreat_event_id = int(_correlation_event_id)
+                                elif virtual_hand is not None:
+                                    virtual_hand.on_replan()
+                                    if _src in (
+                                        "scripted_virtual_hand",
+                                        "g1_attached_proxy",
+                                    ) or per_part is not None:
+                                        _already = (
+                                            _disturbance_attempt_id in metrics._attempt_recoveries
+                                            and metrics._attempt_recoveries[
+                                                _disturbance_attempt_id
+                                            ].retreat_step >= 0
+                                        ) or vhand_retreated
+                                        vhand_retreated = True
+                                        if not _already and not retreat_event_this_step:
+                                            retreat_event_this_step = True
+                                            _write_event(
+                                                step, "retreat", _disturbance_attempt_id,
+                                                event_id=_correlation_event_id,
+                                                trigger_rule="replan",
+                                                trigger_source=_src,
+                                                applied_step=str(step),
+                                            )
+                                            print(
+                                                f"  [protocol] RETREAT: replan-applied "
+                                                f"at step {step}, attempt={_disturbance_attempt_id}"
+                                            )
+                                        if per_part is not None and per_part.phase.value == "transit":
+                                            metrics.note_transit_replan()
+                                replan_last_failure_reason = ""
+                                print(f"  [replan] detour APPLIED at step {step}, "
+                                      f"resume_ts={done.resume_time_step} "
+                                      f"cumul_lat={replan_state.cumulative_lateral_m:.3f}m "
+                                      f"event_id={_correlation_event_id}")
+                            else:
+                                replan_last_success = False
+                                _replan_applied_this_step = False
+                                replan_last_failure_reason = "executor.apply returned False"
+                                _write_event(
+                                    step, "apply_failed", _disturbance_attempt_id,
+                                    event_id=_correlation_event_id,
+                                    trigger_rule=_replan_trigger_rule,
+                                    trigger_source=_src,
+                                    applied_step=str(step),
+                                )
+                                print(f"  [replan] apply FAILED at step {step}")
                         else:
                             replan_last_success = False
-                            replan_last_failure_reason = "executor.apply returned False"
-                            print(f"  [replan] apply FAILED at step {step}")
+                            _replan_applied_this_step = False
+                            replan_last_failure_reason = "executor.poll returned None"
+                            _write_event(
+                                step, "apply_cancelled", _disturbance_attempt_id,
+                                event_id=_correlation_event_id,
+                                trigger_rule=_replan_trigger_rule,
+                                trigger_source=_src,
+                            )
+                            print(f"  [replan] apply CANCELLED (no result) at step {step}")
+                else:
+                    _replan_applied_this_step = False
             except Exception as e:
                 import traceback
                 print(f"[phase3] WARNING: replan trigger/apply failed at step {step}: {e}")
@@ -1485,26 +2449,40 @@ def main():
                     print(f"  [grasp] rewind_event={event}")
 
         # ── UR10e clock advance ────────────────────────────────────────
-        # Only advance the pick-and-place stage clock when the safety gate
-        # allows motion.  During STOP the EE is held in place — advancing
-        # the clock anyway would cause stage transitions (e.g. close_gripper)
-        # to fire before the EE reaches the target pose.
-        should_advance = (gate_decision is None)  # no safety → always advance
-        if gate_decision is not None:
-            if gate_decision.name == "ALLOW":
-                should_advance = True
-            elif (replan_state is not None
-                  and replan_state.allows_advance(ur10e.time_step)
-                  and ur10e.stage_name.startswith("replan_")):
-                # Only force advance through actual detour waypoints.
-                # Once the clock reaches the suffix (move_above_slot etc.),
-                # normal gate rules resume — preventing the clock from
-                # racing through close_gripper while the EE is still
-                # mid-detour (rubber-band → empty grasp).
-                should_advance = True
-            # grasp rewind already modified time_step — don't double-advance
-            if grasp_rewound:
-                should_advance = False
+        # Only advance the pick-and-place stage clock when the *effective*
+        # safety gate allows motion.  Under shadow, evaluated STOP/SLOW is
+        # logged but effective is forced to ALLOW so the policy clock is
+        # not frozen (B4 control-isolation).
+        _evaluated_gate_name = (
+            gate_decision.name if gate_decision is not None else None
+        )
+        _effective_gate_name = resolve_effective_gate_name(
+            _evaluated_gate_name, _enforcement_mode
+        )
+        _replan_force_advance = bool(
+            replan_state is not None
+            and replan_state.allows_advance(ur10e.time_step)
+            and ur10e.stage_name.startswith("replan_")
+        )
+        should_advance = policy_clock_should_advance(
+            effective_gate_name=_effective_gate_name,
+            grasp_rewound=grasp_rewound,
+            replan_force_advance=_replan_force_advance,
+        )
+        if _enforcement_mode == "shadow":
+            if _evaluated_gate_name in ("STOP", "SLOW_DOWN"):
+                metrics.shadow_nonallow_evaluated_steps += 1
+            if not np.allclose(
+                ur10e_action.astype(np.float64),
+                ur10e_proposed.astype(np.float64),
+                rtol=0.0,
+                atol=0.0,
+                equal_nan=True,
+            ):
+                metrics.shadow_action_modified_steps += 1
+            # Leakage: clock blocked by safety (not grasp rewind).
+            if not should_advance and not grasp_rewound:
+                metrics.shadow_clock_blocked_steps += 1
         if should_advance:
             ur10e.advance()
 
@@ -1563,13 +2541,15 @@ def main():
 
             # --- Trigger A: consecutive STOP timeout ---
             timeout_trigger = (
-                vhand_retreat_steps > 0
+                _enforcement_mode != "shadow"
+                and vhand_retreat_steps > 0
                 and vhand_reploy_cooldown <= 0   # R7: don't retreat during cooldown
                 and consecutive_gate_count >= vhand_retreat_steps
             )
             # --- Trigger B: repeated grasp rewind ---
             rewind_exhausted = (
-                grasp_rewound
+                _enforcement_mode != "shadow"
+                and grasp_rewound
                 and hasattr(ur10e._policy, '_grasp_rewind_attempts')
                 and ur10e._policy._grasp_rewind_attempts >= 2  # GRASP_MAX_REWIND_ATTEMPTS
             )
@@ -1602,6 +2582,7 @@ def main():
         mat_events = detector.detect(
             tactile_img, left_foot_pos, right_foot_pos,
             part_positions=part_positions if part_positions else None,
+            ee_pos=ur10e_ee,
         )
 
         # ── 7. Apply arm motion (BEFORE env.step — WalkJointAction preserves non-leg joints) ──
@@ -1610,6 +2591,13 @@ def main():
         arm_t = disturb.step_in_phase * 0.02  # seconds into current phase → ramp-up
         g1_quat = g1.data.root_quat_w[0].cpu().numpy()
         g1_tilt = _quat_tilt_angle(g1_quat)
+        _g1_root_now = g1.data.root_pos_w[0].cpu().numpy()
+        metrics.g1_root_x = float(_g1_root_now[0])
+        metrics.g1_root_y = float(_g1_root_now[1])
+        metrics.g1_root_z = float(_g1_root_now[2])
+        metrics.g1_tilt_rad = float(g1_tilt)
+        if g1_tilt > metrics.g1_tilt_rad_max:
+            metrics.g1_tilt_rad_max = float(g1_tilt)
         if g1_tilt > cfg.safety.tilt_threshold_rad:
             if not tilt_warned:
                 print(f"\n[phase3] G1 tilting ({g1_tilt:.2f} rad) — retracting arms for stability")
@@ -1638,24 +2626,111 @@ def main():
         # ── 9. Metrics ─────────────────────────────────────────────────
         g1_ur10e_dist = float(np.linalg.norm(g1_root[:2] - ur10e_ee[:2]))
         adapter_surface_dist = adapter.closest_body_distance if adapter is not None else float("inf")
+        # Gate attribution: only attribute when trigger is distance/geometry-related.
+        _gate_reason = getattr(gate_result, 'reason', '') if gate_decision is not None else ''
+        _gate_is_distance_related = (
+            gate_decision is not None
+            and gate_decision.name in ("STOP", "SLOW_DOWN")
+            and any(kw in _gate_reason for kw in ("tier0", "warn", "ttc", "static", "dynamic"))
+        )
+        # TRANSIT telemetry + SLOW streak events (observation only).
+        _in_transit_now = (
+            per_part is not None and per_part.phase.value == "transit"
+        )
+        if _in_transit_now:
+            _is_slow = (
+                gate_decision is not None and gate_decision.name == "SLOW_DOWN"
+            )
+            _proxy_d = float(
+                adapter.closest_body_distance
+                if adapter is not None else float("inf")
+            )
+            _streak_before = metrics._transit_slow_streak
+            _ended = metrics.note_transit_observation(
+                proxy_distance=_proxy_d, is_slow=_is_slow,
+            )
+            if _is_slow and _streak_before == 0:
+                _write_event(
+                    step, "slow_streak_start", _disturbance_attempt_id,
+                    trigger_rule="slow",
+                    trigger_source=_resolve_disturbance_source(args_cli, virtual_hand),
+                    slow_streak_length=metrics._transit_slow_streak,
+                )
+            if _ended > 0:
+                _write_event(
+                    step, "slow_streak_end", _disturbance_attempt_id,
+                    trigger_rule="slow",
+                    trigger_source=_resolve_disturbance_source(args_cli, virtual_hand),
+                    slow_streak_length=_ended,
+                )
+        elif _in_transit_prev:
+            _ended = metrics.end_transit_slow_streak()
+            if _ended > 0:
+                _write_event(
+                    step, "slow_streak_end", _disturbance_attempt_id,
+                    trigger_rule="slow",
+                    trigger_source=_resolve_disturbance_source(args_cli, virtual_hand),
+                    slow_streak_length=_ended,
+                )
+        _in_transit_prev = _in_transit_now
+
+        if _enforcement_mode == "shadow":
+            if _replan_applied_this_step:
+                metrics.shadow_replan_applied_count += 1
+            if retreat_event_this_step:
+                metrics.shadow_retreat_count += 1
+
         metrics.record_step(
             g1_root_z=float(g1_root[2]),
             g1_ur10e_distance=g1_ur10e_dist,
             surface_distance=adapter_surface_dist,
             mat_events=mat_events,
             gate_decision=gate_decision.name if gate_decision is not None else None,
-            gate_trigger=getattr(gate_result, 'reason', '') if gate_decision is not None else '',
+            gate_trigger=_gate_reason,
             gate_distance=adapter.closest_body_distance if adapter is not None else float("inf"),
             closest_body=adapter.closest_body_name if adapter is not None else '',
-            # D-group / F-group / H-group (2026-07-11)
             disturbance_active=disturbance_active,
-            consecutive_stop_count=consecutive_gate_count,  # R7 C3 fix: param name synced with test_metrics.py:88
-            replan_success=replan_last_success if args_cli.replan else None,
+            consecutive_stop_count=consecutive_gate_count,
+            replan_success=True if (args_cli.replan and _replan_applied_this_step) else (None if not args_cli.replan else False),
             replan_failure_reason=replan_last_failure_reason,
+            replan_event_id=_replan_event_id if _replan_applied_this_step else 0,
+            replan_attribution=_applied_replan_attr if _replan_applied_this_step else None,
             vlm_action=last_vlm_decision.get("action", ""),
             vlm_latency_ms=last_vlm_decision.get("latency_ms", 0.0),
             vlm_reason=last_vlm_decision.get("reason", ""),
+            disturbance_source=(
+                "scripted_virtual_hand" if dynamic_sweep is not None
+                else _resolve_disturbance_source(args_cli, virtual_hand)
+            ),
+            disturbance_scenario=args_cli.disturbance_scenario_label or args_cli.scenario or "wander",
+            disturbance_attempt_id=_disturbance_attempt_id,
+            gate_trigger_source=(
+                ("scripted_virtual_hand" if dynamic_sweep is not None else _resolve_disturbance_source(args_cli, virtual_hand))
+                if (_gate_is_distance_related and disturbance_active and _enforcement_mode != "shadow")
+                else ""
+            ),
+            replan_trigger_source=(
+                getattr(_applied_replan_attr, "trigger_source", "")
+                if _replan_applied_this_step and _applied_replan_attr is not None
+                else ""
+            ),
+            closest_g1_body_name=_g1_closest_body_name,
+            dist_min_g1_body=_g1_closest_body_dist,
+            dist_min_proxy=adapter_surface_dist if virtual_hand is not None else float("inf"),
+            vhand_retreated=vhand_retreated,
+            retreat_event_this_step=retreat_event_this_step,
+            redeploy_event_this_step=redeploy_event_this_step,
+            policy_step=ur10e.time_step,
+            parts_placed_now=ur10e.parts_placed,
+            enforcement_mode=_enforcement_mode,
+            shadow_gate_decision=_shadow_gate_decision_this_step or None,
+            shadow_replan_would_trigger=_shadow_replan_would_this_step,
+            replan_trigger_rule=_replan_rule_at_trigger,
+            dist_min_at_replan_trigger=_replan_dist_at_trigger,
+            safe_dist_hard_stop_at_trigger=_replan_hard_at_trigger,
+            gate_decision_at_trigger=_replan_gate_at_trigger,
         )
+        _write_dynamic_audit(step)
         metrics.stuck_count = disturb.stuck_count
 
         # ── 10. Progress ───────────────────────────────────────────────
@@ -1681,6 +2756,21 @@ def main():
             # Grasp state.
             _rewind_count = getattr(ur10e._policy, '_grasp_rewind_attempts', 0)
             _carry_aborted = int(getattr(ur10e._policy, '_grasp_carry_aborted', False))
+            _attr = (
+                virtual_hand._attractor if virtual_hand is not None
+                else np.zeros(2, dtype=np.float32)
+            )
+            _head_telem = (
+                virtual_hand.head_position if virtual_hand is not None
+                else np.zeros(3, dtype=np.float32)
+            )
+            _reach_clamped = (
+                int(virtual_hand.last_reach_clamped) if virtual_hand is not None else 0
+            )
+            _slow_streak_len = (
+                int(metrics._transit_slow_streak) if _in_transit_now else 0
+            )
+            _gate_audit = _gate_distance_audit()
             _track_fh.write(
                 f"{step},{ur10e_ee[0]:.4f},{ur10e_ee[1]:.4f},{ur10e_ee[2]:.4f},"
                 f"{_hand[0]:.4f},{_hand[1]:.4f},{_hand[2]:.4f},"
@@ -1694,9 +2784,43 @@ def main():
                 f"{int(_dl_escape_tier)},{int(vhand_retreated) if virtual_hand is not None else 0},"
                 f"{int(not vhand_retreated and virtual_hand is not None)},"
                 f"{_sphere[0]:.4f},{_sphere[1]:.4f},{_sphere[2]:.4f},"
-                f"{_proto_phase},{_proto_part}\n"
+                f"{_proto_phase},{_proto_part},"
+                f"{_resolve_disturbance_source(args_cli, virtual_hand)},"
+                f"{args_cli.disturbance_scenario_label or args_cli.scenario or 'wander'},{_disturbance_attempt_id},"
+                f"{_resolve_disturbance_source(args_cli, virtual_hand) if _gate_name in ('STOP','SLOW_DOWN') and _gate_is_distance_related and disturbance_active else ''},"
+                f"{_replan_trigger_rule if step == _replan_trigger_step else ''},"
+                f"{_replan_trigger_step if step == _replan_trigger_step else ''},"
+                f"{_replan_event_id if step == _replan_applied_step else ''},"
+                f"{_replan_applied_step if step == _replan_applied_step else ''},"
+                f"{_g1_closest_body_name},"
+                f"{_g1_closest_body_dist:.4f},"
+                f"{adapter_surface_dist if virtual_hand is not None else float('inf'):.4f},"
+                f"{_safety_sc.safe_dist_warn if _safety_sc is not None else 0.0:.4f},"
+                f"{_gate_audit['dist_min_for_gating']},"
+                f"{_gate_audit['dist_min_envelope']},"
+                f"{_gate_audit['dist_min_held']},"
+                f"{_gate_audit['safe_dist_hard_stop_active']},"
+                f"{_gate_audit['safe_dist_warn_active']},"
+                f"{_sphere[0]:.4f},{_sphere[1]:.4f},{_sphere[2]:.4f},"
+                f"{_hand[0]:.4f},{_hand[1]:.4f},{_hand[2]:.4f},"
+                f"{_attr[0]:.4f},{_attr[1]:.4f},0.0000,"
+                f"{_head_telem[0]:.4f},{_head_telem[1]:.4f},{_head_telem[2]:.4f},"
+                f"{_reach_clamped},{_slow_streak_len},"
+                f"{float(virtual_hand.reach_radius) if virtual_hand is not None else 0.0:.4f},"
+                f"{float(virtual_hand.proxy_radius) if virtual_hand is not None else 0.0:.4f},"
+                f"{virtual_hand.head_to_attractor_distance() if virtual_hand is not None else 0.0:.4f},"
+                f"{virtual_hand.reach_margin() if virtual_hand is not None else 0.0:.4f},"
+                f"{float(_g1_root_now[0]):.4f},{float(_g1_root_now[1]):.4f},{float(_g1_root_now[2]):.4f},"
+                f"{float(g1_tilt):.4f},"
+                f"{'' if metrics.g1_spawn_requested_x != metrics.g1_spawn_requested_x else f'{metrics.g1_spawn_requested_x:.4f}'},"
+                f"{'' if metrics.g1_spawn_requested_y != metrics.g1_spawn_requested_y else f'{metrics.g1_spawn_requested_y:.4f}'},"
+                f"{'' if metrics.g1_spawn_requested_yaw != metrics.g1_spawn_requested_yaw else f'{metrics.g1_spawn_requested_yaw:.4f}'},"
+                f"{'' if metrics.spawn_pose_error != metrics.spawn_pose_error else f'{metrics.spawn_pose_error:.4f}'}\n"
             )
             _track_fh.flush()
+            # §6.1: replan trigger_step is one-shot — reset after progress write.
+            if step == _replan_trigger_step:
+                _replan_trigger_step = -1
 
             mode_str = disturb.mode.value.upper() if disturb.mode else "?"
             gate_str = gate_decision.name if gate_decision is not None else "N/A"
@@ -1720,7 +2844,6 @@ def main():
 
         # ── 11. Termination ────────────────────────────────────────────
         metrics.policy_steps = ur10e.time_step
-        metrics.parts_placed = ur10e.parts_placed
 
         if ur10e.success:
             print(f"\n[phase3] ALL PARTS PLACED at step {step}")
@@ -1737,14 +2860,21 @@ def main():
 
     # ── Finalise ───────────────────────────────────────────────────────
     metrics.policy_steps = ur10e.time_step
-    metrics.parts_placed = ur10e.parts_placed
+    # P0-1: single snapshot helper — controller success may report index 19
+    # while success=True (20/20).  Same logic must be used everywhere.
+    metrics.parts_placed = snapshot_parts_placed(
+        success=ur10e.success,
+        parts_placed=ur10e.parts_placed,
+        total_parts=ur10e.total_parts,
+    )
     writer.write(metrics)
     print(
         f"[phase3] Metrics written to {args_cli.output_csv}"
     )
     print(
         f"[phase3] time_step={ur10e.time_step}  success={ur10e.success}  "
-        f"parts={ur10e.parts_placed}/{ur10e.total_parts}"
+        f"parts={metrics.parts_placed}/{ur10e.total_parts}  "
+        f"task_completed={metrics.parts_placed >= ur10e.total_parts}"
     )
     print(
         f"[phase3] Safety: STOP={metrics.tier0_stop_count}  "
@@ -1757,6 +2887,11 @@ def main():
     )
 
     _track_fh.close()
+    _event_fh.close()
+    if _dynamic_audit_fh is not None:
+        _dynamic_audit_fh.close()
+    if _trajectory_fh is not None:
+        _trajectory_fh.close()
     _cleanup_sim(env, simulation_app)
 
 

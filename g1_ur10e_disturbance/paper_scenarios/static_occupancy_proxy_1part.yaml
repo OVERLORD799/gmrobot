@@ -1,0 +1,46 @@
+# B1 1-part quick gate for reach_radius dwell tuning.
+# Validates reach_margin / reach_clamped / TRANSIT SLOW before 8-part runs.
+
+name: "static_occupancy_proxy_1part"
+description: "B1 1-part quick gate — reach vs proxy split validation"
+mode: "constrained_wander"
+scenario: "constrained_wander"
+
+per_part_protocol: true
+
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+  enable_replan: true
+  replan:
+    held_critical_replan_enabled: true
+
+virtual_hand:
+  reach_radius: 0.55
+  transit_proxy_radius: 0.40
+  pick_place_proxy_radius: 0.08
+  reset_proxy_radius: 0.30
+  speed: 0.12
+  height_mode: "table"
+  retreat_steps: 200
+
+episode:
+  max_steps: 2000
+  num_parts: 1
+
+disturbance:
+  workspace_x: [0.00, 0.15]
+  workspace_y: [-0.5, 0.5]
+  cautious_threshold: 0.15
+  moderate_threshold: 0.55
+  g1_spawn_x: -1.45
+  g1_spawn_y: 0.0
+  g1_spawn_yaw: 0.0
+  g1_spawn_jitter_xy: 0.0
+
+batch:
+  max_steps: 2000
+  output_csv: ""
+
+seed: 42
+repeat: 1

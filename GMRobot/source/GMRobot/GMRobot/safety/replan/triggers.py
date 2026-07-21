@@ -86,11 +86,9 @@ class ReplanTriggerConfig:
     detour_stage_duration: int = 55
     # S13 P1: opt-in bonus from SAM2 /track kinematics in select_detour_strategy.
     use_perception_track_strategy: bool = False
-    # ivj_intrusion_positive v8: transit replan on held_critical STOP / early warn.
-    # NOTE: held_critical paths require dist_min_held in gate metadata, which is
-    # only populated when RuleEngine.evaluate() receives dist_min_held != None.
-    # In GMDisturb, dist_min_held is not yet wired through safety_adapter.py,
-    # so held_critical_replan_enabled is dead code in that context.
+    # Transit replan on held_critical STOP / early warn (B1 paper / IVJ).
+    # Requires RuleEngine.evaluate(dist_min_held=...) while grasping; GMDisturb
+    # wires this from closest_body_distance when ur10e.is_grasping.
     held_critical_replan_enabled: bool = False
     # Route-aware proactive splice before gate STOP (opt-in per scenario yaml).
     proactive_route_replan_enabled: bool = False

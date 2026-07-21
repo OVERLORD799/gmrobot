@@ -1,0 +1,511 @@
+[INFO][AppLauncher]: Using device: cuda:0
+[INFO][AppLauncher]: Loading experience file: /opt/IsaacLab/apps/isaaclab.python.rendering.kit
+[Info] [carb] Logging to file: /isaac-sim/kit/logs/Kit/Isaac-Sim/5.1/kit_20260720_012631.log
+2026-07-20T01:26:35Z [4,708ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:35Z [4,708ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-07-20T01:26:35Z [4,724ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.
+2026-07-20T01:26:36Z [4,890ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:36Z [4,890ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+
+|---------------------------------------------------------------------------------------------|
+| Driver Version: 580.159.03    | Graphics API: Vulkan
+|=============================================================================================|
+| GPU | Name                             | Active | LDA | GPU Memory | Vendor-ID | LUID       |
+|     |                                  |        |     |            | Device-ID | UUID       |
+|     |                                  |        |     |            | Bus-ID    |            |
+|---------------------------------------------------------------------------------------------|
+| 0   | NVIDIA GeForce RTX 5090 Laptop.. | Yes: 0 |     | 24463   MB | 10de      | 0          |
+|     |                                  |        |     |            | 2c58      | 6b6f962a.. |
+|     |                                  |        |     |            | 2         |            |
+|=============================================================================================|
+| OS: 24.04.2 LTS (Noble Numbat) ubuntu, Version: 24.04.2, Kernel: 7.0.0-28-generic
+| Processor: Intel(R) Core(TM) Ultra 9 290HX Plus
+| Cores: 24 | Logical Cores: 24
+|---------------------------------------------------------------------------------------------|
+| Total Memory (MB): 125865 | Free Memory: 102683
+| Total Page/Swap (MB): 61035 | Free Page/Swap: 0
+|---------------------------------------------------------------------------------------------|
+2026-07-20T01:26:36Z [5,436ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.
+2026-07-20T01:26:36Z [5,446ms] [Warning] [gpu.foundation.plugin] PCIe link width current (8) and maximum (16) for device 0 don't match.
+2026-07-20T01:26:36Z [5,447ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.
+2026-07-20T01:26:37Z [5,947ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:37Z [5,947ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-07-20T01:26:37Z [5,948ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:37Z [5,948ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-07-20T01:26:37Z [5,971ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:37Z [5,972ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-07-20T01:26:37Z [5,977ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T01:26:37Z [5,977ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)
+2026-07-20T01:26:37Z [5,977ms] [Warning] [omni.ui.windowmanager.plugin] Failed to set app window for default window set!
+2026-07-20T01:26:37Z [6,419ms] [Warning] [omni.log] Source: omni.hydra was already registered.
+2026-07-20T01:26:38Z [7,430ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.
+2026-07-20T01:26:38Z [7,570ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.
+2026-07-20T01:26:40Z [9,388ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead
+2026-07-20T01:26:40Z [9,536ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'
+2026-07-20T01:26:40Z [9,536ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'
+2026-07-20T01:26:40Z [9,536ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.
+2026-07-20T01:26:41Z [10,639ms] [Warning] [omni.physxui.scripts.menu] PhysicsMenu: instance is not alive, did you forget a dependency?
+2026-07-20T01:26:41Z [10,639ms] [Warning] [omni.physxui.scripts.menu] PhysicsMenu: instance is not alive, did you forget a dependency?
+2026-07-20T01:26:43Z [12,085ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 9
+
+2026-07-20T01:26:43Z [12,108ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:transmittance_color)
+2026-07-20T01:26:43Z [12,109ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:reflection_roughness_constant)
+2026-07-20T01:26:43Z [12,109ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:ior_constant)
+[INFO]: Parsing configuration from: <class 'dual_env_cfg.DualRobotDisturbanceEnvCfg'>
+[phase3] episode_length_s=300.0s (max_steps=15000, step_dt=0.0200s)
+[phase3] G1 spawn (pre-make): x=-1.450 y=0.000 yaw=0.000 jitter_xy=0.000 pose_range={'x': (-0.0, 0.0), 'y': (-0.0, 0.0), 'yaw': (0.0, 0.0)}
+
+[36m======================================================================================[0m
+[36m[1m[INFO][IsaacLab]: Logging to file: /tmp/isaaclab/logs/isaaclab_2026-07-20_01-26-46.log[0m
+[36m======================================================================================[0m
+
+[33m01:26:46 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.[0m
+[INFO]: Base environment:
+	Environment device    : cuda:0
+	Environment seed      : 42
+	Physics step-size     : 0.005
+	Rendering step-size   : 0.02
+	Environment step-size : 0.02
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_1'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_2'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_3'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_4'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_5'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_6'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_7'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:50 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_8'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_9'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_10'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_11'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_12'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_13'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_14'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_15'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_16'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:51 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_17'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:52 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_18'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:52 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_19'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[33m01:26:52 [prims.py] WARNING: Could not perform 'modify_mass_properties' on any prims under: '/World/envs/env_0/Part_20'. This might be because of the following reasons:
+	(1) The desired attribute does not exist on any of the prims.
+	(2) The desired attribute exists on an instanced prim.
+		Discovered list of instanced prim paths: [][0m
+[INFO]: Time taken for scene creation : 6.145809 seconds
+[INFO]: Scene manager:  <class InteractiveScene>
+	Number of environments: 1
+	Environment spacing   : 5.0
+	Source prim name      : /World/envs/env_0
+	Global prim paths     : []
+	Replicate physics     : True
+[INFO]: Starting the simulation. This may take a few seconds. Please wait...
+2026-07-20T01:26:52Z [21,553ms] [Warning] [omni.physx.plugin] PhysicsUSD: CreateJoint - found a joint with disjointed body transforms, the simulation will most likely snap objects together: /World/envs/env_0/Robot_UR10e/ur10e/joints/ee_joint
+2026-07-20T01:26:54Z [23,697ms] [Warning] [omni.fabric.plugin] getAttributeCount called on non-existent path /World/envs/env_0/Robot_UR10e/Robotiq_2F_85_edit/Robotiq_2F_85/right_outer_knuckle/visuals/Defeatured_2F_85_PAD_OPEN_Finger1step_01
+2026-07-20T01:26:54Z [23,697ms] [Warning] [omni.fabric.plugin] getTypes called on non-existent path /World/envs/env_0/Robot_UR10e/Robotiq_2F_85_edit/Robotiq_2F_85/right_outer_knuckle/visuals/Defeatured_2F_85_PAD_OPEN_Finger1step_01
+2026-07-20T01:26:55Z [24,159ms] [Warning] [omni.fabric.plugin] USD->Fabric: Unhandled array type string[]
+2026-07-20T01:26:55Z [24,160ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:reflection_roughness_constant)
+2026-07-20T01:26:55Z [24,160ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:ior_constant)
+2026-07-20T01:26:55Z [24,160ms] [Warning] [usdrt.population.plugin] [UsdNoticeHandler] Unhandled attribute type VtArray<std::string> (prim attribute: omni:rtx:material:db:flattener:transmittance_color)
+2026-07-20T01:26:56Z [25,121ms] [Warning] [rtx.postprocessing.plugin] DLSS increasing input dimensions: Render resolution of (371, 278) is below minimal input resolution of 300.
+[INFO]: Time taken for simulation start : 10.210101 seconds
+[INFO] Command Manager:  <CommandManager> contains 1 active terms.
++---------------------------------------------------+
+|                Active Command Terms               |
++-------+------------------+------------------------+
+| Index | Name             |          Type          |
++-------+------------------+------------------------+
+|   0   | g1_base_velocity | UniformVelocityCommand |
++-------+------------------+------------------------+
+
+[INFO] Event Manager:  <EventManager> contains 1 active terms.
++---------------------------------------+
+|  Active Event Terms in Mode: 'reset'  |
++--------+------------------------------+
+| Index  | Name                         |
++--------+------------------------------+
+|   0    | fix_ur10e_position           |
+|   1    | disable_g1_ur10e_collision   |
+|   2    | reset_g1_base                |
+|   3    | reset_g1_joints              |
+|   4    | g1_foot_friction             |
+|   5    | reset_parts                  |
+|   6    | reset_ur10e_joints           |
++--------+------------------------------+
+
+[INFO] Recorder Manager:  <RecorderManager> contains 0 active terms.
++---------------------+
+| Active Recorder Terms |
++-----------+---------+
+|   Index   | Name    |
++-----------+---------+
++-----------+---------+
+
+[INFO] Action Manager:  <ActionManager> contains 3 active terms.
++-----------------------------------+
+|  Active Action Terms (shape: 20)  |
++-------+---------------+-----------+
+| Index | Name          | Dimension |
++-------+---------------+-----------+
+|   0   | g1_joint_pos  |        12 |
+|   1   | ur10e_ee      |         7 |
+|   2   | ur10e_gripper |         1 |
++-------+---------------+-----------+
+
+[INFO] Observation Manager: <ObservationManager> contains 8 groups.
++-------------------------------------------------------------+
+| Active Observation Terms in Group: 'g1_walker' (shape: (588,)) |
++------------+----------------------------------+-------------+
+|   Index    | Name                             |    Shape    |
++------------+----------------------------------+-------------+
+|     0      | base_ang_vel                     |    (18,)    |
+|     1      | projected_gravity                |    (18,)    |
+|     2      | velocity_commands                |    (18,)    |
+|     3      | joint_pos                        |    (174,)   |
+|     4      | joint_vel                        |    (174,)   |
+|     5      | actions                          |    (174,)   |
+|     6      | sin_phase                        |     (6,)    |
+|     7      | cos_phase                        |     (6,)    |
++------------+----------------------------------+-------------+
++-------------------------------------------+
+| Active Observation Terms in Group: 'tactile' |
++-----------+--------------+----------------+
+|   Index   | Name         |     Shape      |
++-----------+--------------+----------------+
+|     0     | tactile      |    (32, 32)    |
++-----------+--------------+----------------+
++------------------------------------------------+
+| Active Observation Terms in Group: 'ur10e_policy' |
++-----------+----------------------+-------------+
+|   Index   | Name                 |    Shape    |
++-----------+----------------------+-------------+
+|     0     | ee_pos               |     (7,)    |
+|     1     | box_A_pos            |    (4, 4)   |
+|     2     | box_B_pos            |    (4, 4)   |
+|     3     | part_1_pos           |     (7,)    |
+|     4     | part_2_pos           |     (7,)    |
+|     5     | part_3_pos           |     (7,)    |
+|     6     | part_4_pos           |     (7,)    |
+|     7     | part_5_pos           |     (7,)    |
+|     8     | part_6_pos           |     (7,)    |
+|     9     | part_7_pos           |     (7,)    |
+|     10    | part_8_pos           |     (7,)    |
+|     11    | part_9_pos           |     (7,)    |
+|     12    | part_10_pos          |     (7,)    |
+|     13    | part_11_pos          |     (7,)    |
+|     14    | part_12_pos          |     (7,)    |
+|     15    | part_13_pos          |     (7,)    |
+|     16    | part_14_pos          |     (7,)    |
+|     17    | part_15_pos          |     (7,)    |
+|     18    | part_16_pos          |     (7,)    |
+|     19    | part_17_pos          |     (7,)    |
+|     20    | part_18_pos          |     (7,)    |
+|     21    | part_19_pos          |     (7,)    |
+|     22    | part_20_pos          |     (7,)    |
+|     23    | slot_A_1_T           |    (4, 4)   |
+|     24    | slot_A_2_T           |    (4, 4)   |
+|     25    | slot_A_3_T           |    (4, 4)   |
+|     26    | slot_A_4_T           |    (4, 4)   |
+|     27    | slot_A_5_T           |    (4, 4)   |
+|     28    | slot_A_6_T           |    (4, 4)   |
+|     29    | slot_A_7_T           |    (4, 4)   |
+|     30    | slot_A_8_T           |    (4, 4)   |
+|     31    | slot_A_9_T           |    (4, 4)   |
+|     32    | slot_A_10_T          |    (4, 4)   |
+|     33    | slot_A_11_T          |    (4, 4)   |
+|     34    | slot_A_12_T          |    (4, 4)   |
+|     35    | slot_A_13_T          |    (4, 4)   |
+|     36    | slot_A_14_T          |    (4, 4)   |
+|     37    | slot_A_15_T          |    (4, 4)   |
+|     38    | slot_A_16_T          |    (4, 4)   |
+|     39    | slot_A_17_T          |    (4, 4)   |
+|     40    | slot_A_18_T          |    (4, 4)   |
+|     41    | slot_A_19_T          |    (4, 4)   |
+|     42    | slot_A_20_T          |    (4, 4)   |
+|     43    | slot_B_1_T           |    (4, 4)   |
+|     44    | slot_B_2_T           |    (4, 4)   |
+|     45    | slot_B_3_T           |    (4, 4)   |
+|     46    | slot_B_4_T           |    (4, 4)   |
+|     47    | slot_B_5_T           |    (4, 4)   |
+|     48    | slot_B_6_T           |    (4, 4)   |
+|     49    | slot_B_7_T           |    (4, 4)   |
+|     50    | slot_B_8_T           |    (4, 4)   |
+|     51    | slot_B_9_T           |    (4, 4)   |
+|     52    | slot_B_10_T          |    (4, 4)   |
+|     53    | slot_B_11_T          |    (4, 4)   |
+|     54    | slot_B_12_T          |    (4, 4)   |
+|     55    | slot_B_13_T          |    (4, 4)   |
+|     56    | slot_B_14_T          |    (4, 4)   |
+|     57    | slot_B_15_T          |    (4, 4)   |
+|     58    | slot_B_16_T          |    (4, 4)   |
+|     59    | slot_B_17_T          |    (4, 4)   |
+|     60    | slot_B_18_T          |    (4, 4)   |
+|     61    | slot_B_19_T          |    (4, 4)   |
+|     62    | slot_B_20_T          |    (4, 4)   |
++-----------+----------------------+-------------+
++--------------------------------------------------+
+| Active Observation Terms in Group: 'ur10e_camera' |
++----------+----------------+----------------------+
+|  Index   | Name           |        Shape         |
++----------+----------------+----------------------+
+|    0     | scene_rgb      |    (480, 640, 3)     |
++----------+----------------+----------------------+
++------------------------------------------+
+| Active Observation Terms in Group: 'safety' |
++-----------+------------------+-----------+
+|   Index   | Name             |   Shape   |
++-----------+------------------+-----------+
+|     0     | ee_vel           |    (3,)   |
+|     1     | joint_pos        |    (6,)   |
+|     2     | joint_vel        |    (6,)   |
++-----------+------------------+-----------+
++----------------------------------------------+
+| Active Observation Terms in Group: 'g1_body' |
++---------+--------------------------+---------+
+|  Index  | Name                     |  Shape  |
++---------+--------------------------+---------+
+|    0    | g1_root_pos              |   (3,)  |
+|    1    | g1_root_vel              |   (3,)  |
+|    2    | g1_root_ang_vel          |   (3,)  |
+|    3    | g1_left_hand_pos         |   (7,)  |
+|    4    | g1_right_hand_pos        |   (7,)  |
+|    5    | g1_left_foot_pos         |   (7,)  |
+|    6    | g1_right_foot_pos        |   (7,)  |
++---------+--------------------------+---------+
++----------------------------------------------------+
+| Active Observation Terms in Group: 'g1_head_camera' |
++-----------+---------------+------------------------+
+|   Index   | Name          |         Shape          |
++-----------+---------------+------------------------+
+|     0     | head_rgb      |     (240, 320, 3)      |
++-----------+---------------+------------------------+
++----------------------------------------------------------+
+| Active Observation Terms in Group: 'policy' (shape: (588,)) |
++-----------+--------------------------------+-------------+
+|   Index   | Name                           |    Shape    |
++-----------+--------------------------------+-------------+
+|     0     | base_ang_vel                   |    (18,)    |
+|     1     | projected_gravity              |    (18,)    |
+|     2     | velocity_commands              |    (18,)    |
+|     3     | joint_pos                      |    (174,)   |
+|     4     | joint_vel                      |    (174,)   |
+|     5     | actions                        |    (174,)   |
+|     6     | sin_phase                      |     (6,)    |
+|     7     | cos_phase                      |     (6,)    |
++-----------+--------------------------------+-------------+
+
+[INFO] Termination Manager:  <TerminationManager> contains 3 active terms.
++----------------------------------+
+|     Active Termination Terms     |
++-------+---------------+----------+
+| Index | Name          | Time Out |
++-------+---------------+----------+
+|   0   | time_out      |   True   |
+|   1   | g1_fall       |  False   |
+|   2   | g1_out_of_mat |  False   |
++-------+---------------+----------+
+
+[INFO] Reward Manager:  <RewardManager> contains 0 active terms.
++-----------------------+
+|  Active Reward Terms  |
++-------+------+--------+
+| Index | Name | Weight |
++-------+------+--------+
++-------+------+--------+
+
+[INFO] Curriculum Manager:  <CurriculumManager> contains 0 active terms.
++----------------------+
+| Active Curriculum Terms |
++-----------+----------+
+|   Index   | Name     |
++-----------+----------+
++-----------+----------+
+
+Creating window for environment.
+[INFO]: Completed setting up the environment...
+[GMDisturb] UR10e teleported: (-1.08,2.35,0.00) -> (0.00,0.00,0.00)
+[GMDisturb] G1↔UR10e collision filter APPLIED (FK safety gate active).
+[phase3] G1 root after reset: (-1.450,0.000,-0.250) spawn_pose_error=0.0000m
+[phase3] seeds: env=42 controller=42 vhand=42 (sidecar=/opt/projects/g1_ur10e_disturbance/results/final_six_ordered/static_occupancy_proxy_s42_012630/static_occupancy_proxy_s42_012630_seeds.json)
+[phase3] GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit.
+[phase3] Truncated task to 20 parts (--num-parts)
+[phase3] Per-part protocol enabled: 20 parts, 4-phase cycle (Pick→Transit→Place→Reset) [prefer_replan]
+[phase3] Protocol: workspace from YAML x∈[0.00,0.15] y∈[-0.50,0.50]; reach_radius=0.55; proxy per-phase (TRANSIT=0.40, PICK/PLACE=0.08, RESET=0.30)
+[phase3] Approach side: front (default)  ws_x=(0.0, 0.15) ws_y=(-0.5, 0.5) vx_bias=0.0 vy_bias=0.0
+[phase3] UR10e base_z=0.000  G1 root_z=-0.250
+[phase3] Scenario: wander  Mode: auto  Safety: ON  VLM: OFF  CAUTIOUS < 0.15m  MODERATE < 0.55m  AGGRESSIVE ≥ 0.55m
+[phase3] Safety thresholds from config: hard_stop=0.25m warn=0.28m TTC_stop=0.5s
+[phase3] Workspace z_max widened: 0.80 → 0.95 (detour headroom)
+[phase3] Workspace x_max widened to 1.25 (detour lateral headroom)
+[phase3] Workspace y_max widened to 0.65 (detour lateral headroom)
+[phase3] Workspace y_min widened to -0.65 (detour lateral headroom)
+[phase3] Motion replan enabled (GMRobot L1WarnReplanTrigger + GeometryReplanV0); held_critical_replan=True
+  [protocol] part=1/20 phase=reset   step_in_phase=1 attr=[-1.3963401  0.01753  ] retreated=False
+2026-07-20T01:27:03Z [32,739ms] [Warning] [omni.fabric.plugin] Warning: attribute physics:filteredPairs not found for path /World/envs/env_0/Robot_G1
+
+  step     0  t=    1  wander    mode=AGGRESSIVE  d_root=2.15  d_adp=999.00  head=(-1.45,0.00,0.35)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=ALLOW        start                                   
+2026-07-20T01:27:14Z [43,299ms] [Warning] [carb] Client gpu.foundation.plugin has acquired [gpu::unstable::IMemoryBudgetManagerFactory v0.1] 100 times. Consider accessing this interface with carb::getCachedInterface() (Performance warning)
+  [protocol] part=1/20 phase=pick    step_in_phase=100 attr=[ 0.53494805 -0.36173975] retreated=False
+  step   200  t=  201  wander    mode=MODERATE    d_root=0.94  d_adp=0.35  head=(-0.54,-0.14,0.30)  hand=(0.10,-0.34,0.55)  v=(+0.30,+0.00)  gate=ALLOW        lift_slot_A_1                           
+  [replan] trigger fired at step 201, rule=held_critical, strategy=auto, dist_min=0.0, dist_held=0.03066547632217405
+  [protocol] RETREAT: replan-applied at step 201, attempt=1
+  [replan] detour APPLIED at step 201, resume_ts=201 cumul_lat=0.143m event_id=1
+  [protocol] part=1/20 phase=transit step_in_phase=199 attr=[0.65 0.  ] retreated=True
+  step   400  t=  400  wander    mode=AGGRESSIVE  d_root=1.01  d_adp=1.16  head=(-0.53,-0.40,0.30)  hand=(-0.49,-0.37,0.33)  v=(+0.30,+0.00)  gate=ALLOW        replan_realign_place_mid                
+  [protocol] part=1/20 phase=place   step_in_phase=23 attr=[0.53928256 0.14808008] retreated=True
+  step   600  t=  600  wander    mode=AGGRESSIVE  d_root=1.05  d_adp=1.13  head=(-0.47,-0.51,0.30)  hand=(-0.41,-0.47,0.33)  v=(+0.30,+0.00)  gate=ALLOW        descend_to_box_with_slot_B_1            
+  [protocol] part=2/20 phase=pick    step_in_phase=14 attr=[ 0.5357337  -0.29148257] retreated=False
+  step   800  t=  761  wander    mode=MODERATE    d_root=0.86  d_adp=0.24  head=(-0.43,-0.52,0.31)  hand=(0.21,-0.31,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_slot_A_2                     
+  [protocol] RETREAT: replan-applied at step 887, attempt=2
+  [replan] detour APPLIED at step 887, resume_ts=847 cumul_lat=0.156m event_id=2
+  [protocol] part=2/20 phase=transit step_in_phase=113 attr=[0.65 0.  ] retreated=True
+  step  1000  t=  960  wander    mode=AGGRESSIVE  d_root=0.94  d_adp=1.17  head=(-0.37,-0.60,0.30)  hand=(-0.35,-0.57,0.33)  v=(+0.30,+0.30)  gate=ALLOW        replan_detour_arc                       
+  [protocol] part=2/20 phase=transit step_in_phase=313 attr=[0.65 0.  ] retreated=True
+  step  1200  t= 1160  wander    mode=AGGRESSIVE  d_root=1.07  d_adp=1.18  head=(-0.43,-0.50,0.31)  hand=(-0.39,-0.47,0.34)  v=(+0.30,+0.30)  gate=ALLOW        replan_detour_rejoin                    
+  [protocol] part=2/20 phase=reset   step_in_phase=37 attr=[-0.36236212 -0.47663125] retreated=True
+  step  1400  t= 1321  wander    mode=AGGRESSIVE  d_root=0.93  d_adp=999.00  head=(-0.40,-0.52,0.32)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.30)  gate=ALLOW        lift_after_releasing_slot_B_2           
+  [protocol] RETREAT: replan-applied at step 1573, attempt=3
+  [replan] detour APPLIED at step 1573, resume_ts=1493 cumul_lat=0.156m event_id=3
+  [protocol] part=3/20 phase=transit step_in_phase=27 attr=[0.65 0.  ] retreated=True
+  step  1600  t= 1520  wander    mode=AGGRESSIVE  d_root=0.83  d_adp=0.92  head=(-0.36,-0.54,0.32)  hand=(-0.33,-0.49,0.35)  v=(+0.30,+0.30)  gate=ALLOW        lift_slot_A_3                           
+  [protocol] part=3/20 phase=transit step_in_phase=227 attr=[0.65 0.  ] retreated=True
+  step  1800  t= 1720  wander    mode=AGGRESSIVE  d_root=1.18  d_adp=1.27  head=(-0.39,-0.57,0.30)  hand=(-0.35,-0.52,0.33)  v=(+0.30,+0.30)  gate=ALLOW        replan_realign_place                    
+  [protocol] part=3/20 phase=place   step_in_phase=51 attr=[0.53881353 0.29041314] retreated=True
+  step  2000  t= 1918  wander    mode=AGGRESSIVE  d_root=1.11  d_adp=1.21  head=(-0.41,-0.56,0.30)  hand=(-0.38,-0.51,0.34)  v=(+0.30,+0.30)  gate=ALLOW        open_gripper_to_release_slot_B_3        
+  [protocol] part=4/20 phase=pick    step_in_phase=42 attr=[ 0.53735673 -0.15037683] retreated=False
+  step  2200  t= 2081  wander    mode=MODERATE    d_root=0.88  d_adp=0.30  head=(-0.44,-0.55,0.30)  hand=(0.15,-0.23,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_slot_A_4                     
+  [protocol] RETREAT: replan-applied at step 2259, attempt=4
+  [replan] detour APPLIED at step 2259, resume_ts=2139 cumul_lat=0.156m event_id=4
+  [protocol] part=4/20 phase=transit step_in_phase=141 attr=[0.65 0.  ] retreated=True
+  step  2400  t= 2280  wander    mode=AGGRESSIVE  d_root=1.10  d_adp=1.27  head=(-0.45,-0.52,0.30)  hand=(-0.41,-0.49,0.33)  v=(+0.30,+0.30)  gate=ALLOW        replan_detour_arc                       
+  [protocol] part=4/20 phase=place   step_in_phase=20 attr=[0.5377569  0.36049354] retreated=True
+  step  2600  t= 2480  wander    mode=AGGRESSIVE  d_root=1.15  d_adp=1.25  head=(-0.46,-0.48,0.30)  hand=(-0.42,-0.45,0.33)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_box_with_slot_B_4            
+  [protocol] part=5/20 phase=pick    step_in_phase=11 attr=[ 0.64549935 -0.36035472] retreated=False
+  step  2800  t= 2641  wander    mode=MODERATE    d_root=0.97  d_adp=0.41  head=(-0.49,-0.44,0.30)  hand=(0.16,-0.29,0.29)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_slot_A_5                     
+  [protocol] part=5/20 phase=place   step_in_phase=5 attr=[0.6488896  0.14830323] retreated=False
+  step  3000  t= 2836  wander    mode=AGGRESSIVE  d_root=1.13  d_adp=0.57  head=(-0.50,-0.42,0.30)  hand=(0.01,0.02,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_box_with_slot_B_5            
+  [protocol] part=6/20 phase=reset   step_in_phase=46 attr=[-0.46010822 -0.35969356] retreated=False
+  step  3200  t= 2997  wander    mode=AGGRESSIVE  d_root=1.01  d_adp=999.00  head=(-0.51,-0.38,0.30)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=ALLOW        move_above_slot_A_6                     
+  [protocol] part=6/20 phase=transit step_in_phase=95 attr=[0.65 0.  ] retreated=False
+  step  3400  t= 3191  wander    mode=MODERATE    d_root=1.19  d_adp=0.29  head=(-0.48,-0.53,0.30)  hand=(0.31,0.06,0.36)  v=(+0.30,+0.00)  gate=ALLOW        move_above_box_with_slot_B_6            
+  [protocol] part=7/20 phase=reset   step_in_phase=30 attr=[-0.46690062 -0.35001212] retreated=False
+  step  3600  t= 3352  wander    mode=AGGRESSIVE  d_root=1.02  d_adp=999.00  head=(-0.51,-0.37,0.31)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=ALLOW        move_above_slot_A_7                     
+  [protocol] part=7/20 phase=transit step_in_phase=79 attr=[0.65 0.  ] retreated=False
+  step  3800  t= 3547  wander    mode=MODERATE    d_root=1.17  d_adp=0.27  head=(-0.50,-0.40,0.30)  hand=(0.33,0.15,0.44)  v=(+0.30,+0.00)  gate=ALLOW        move_above_box_with_slot_B_7            
+  [protocol] part=8/20 phase=reset   step_in_phase=15 attr=[-0.43701077 -0.3866064 ] retreated=False
+  step  4000  t= 3708  wander    mode=AGGRESSIVE  d_root=1.00  d_adp=999.00  head=(-0.48,-0.41,0.30)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=ALLOW        move_above_slot_A_8                     
+  [protocol] part=8/20 phase=transit step_in_phase=64 attr=[0.65 0.  ] retreated=False
+  step  4200  t= 3884  wander    mode=MODERATE    d_root=1.16  d_adp=0.23  head=(-0.47,-0.44,0.30)  hand=(0.35,0.12,0.56)  v=(+0.30,+0.00)  gate=ALLOW        lift_slot_A_8                           
+  [protocol] part=8/20 phase=reset   step_in_phase=40 attr=[-0.33448353 -0.5168759 ] retreated=False
+  step  4400  t= 4045  wander    mode=AGGRESSIVE  d_root=1.13  d_adp=999.00  head=(-0.38,-0.55,0.31)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.30)  gate=ALLOW        lift_after_releasing_slot_B_8           
+  [protocol] part=9/20 phase=transit step_in_phase=30 attr=[0.65 0.  ] retreated=False
+  step  4600  t= 4243  wander    mode=MODERATE    d_root=1.12  d_adp=0.28  head=(-0.46,-0.44,0.30)  hand=(0.40,-0.07,0.56)  v=(+0.30,+0.00)  gate=ALLOW        lift_slot_A_9                           
+  [protocol] part=9/20 phase=reset   step_in_phase=28 attr=[-0.44466126 -0.515973  ] retreated=False
+  step  4800  t= 4403  wander    mode=AGGRESSIVE  d_root=1.17  d_adp=999.00  head=(-0.48,-0.54,0.29)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.30)  gate=ALLOW        lift_after_releasing_slot_B_9           
+  [protocol] part=10/20 phase=transit step_in_phase=17 attr=[0.65 0.  ] retreated=False
+  step  5000  t= 4603  wander    mode=MODERATE    d_root=1.13  d_adp=0.29  head=(-0.45,-0.55,0.31)  hand=(0.38,-0.13,0.57)  v=(+0.30,+0.30)  gate=ALLOW        lift_slot_A_10                          
+  [protocol] part=10/20 phase=reset   step_in_phase=17 attr=[-0.42179805 -0.40468505] retreated=False
+  step  5200  t= 4763  wander    mode=AGGRESSIVE  d_root=1.13  d_adp=999.00  head=(-0.47,-0.43,0.30)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=ALLOW        lift_after_releasing_slot_B_10          
+  [protocol] part=11/20 phase=transit step_in_phase=6 attr=[0.65 0.  ] retreated=False
+  step  5400  t= 4963  wander    mode=MODERATE    d_root=1.11  d_adp=0.28  head=(-0.46,-0.45,0.31)  hand=(0.39,-0.12,0.58)  v=(+0.30,+0.00)  gate=ALLOW        lift_slot_A_11                          
+  [protocol] part=11/20 phase=reset   step_in_phase=6 attr=[-0.3774236  -0.47577813] retreated=False
+  [replan] suppressed at step 5600: phase=reset retreated=False dist=999.000
+  step  5600  t= 5127  wander    mode=AGGRESSIVE  d_root=1.28  d_adp=999.00  head=(-0.42,-0.51,0.31)  hand=(0.00,0.00,2.00)  v=(+0.30,+0.00)  gate=SLOW_DOWN    lift_after_releasing_slot_B_11          
+  [protocol] part=12/20 phase=pick    step_in_phase=96 attr=[ 0.7570414  -0.14807314] retreated=False
+  step  5800  t= 5323  wander    mode=MODERATE    d_root=1.12  d_adp=0.52  head=(-0.43,-0.48,0.31)  hand=(0.15,-0.13,0.53)  v=(+0.30,+0.30)  gate=ALLOW        grasp_slot_A_12                         
+  [protocol] part=12/20 phase=place   step_in_phase=95 attr=[0.75732255 0.36068276] retreated=False
+  step  6000  t= 5493  wander    mode=AGGRESSIVE  d_root=1.33  d_adp=0.76  head=(-0.44,-0.58,0.29)  hand=(0.05,-0.11,0.30)  v=(+0.30,+0.30)  gate=ALLOW        open_gripper_to_release_slot_B_12       
+  [protocol] part=13/20 phase=pick    step_in_phase=85 attr=[ 0.86606824 -0.35866234] retreated=False
+  step  6200  t= 5683  wander    mode=AGGRESSIVE  d_root=1.17  d_adp=0.59  head=(-0.45,-0.53,0.30)  hand=(0.18,-0.30,0.47)  v=(+0.30,+0.30)  gate=ALLOW        grasp_slot_A_13                         
+  [protocol] part=13/20 phase=place   step_in_phase=84 attr=[0.8683302  0.14755867] retreated=False
+  step  6400  t= 5853  wander    mode=AGGRESSIVE  d_root=1.31  d_adp=0.77  head=(-0.47,-0.48,0.30)  hand=(0.03,-0.04,0.30)  v=(+0.30,+0.30)  gate=ALLOW        open_gripper_to_release_slot_B_13       
+  [protocol] part=14/20 phase=pick    step_in_phase=74 attr=[ 0.8663084  -0.28822607] retreated=False
+  step  6600  t= 6043  wander    mode=AGGRESSIVE  d_root=1.20  d_adp=0.62  head=(-0.49,-0.41,0.30)  hand=(0.16,-0.22,0.41)  v=(+0.30,+0.00)  gate=ALLOW        grasp_slot_A_14                         
+  [protocol] part=14/20 phase=place   step_in_phase=73 attr=[0.8680826  0.21915203] retreated=False
+  step  6800  t= 6219  wander    mode=AGGRESSIVE  d_root=1.34  d_adp=0.76  head=(-0.45,-0.47,0.31)  hand=(0.05,-0.03,0.30)  v=(+0.30,+0.00)  gate=ALLOW        open_gripper_to_release_slot_B_14       
+  [protocol] part=15/20 phase=pick    step_in_phase=63 attr=[ 0.86661476 -0.2178489 ] retreated=False
+  step  7000  t= 6403  wander    mode=AGGRESSIVE  d_root=1.21  d_adp=0.61  head=(-0.43,-0.47,0.32)  hand=(0.17,-0.18,0.34)  v=(+0.30,+0.00)  gate=ALLOW        grasp_slot_A_15                         
+  [protocol] part=15/20 phase=place   step_in_phase=62 attr=[0.8679392  0.28898814] retreated=False
+  step  7200  t= 6590  wander    mode=AGGRESSIVE  d_root=1.37  d_adp=0.78  head=(-0.45,-0.46,0.31)  hand=(0.05,-0.01,0.30)  v=(+0.30,+0.00)  gate=ALLOW        open_gripper_to_release_slot_B_15       
+  [protocol] part=16/20 phase=pick    step_in_phase=53 attr=[ 0.866898   -0.14742051] retreated=False
+  step  7400  t= 6764  wander    mode=AGGRESSIVE  d_root=1.23  d_adp=0.69  head=(-0.46,-0.54,0.30)  hand=(0.09,-0.17,0.30)  v=(+0.30,+0.00)  gate=ALLOW        grasp_slot_A_16                         
+  [protocol] part=16/20 phase=place   step_in_phase=52 attr=[0.8676615 0.3595743] retreated=False
+  step  7600  t= 6961  wander    mode=AGGRESSIVE  d_root=1.40  d_adp=0.80  head=(-0.45,-0.45,0.31)  hand=(0.06,-0.00,0.30)  v=(+0.30,+0.00)  gate=ALLOW        open_gripper_to_release_slot_B_16       
+  [protocol] part=17/20 phase=pick    step_in_phase=43 attr=[ 0.9765313  -0.35792592] retreated=False
+  step  7800  t= 7125  wander    mode=AGGRESSIVE  d_root=1.32  d_adp=0.71  head=(-0.47,-0.43,0.29)  hand=(0.19,-0.28,0.30)  v=(+0.30,+0.00)  gate=ALLOW        descend_to_slot_A_17                    
+  [protocol] part=17/20 phase=place   step_in_phase=42 attr=[0.9781892  0.14914572] retreated=False
+  step  8000  t= 7325  wander    mode=AGGRESSIVE  d_root=1.42  d_adp=0.85  head=(-0.46,-0.40,0.31)  hand=(0.05,0.02,0.30)  v=(+0.30,+0.00)  gate=ALLOW        descend_to_box_with_slot_B_17           
+  [protocol] part=18/20 phase=pick    step_in_phase=32 attr=[ 0.9765488  -0.28757846] retreated=False
+  step  8200  t= 7485  wander    mode=AGGRESSIVE  d_root=1.31  d_adp=0.70  head=(-0.43,-0.50,0.31)  hand=(0.19,-0.24,0.30)  v=(+0.30,+0.00)  gate=ALLOW        descend_to_slot_A_18                    
+  [protocol] part=18/20 phase=place   step_in_phase=31 attr=[0.9783136  0.21904895] retreated=False
+  step  8400  t= 7685  wander    mode=AGGRESSIVE  d_root=1.53  d_adp=0.93  head=(-0.40,-0.77,0.28)  hand=(0.10,-0.30,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_box_with_slot_B_18           
+  [protocol] part=19/20 phase=pick    step_in_phase=21 attr=[ 0.97673625 -0.21727188] retreated=False
+  step  8600  t= 7845  wander    mode=AGGRESSIVE  d_root=1.29  d_adp=0.76  head=(-0.44,-0.55,0.30)  hand=(0.14,-0.21,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_slot_A_19                    
+  [protocol] part=19/20 phase=place   step_in_phase=20 attr=[0.9782218  0.28931054] retreated=False
+  step  8800  t= 8045  wander    mode=AGGRESSIVE  d_root=1.47  d_adp=0.91  head=(-0.46,-0.51,0.29)  hand=(0.04,-0.07,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_box_with_slot_B_19           
+  [protocol] part=20/20 phase=pick    step_in_phase=10 attr=[ 0.97690725 -0.14691022] retreated=False
+  step  9000  t= 8205  wander    mode=AGGRESSIVE  d_root=1.32  d_adp=0.80  head=(-0.47,-0.47,0.30)  hand=(0.10,-0.13,0.28)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_slot_A_20                    
+  [protocol] part=20/20 phase=place   step_in_phase=9 attr=[0.9781183 0.3598145] retreated=False
+  step  9200  t= 8405  wander    mode=AGGRESSIVE  d_root=1.51  d_adp=0.94  head=(-0.48,-0.45,0.30)  hand=(0.02,0.00,0.30)  v=(+0.30,+0.30)  gate=ALLOW        descend_to_box_with_slot_B_20           
+
+[phase3] ALL PARTS PLACED at step 9290
+[phase3] Metrics written to /opt/projects/g1_ur10e_disturbance/results/final_six_ordered/static_occupancy_proxy_s42_012630/static_occupancy_proxy_s42_012630.csv
+[phase3] time_step=8465  success=True  parts=20/20  task_completed=True
+[phase3] Safety: STOP=40  SLOW=186  REPLAN=4  STUCK=0
+[phase3] Proximity: min=0.770m  mean=1.174m
+2026-07-20T02:10:12Z [2,621,088ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.
+2026-07-20T02:10:12Z [2,621,088ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)

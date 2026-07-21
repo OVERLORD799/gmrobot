@@ -85,6 +85,11 @@ class RuleEngine:
 
         hard_stop = cfg.effective_hard_stop
         warn_dist = cfg.effective_warn
+        # Audit: thresholds actually used this step (dynamic warn may override).
+        metadata["safe_dist_hard_stop_active"] = float(hard_stop)
+        metadata["safe_dist_warn_active"] = float(warn_dist)
+        if dist_min_held is not None:
+            metadata["dist_min_held"] = float(dist_min_held)
         # Option A static_far: use envelope-specific threshold under envelope gating
         # (ADR O2 / W16), falling back to disabled when neither is configured.
         if use_envelope:

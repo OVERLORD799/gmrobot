@@ -1,0 +1,63 @@
+# B1: Static Occupancy Proxy (§6.3)
+# Virtual hand enters placement zone and becomes stationary during UR10e
+# transit.  Uses per-part-protocol for deterministic phase-driven hand
+# behaviour: hand blocks corridor during TRANSIT, retreats during PICK/PLACE.
+#
+# Expected: static risk detected → STOP or SLOW → replan → hand retreat → task resumes.
+#
+# Dual role: batch_runner YAML + run_phase3.py --config YAML.
+
+name: "static_occupancy_proxy"
+description: "B1 static occupancy — proxy hand blocks transit corridor, triggers STOP/SLOW/replan, task resumes after retreat"
+mode: "constrained_wander"
+scenario: "constrained_wander"
+
+per_part_protocol: true  # deterministic Pick→Transit→Place→Reset phases
+
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+  enable_replan: true
+  replan:
+    held_critical_replan_enabled: true
+
+virtual_hand:
+  # reach = kinematic centre reach; proxy_* = occupancy envelope (not warn).
+  reach_radius: 0.55
+  transit_proxy_radius: 0.40
+  pick_place_proxy_radius: 0.08
+  reset_proxy_radius: 0.30
+  speed: 0.12
+  height_mode: "table"
+  retreat_steps: 200
+
+episode:
+  max_steps: 15000
+  num_parts: 20
+
+# ── run_phase3.py --config sections ──
+# G1 workspace is NOT hardcoded in run_phase3 — tune here using measured g1_head_*.
+disturbance:
+  workspace_x: [0.00, 0.15]
+  workspace_y: [-0.5, 0.5]
+  cautious_threshold: 0.15
+  moderate_threshold: 0.55
+  g1_spawn_x: -1.45
+  g1_spawn_y: 0.0
+  g1_spawn_yaw: 0.0
+  g1_spawn_jitter_xy: 0.0
+
+batch:
+  max_steps: 15000
+  output_csv: ""   # overridden by --output_csv CLI arg
+
+# Expected behaviour (§6.2):
+#   disturbance_source: scripted_virtual_hand
+#   risk_type: static
+#   gate_range: STOP or SLOW_DOWN (at least 1 event attributed to virtual hand)
+#   replan_expected: true (after sustained SLOW_DOWN during transit)
+#   physical_contact: false
+#   pass_threshold: >=1 STOP/SLOW attributed to virtual hand,
+#                    task makes progress (parts placed > 0)
+seed: 42
+repeat: 3

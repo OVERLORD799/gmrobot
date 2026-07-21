@@ -1,0 +1,44 @@
+# B0: Safety Baseline (§6.3)
+# G1 wanders safely far from UR10e workspace.  UR10e completes full
+# pick-and-place task.  NO virtual hand — clean baseline proving zero
+# false positives when no disturbance source is active.
+#
+# This file serves dual role:
+#   1. batch_runner YAML (name, scenario, mode, safety, episode, seed, repeat)
+#   2. run_phase3.py --config YAML (disturbance, batch sections)
+
+name: "baseline_safe"
+description: "B0 safety baseline — G1 safe wander, no UR10e interference, no virtual hand"
+mode: "constrained_wander"
+scenario: "constrained_wander"
+
+safety:
+  config_path: "configs/safety_layer1.yaml"
+  enable_envelope: true
+
+episode:
+  max_steps: 10000
+  num_parts: 20
+
+# ── run_phase3.py --config sections ──
+
+# G1 stays far from table (x < 0.0 keeps G1 >= 0.75 m from containers).
+disturbance:
+  workspace_x: [-0.5, 0.0]
+  workspace_y: [-0.3, 0.3]
+  cautious_threshold: 0.10
+  moderate_threshold: 0.30
+
+batch:
+  max_steps: 10000
+  output_csv: ""   # overridden by --output_csv CLI arg
+
+# Expected behaviour (§6.2):
+#   disturbance_source: g1_body
+#   risk_type: none
+#   gate_range: ALLOW (no STOP/SLOW attributed to G1)
+#   replan_expected: false
+#   physical_contact: false
+#   pass_threshold: 0 G1-attributed STOP events, task completes
+seed: 42
+repeat: 3

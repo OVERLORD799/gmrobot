@@ -1,0 +1,50 @@
+2026-07-20T06:26:13Z [6,874ms] [Error] [omni.appwindow.plugin] Failed to acquire IWindowing interface
+2026-07-20T06:26:13Z [6,874ms] [Error] [omni.appwindow.plugin] IAppWindow::startup failed
+2026-07-20T06:26:13Z [7,289ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T06:26:14Z [8,178ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T06:26:14Z [8,178ms] [Error] [omni.ui.python] AttributeError: 'NoneType' object has no attribute 'get_window_minimize_event_stream'
+
+At:
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/window.py(136): __init__
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(203): __show_window
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(139): <lambda>
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(141): __init__
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(250): <listcomp>
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(249): create_viewport_window_menu
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/extension.py(37): on_startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(173): _startup_ext
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(233): startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(337): startup_extension
+  PythonExtension.cpp::startup()(2): <module>
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(534): _start_app
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(270): __init__
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(823): _create_app
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(131): __init__
+  /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py(261): <module>
+
+2026-07-20T06:26:15Z [8,635ms] [Error] [carb.scripting-python.plugin] AttributeError: 'NoneType' object has no attribute 'get_keyboard'
+
+At:
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/physxViewportOverlays.py(64): _attach_keyboard_events
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/physxViewportOverlays.py(57): on_startup
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/extension.py(110): on_startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(175): _startup_ext
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(233): startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(337): startup_extension
+  PythonExtension.cpp::startup()(2): <module>
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(534): _start_app
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(270): __init__
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(823): _create_app
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(131): __init__
+  /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py(261): <module>
+
+2026-07-20T06:26:15Z [8,635ms] [Error] [omni.ext.plugin] [ext: omni.physx.ui-107.3.26] Failed to startup python extension.
+2026-07-20T06:26:19Z [12,924ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T06:26:19Z [12,946ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T06:26:19Z [13,466ms] [Error] [omni.kit.menu.utils.app_menu] Hotkeys cannot be setup without a default window
+2026-07-20T06:26:28Z [22,391ms] [Error] [omni.physicsschema.plugin] Rigid Body of (/World/envs/env_0/ContainerA/Container/Ref) missing xformstack reset when child of another enabled rigid body (/World/envs/env_0/ContainerA/Container) in hierarchy. Simulation of multiple RigidBodyAPI's in a hierarchy will cause unpredicted results. Please fix the hierarchy or use XformStack reset.
+2026-07-20T06:26:28Z [22,395ms] [Error] [omni.physicsschema.plugin] Rigid Body of (/World/envs/env_0/ContainerB/Container/Ref) missing xformstack reset when child of another enabled rigid body (/World/envs/env_0/ContainerB/Container) in hierarchy. Simulation of multiple RigidBodyAPI's in a hierarchy will cause unpredicted results. Please fix the hierarchy or use XformStack reset.
+2026-07-20T06:26:29Z [22,805ms] [Error] [omni.physx.plugin] PhysX error: PxRigidBody::setRigidBodyFlag(): kinematic bodies with CCD enabled are not supported! CCD will be ignored., FILE /builds/omniverse/physics/physx/source/physx/src/NpRigidBodyTemplate.h, LINE 645
+2026-07-20T06:26:29Z [22,806ms] [Error] [omni.physx.plugin] PhysX error: PxRigidBody::setRigidBodyFlag(): kinematic bodies with CCD enabled are not supported! CCD will be ignored., FILE /builds/omniverse/physics/physx/source/physx/src/NpRigidBodyTemplate.h, LINE 645
+2026-07-20T07:02:54Z [2,208,563ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T07:02:54Z [2,208,565ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window

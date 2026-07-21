@@ -981,9 +981,10 @@ class DualRobotDisturbanceEnvCfg(ManagerBasedRLEnvCfg):
 
     def __post_init__(self):
         self.decimation = 4
-        # Configurable via env var EPISODE_LENGTH_S; default 200s = 10000 steps at 50Hz.
-        # GMRobot 20-part trajectory needs ~7521 steps; disturbance adds STOP/rewind overhead.
-        self.episode_length_s = float(os.environ.get("EPISODE_LENGTH_S", "200.0"))
+        # Configurable via env var EPISODE_LENGTH_S; default 300s = 15000 steps
+        # at 50 Hz.  B1 (20 parts + replan overhead) needs >10000 steps.
+        # run_phase3.py further raises this to cover --max_steps when needed.
+        self.episode_length_s = float(os.environ.get("EPISODE_LENGTH_S", "300.0"))
         self.sim.dt = 0.005  # 200 Hz physics
         self.sim.render_interval = self.decimation
 

@@ -218,7 +218,14 @@ def select_detour_strategy(
 
     # R7: when headroom is ample (hand is below EE operating ceiling),
     # prefer RAISE_HIGH — go OVER the obstacle entirely rather than around it.
-    if headroom >= Z_HEADROOM_RAISE_HIGH_M:
+    # Exceptions:
+    #   - Held object at risk (closest or tight) → raising risks knock-off.
+    #   - TTC / ttc_forecast → time-critical; immediate lateral movement needed.
+    if (
+        headroom >= Z_HEADROOM_RAISE_HIGH_M
+        and not (held_is_closest or held_tight)
+        and trigger_rule not in ("ttc", "ttc_forecast")
+    ):
         scores[DetourStrategy.RAISE_THEN_LATERAL] += 4.0
         reasons[DetourStrategy.RAISE_THEN_LATERAL] = f"raise_high:headroom={headroom:.3f}m"
         scores[DetourStrategy.LATERAL_FIRST] -= 1.0

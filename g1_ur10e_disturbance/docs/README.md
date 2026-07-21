@@ -1,8 +1,8 @@
 # GMDisturb 项目文档总索引
 
 GMDisturb 是一个**双机器人联合仿真框架**，用于测试 GMRobot 安全层的边界和弱点。
-G1 人形机器人作为扰动源在 UR10e 机械臂旁行走/伸手，触发安全门（STOP/SLOW_DOWN），
-验证 GMRobot 的 RuleEngine + SafetyGate 在真实物理交互下的行为。
+G1 人形机器人、明确标注的代理手或脚本化虚拟手作为扰动源，触发安全门（STOP/SLOW_DOWN），
+验证 GMRobot 的 RuleEngine、SafetyGate 和 replan 在 Isaac Lab 仿真中的行为。当前默认过滤 G1↔UR10e PhysX 碰撞响应，不得描述为真机或真实物理碰撞验证。
 
 ## 涉及项目
 
@@ -56,6 +56,9 @@ G1 人形机器人作为扰动源在 UR10e 机械臂旁行走/伸手，触发安
 
 | 文件 | 内容 |
 |------|------|
+| [paper-demo-implementation-plan-2026-07-18.md](cross-project/paper-demo-implementation-plan-2026-07-18.md) | 论文实施任务书：五阶段闭环、G1真实手臂、对抗基准、消融实验与验收合同 |
+| [paper-demo-status-2026-07-20.md](cross-project/paper-demo-status-2026-07-20.md) | 当前事实源：B0/B1最终证据、里程碑状态、已证明/未证明边界 |
+| [code-agent-b2-b4-instructions-2026-07-20.md](cross-project/code-agent-b2-b4-instructions-2026-07-20.md) | 下一轮代码 agent 指令：B2动态横扫与B4-Dynamic同轨迹shadow对照 |
 | [iteration-plan.md](cross-project/iteration-plan.md) | 迭代计划：4 轮测试 → AGGRESSIVE→MODERATE→CAUTIOUS 循环 |
 | [gmrobot-weaknesses.md](cross-project/gmrobot-weaknesses.md) | GMRobot 弱点报告：W1-W5 分析 + 验证场景 |
 | [adversarial-review.md](cross-project/adversarial-review.md) | 对抗性审查 #1 (2026-07-01)：26 个问题 |
@@ -77,32 +80,36 @@ G1 人形机器人作为扰动源在 UR10e 机械臂旁行走/伸手，触发安
 
 ### 按角色
 
-- **新开发者** → [ARCHITECTURE.md](ARCHITECTURE.md) + [DATA_FLOW.md](DATA_FLOW.md)
+- **新开发者** → [paper-demo-status-2026-07-20.md](cross-project/paper-demo-status-2026-07-20.md) + [ARCHITECTURE.md](ARCHITECTURE.md) + [DATA_FLOW.md](DATA_FLOW.md)
 - **测试工程师** → [SCENARIOS.md](SCENARIOS.md) + [cross-project/gmrobot-weaknesses.md](cross-project/gmrobot-weaknesses.md)
 - **GMRobot 开发者** → [gmrobot/架构总览.md](gmrobot/架构总览.md) + [fixes/coordination-items.md](fixes/coordination-items.md)
-- **架构决策** → [ROBOT_SELECTION.md](ROBOT_SELECTION.md) + [cross-project/iteration-plan.md](cross-project/iteration-plan.md)
+- **下一轮代码 agent** → [code-agent-b2-b4-instructions-2026-07-20.md](cross-project/code-agent-b2-b4-instructions-2026-07-20.md)
+- **架构决策** → [paper-demo-implementation-plan-2026-07-18.md](cross-project/paper-demo-implementation-plan-2026-07-18.md) + [ROBOT_SELECTION.md](ROBOT_SELECTION.md)
 
 ### 按阶段
 
 | 阶段 | 关键文档 |
 |------|---------|
-| Phase 1-2（已完成） | [fixes/gmdisturb-self-fixes.md](fixes/gmdisturb-self-fixes.md) |
-| Phase 3（已完成） | [DATA_FLOW.md](DATA_FLOW.md) + [INTERFACES.md](INTERFACES.md) |
-| Phase 4（已完成） | [ROBOT_SELECTION.md](ROBOT_SELECTION.md)。手臂控制 (`g1_arm_controller.py`) 已实现但因行走策略限制不启用；虚拟手 (`g1_virtual_hand.py`) 作为替代方案 |
-| Phase 5+（未完成） | [cross-project/gmrobot-weaknesses.md](cross-project/gmrobot-weaknesses.md) + [fixes/coordination-items.md](fixes/coordination-items.md) + **[ARCHITECTURE.md §未完工清单](ARCHITECTURE.md#未完工清单2026-07-11审计)** |
+| 论文 M0（已完成） | 可信测试基础、Docker、种子、归因、B0/B1 批测入口 |
+| 论文 M1（部分完成） | B0/B1 已完成；B2–B4 待实现。见 [当前状态](cross-project/paper-demo-status-2026-07-20.md) |
+| 论文 M2（未完成） | G1 真实手臂状态机与真实手 body 门禁证据 |
+| 论文 M3（未完成验收） | 五阶段视觉闭环与 PPE/工具对照 |
+| 论文 M4（未开始） | 5-seed 消融、统计、视频和结果冻结 |
 
 ---
 
-## 项目状态（2026-07-11 最终）
+## 项目状态（2026-07-20）
 
-| Phase | 状态 |
+| 范围 | 状态 |
 |-------|------|
-| 1-4, 6-7 | ✅ 全部完成 |
-| 5 | ✅ 完成 — [4 场景对比 + F1-F4 发现](findings/phase5-batch-results.md) |
-| 代码 gap | ✅ 13/13 清零 |
-| 已知限制 | G1 物理手臂不启用；vy=0 限制覆盖（见 F1）；VLM 服务器临时 |
+| 历史工程 Phase 1–7 | 已有实现与历史测试，但不能等同于论文 Definition of Done |
+| 论文 M0 | ✅ 完成 |
+| B0/B1 最小切片 | ✅ 各 3 seeds、20/20、最终门禁通过 |
+| 论文 M1 | 🟡 部分完成：B2–B4 待实现 |
+| 论文 M2–M4 | ❌ 未完成 |
+| 当前完整项目结论 | **未完成，不得向评审宣称完整系统已经交付** |
 
-**全部 7 个 Phase 完工。**
+最新证据与边界以 [paper-demo-status-2026-07-20.md](cross-project/paper-demo-status-2026-07-20.md) 为准。旧文档中的“Phase 完成”只表示历史工程任务状态，不覆盖论文验收合同。
 
 ---
 
@@ -121,3 +128,5 @@ G1 人形机器人作为扰动源在 UR10e 机械臂旁行走/伸手，触发安
 | 2026-07-10 | 对抗性审查 #3 (ponytail): 17 issues (2 CRITICAL 全新)。SSH 凭据泄露修复，VLM prompt 纠正，5 文件 9 改动 | [cross-project/adversarial-review-ponytail-2026-07-10.md](cross-project/adversarial-review-ponytail-2026-07-10.md) |
 | 2026-07-11 | 文档全面同步: ARCHITECTURE/DATA_FLOW/INTERFACES/VARIABLES/SCENARIOS/README 全部与代码对齐 | 本文件 |
 | **2026-07-11** | **对抗性审查 #4 (ponytail): 12 issues (1 CRITICAL 回归 + 2 HIGH 全新)** — C1 密码仍在 git 追踪的 YAML 中；H1 配置管线断开；H2 argparse 幽灵选项 | [cross-project/adversarial-review-ponytail-2026-07-11.md](cross-project/adversarial-review-ponytail-2026-07-11.md) |
+| 2026-07-18 | 确立“GMRobot 五阶段 + G1 对抗基准”论文实施合同 | [cross-project/paper-demo-implementation-plan-2026-07-18.md](cross-project/paper-demo-implementation-plan-2026-07-18.md) |
+| 2026-07-20 | M0 完成，B0/B1 各 3 seeds 最终门禁通过；项目仍未完成 | [cross-project/paper-demo-status-2026-07-20.md](cross-project/paper-demo-status-2026-07-20.md) |

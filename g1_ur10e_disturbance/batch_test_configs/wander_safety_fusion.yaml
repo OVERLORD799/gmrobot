@@ -1,6 +1,7 @@
 name: "wander_safety_fusion"
 description: "constrained_wander + safety_fusion (L1+L2 baseline)"
 mode: "constrained_wander"
+scenario: "constrained_wander"
 safety:
   config_path: "configs/safety_fusion.yaml"
   enable_envelope: true

@@ -20,8 +20,10 @@ _PROJ_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _PROJ_ROOT not in sys.path:
     sys.path.insert(0, _PROJ_ROOT)
 
-from paths import PHASE3_SCRIPT as _PHASE3, CONDA_PYTHON as _PYTHON, \
+from paths import PHASE3_SCRIPT as _PHASE3, resolve_python, \
     ISAACLAB_ROOT as _ISAAC_LAB, CONDA_PREFIX as _CONDA_PREFIX
+
+_PYTHON = resolve_python()
 
 parser = argparse.ArgumentParser(description="GMDisturb Batch Runner")
 parser.add_argument("--radii", type=str, default="0.5,0.8,1.0",

@@ -6,7 +6,7 @@
 #   ./export.sh --tag v2.0   # export a specific tag
 set -euo pipefail
 
-TAG="gmdisturb:latest"
+TAG="gmdisturb:paper-demo-20260718"
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --tag) TAG="$2"; shift 2 ;;

@@ -12,6 +12,7 @@ Usage::
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 
 # Workspace layout: GMrobot/{g1_ur10e_disturbance, GMRobot, pressure_mat_repro}
@@ -37,7 +38,23 @@ PRESSURE_MAT_ROOT = os.environ.get(
 # ---------------------------------------------------------------------------
 
 # Executables
+# Prefer ISAAC_PYTHON (Docker / Isaac Kit) over bare-metal conda fallback.
+# Do not invent CONDA_PREFIX inside containers — set ISAAC_PYTHON instead.
+ISAAC_PYTHON = os.environ.get("ISAAC_PYTHON", "")
 CONDA_PYTHON = os.path.join(CONDA_PREFIX, "bin", "python3")
+
+
+def resolve_python() -> str:
+    """Return the interpreter that should launch Isaac / phase3 subprocesses."""
+    if ISAAC_PYTHON and os.path.exists(ISAAC_PYTHON):
+        return ISAAC_PYTHON
+    if os.path.exists(CONDA_PYTHON):
+        return CONDA_PYTHON
+    return sys.executable
+
+
+# Back-compat alias used by batch runners
+PYTHON = resolve_python()
 
 # GMDisturb project
 PHASE3_SCRIPT = os.path.join(GMDISTURB_ROOT, "scripts", "run_phase3.py")

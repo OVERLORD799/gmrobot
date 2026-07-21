@@ -1,0 +1,48 @@
+# B1 mini: 3-part static occupancy proxy for fast GPU validation.
+# Same protocol / replan wiring as static_occupancy_proxy.yaml, truncated
+# to ~2000–2500 steps so attempt/retreat/replan invariants can be checked
+# without a full 57-minute episode.
+
+name: "static_occupancy_proxy_mini"
+description: "B1 mini (3 parts) — validate attempt uniqueness and replan→retreat order"
+mode: "constrained_wander"
+scenario: "constrained_wander"
+
+per_part_protocol: true
+
+safety:
+  config_path: "configs/safety_fusion.yaml"
+  enable_envelope: true
+  enable_replan: true
+  replan:
+    held_critical_replan_enabled: true
+
+virtual_hand:
+  reach_radius: 0.55
+  transit_proxy_radius: 0.40
+  pick_place_proxy_radius: 0.08
+  reset_proxy_radius: 0.30
+  speed: 0.12
+  height_mode: "table"
+  retreat_steps: 200
+
+episode:
+  max_steps: 4000
+  num_parts: 3
+
+disturbance:
+  workspace_x: [0.00, 0.15]
+  workspace_y: [-0.5, 0.5]
+  cautious_threshold: 0.15
+  moderate_threshold: 0.55
+  g1_spawn_x: -1.45
+  g1_spawn_y: 0.0
+  g1_spawn_yaw: 0.0
+  g1_spawn_jitter_xy: 0.0
+
+batch:
+  max_steps: 4000
+  output_csv: ""
+
+seed: 42
+repeat: 1

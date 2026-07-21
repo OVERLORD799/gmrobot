@@ -1,0 +1,27 @@
+{
+  "cli_seed": 43,
+  "env_seed": 43,
+  "controller_seed": 43,
+  "virtual_hand_seed": null,
+  "physx_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit.",
+  "applied": {
+    "seed": 43,
+    "python_random": true,
+    "numpy": true,
+    "torch": true,
+    "torch_cuda": true,
+    "env_cfg_seed": 43,
+    "physx_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit."
+  },
+  "g1_root_initial": {
+    "x": -1.5754038095474243,
+    "y": -0.09063615649938583,
+    "z": -0.25,
+    "quat_wxyz": [
+      0.9997479915618896,
+      -5.960464477539063e-08,
+      3.91155481338501e-08,
+      -0.02245151996612549
+    ]
+  }
+}

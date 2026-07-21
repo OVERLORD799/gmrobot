@@ -1,0 +1,5 @@
+tag=gmdisturb:b2-20260720
+image_id=sha256:20da7e8d0a450902dadfd3de061751116f060b617c626edb539d131bb87960a0
+base_image=nvcr.io/nvidia/isaac-sim:5.1.0
+base_image_digest=nvcr.io/nvidia/isaac-sim@sha256:f3563cb2ba0c18af0b2fb321360dcb73a917b899f879e3213623d6bee484fa54
+built_at=2026-07-20T10:33:26Z

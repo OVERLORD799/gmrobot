@@ -45,26 +45,47 @@ def _action() -> np.ndarray:
 
 
 def test_vlm_log_fields_from_result_maps_api_keys():
+    """VLM API response keys map to SafetyLogger CSV columns.
+
+    Design truth (2026-07-18, §8.1): VLM structured output schema includes
+    risk_class, confidence, suggested_action, model_id, plus extended fields
+    (explanation, keywords, risk_type, risk_confidence, parse_ok) for the
+    full paper-demo logging pipeline.
+    """
     fields = vlm_log_fields_from_result(
         {
-            "vlm_risk_type": "static",
+            "vlm_risk_class": "static",
             "vlm_confidence": 0.82,
             "vlm_suggested_action": "slow_down",
             "model_id": "Qwen2.5-VL-7B-Instruct-awq",
         },
         rgb_frame_path="vlm:step=100",
     )
-    assert fields == {
-        "vlm_risk_class": "static",
-        "vlm_confidence": "0.82",
-        "vlm_suggested_action": "slow_down",
-        "vlm_model_id": "Qwen2.5-VL-7B-Instruct-awq",
-        "rgb_frame_path": "vlm:step=100",
-    }
+    # Core mapping fields must be present.
+    assert fields["vlm_risk_class"] == "static"
+    assert fields["vlm_confidence"] == "0.82"
+    assert fields["vlm_suggested_action"] == "slow_down"
+    assert fields["vlm_model_id"] == "Qwen2.5-VL-7B-Instruct-awq"
+    assert fields["rgb_frame_path"] == "vlm:step=100"
+    # Extended fields (added for paper-demo structured logging).
+    assert "vlm_explanation" in fields
+    assert "vlm_keywords" in fields
+    assert "vlm_risk_type" in fields
+    assert "vlm_risk_confidence" in fields
+    assert "vlm_parse_ok" in fields
 
 
-def test_vlm_log_fields_from_result_returns_none_on_error():
-    assert vlm_log_fields_from_result({"ok": False, "error": "timeout"}) is None
+def test_vlm_log_fields_from_result_returns_error_dict_on_error():
+    """VLM error response returns error dict (not None) so CSV columns are explicit.
+
+    Design truth (2026-07-18): returning a dict with vlm_risk_class="error" is
+    better than returning None — it leaves an explicit audit trail in the CSV
+    rather than silently forward-filling stale data.
+    """
+    fields = vlm_log_fields_from_result({"ok": False, "error": "timeout"})
+    assert fields is not None
+    assert fields["vlm_risk_class"] == "error"
+    assert fields["vlm_suggested_action"] == "error"
 
 
 def test_safety_logger_forward_fills_vlm_columns():
@@ -97,6 +118,6 @@ def test_safety_logger_forward_fills_vlm_columns():
 
 if __name__ == "__main__":
     test_vlm_log_fields_from_result_maps_api_keys()
-    test_vlm_log_fields_from_result_returns_none_on_error()
+    test_vlm_log_fields_from_result_returns_error_dict_on_error()
     test_safety_logger_forward_fills_vlm_columns()
     print("All VLM logger unit tests passed.")

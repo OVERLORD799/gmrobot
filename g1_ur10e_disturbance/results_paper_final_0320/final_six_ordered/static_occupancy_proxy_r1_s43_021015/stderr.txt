@@ -1,0 +1,96 @@
+2026-07-20T02:10:17Z [1,321ms] [Error] [omni.appwindow.plugin] Failed to acquire IWindowing interface
+2026-07-20T02:10:17Z [1,321ms] [Error] [omni.appwindow.plugin] IAppWindow::startup failed
+2026-07-20T02:10:17Z [1,570ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T02:10:17Z [1,570ms] [Error] [omni.ui.python] AttributeError: 'NoneType' object has no attribute 'get_window_minimize_event_stream'
+
+At:
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/window.py(136): __init__
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(203): __show_window
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(139): <lambda>
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(141): __init__
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(250): <listcomp>
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/menu_entry.py(249): create_viewport_window_menu
+  /isaac-sim/extscache/omni.kit.viewport.window-107.2.0+69cbf6ad/omni/kit/viewport/window/extension.py(37): on_startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(173): _startup_ext
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(233): startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(337): startup_extension
+  PythonExtension.cpp::startup()(2): <module>
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(534): _start_app
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(270): __init__
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(823): _create_app
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(131): __init__
+  /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py(261): <module>
+
+2026-07-20T02:10:17Z [1,595ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T02:10:17Z [1,683ms] [Error] [carb.scripting-python.plugin] AttributeError: 'NoneType' object has no attribute 'get_keyboard'
+
+At:
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/physxViewportOverlays.py(64): _attach_keyboard_events
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/physxViewportOverlays.py(57): on_startup
+  /isaac-sim/extscache/omni.physx.ui-107.3.26+107.3.3.lx64.r.cp311.u353/omni/physxui/scripts/extension.py(110): on_startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(175): _startup_ext
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(233): startup
+  /isaac-sim/kit/kernel/py/omni/ext/_impl/_internal.py(337): startup_extension
+  PythonExtension.cpp::startup()(2): <module>
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(534): _start_app
+  /isaac-sim/exts/isaacsim.simulation_app/isaacsim/simulation_app/simulation_app.py(270): __init__
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(823): _create_app
+  /opt/IsaacLab/source/isaaclab/isaaclab/app/app_launcher.py(131): __init__
+  /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py(261): <module>
+
+2026-07-20T02:10:17Z [1,683ms] [Error] [omni.ext.plugin] [ext: omni.physx.ui-107.3.26] Failed to startup python extension.
+2026-07-20T02:10:20Z [4,487ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T02:10:20Z [4,491ms] [Error] [omni.kit.window.drop_support.drop_support] Cannot setup ExternalDragDrop without a default window
+2026-07-20T02:10:20Z [4,974ms] [Error] [omni.kit.menu.utils.app_menu] Hotkeys cannot be setup without a default window
+2026-07-20T02:10:30Z [14,554ms] [Error] [omni.physicsschema.plugin] Rigid Body of (/World/envs/env_0/ContainerA/Container/Ref) missing xformstack reset when child of another enabled rigid body (/World/envs/env_0/ContainerA/Container) in hierarchy. Simulation of multiple RigidBodyAPI's in a hierarchy will cause unpredicted results. Please fix the hierarchy or use XformStack reset.
+2026-07-20T02:10:30Z [14,558ms] [Error] [omni.physicsschema.plugin] Rigid Body of (/World/envs/env_0/ContainerB/Container/Ref) missing xformstack reset when child of another enabled rigid body (/World/envs/env_0/ContainerB/Container) in hierarchy. Simulation of multiple RigidBodyAPI's in a hierarchy will cause unpredicted results. Please fix the hierarchy or use XformStack reset.
+2026-07-20T02:10:30Z [14,974ms] [Error] [omni.physx.plugin] PhysX error: PxRigidBody::setRigidBodyFlag(): kinematic bodies with CCD enabled are not supported! CCD will be ignored., FILE /builds/omniverse/physics/physx/source/physx/src/NpRigidBodyTemplate.h, LINE 645
+2026-07-20T02:10:30Z [14,974ms] [Error] [omni.physx.plugin] PhysX error: PxRigidBody::setRigidBodyFlag(): kinematic bodies with CCD enabled are not supported! CCD will be ignored., FILE /builds/omniverse/physics/physx/source/physx/src/NpRigidBodyTemplate.h, LINE 645
+Traceback (most recent call last):
+  File "/opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py", line 2470, in <module>
+    main()
+  File "/opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py", line 514, in main
+    env = gym.make(task_id, cfg=env_cfg)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/isaac-sim/kit/python/lib/python3.11/site-packages/gymnasium/envs/registration.py", line 734, in make
+    env = env_creator(**env_spec_kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 80, in __init__
+    super().__init__(cfg=cfg)
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/envs/manager_based_env.py", line 180, in __init__
+    self.load_managers()
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/envs/manager_based_rl_env.py", line 117, in load_managers
+    super().load_managers()
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/envs/manager_based_env.py", line 320, in load_managers
+    self.observation_manager = ObservationManager(self.cfg.observations, self)
+                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/managers/observation_manager.py", line 83, in __init__
+    super().__init__(cfg, env)
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/managers/manager_base.py", line 177, in __init__
+    self._prepare_terms()
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/managers/observation_manager.py", line 558, in _prepare_terms
+    obs_dims = tuple(term_cfg.func(self._env, **term_cfg.params).shape)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/envs/mdp/observations.py", line 407, in image
+    images = sensor.data.output[data_type]
+             ^^^^^^^^^^^
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/sensors/camera/camera.py", line 200, in data
+    self._update_outdated_buffers()
+  File "/opt/IsaacLab/source/isaaclab/isaaclab/sensors/sensor_base.py", line 363, in _update_outdated_buffers
+    self._is_outdated[outdated_env_ids] = False
+    ~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^
+RuntimeError: CUDA error: an illegal memory access was encountered
+CUDA kernel errors might be asynchronously reported at some other API call, so the stacktrace below might be incorrect.
+For debugging consider passing CUDA_LAUNCH_BLOCKING=1
+Compile with `TORCH_USE_CUDA_DSA` to enable device-side assertions.
+
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 563
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 566
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 569
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 572
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 575
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 578
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 581
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 584
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 587
+2026-07-20T02:10:34Z [18,315ms] [Error] [omni.physx.fabric.plugin] CUDA error: an illegal memory access was encountered: ../../../extensions/runtime/source/omni.physx.fabric/plugins/DirectGpuHelper.cpp: 610

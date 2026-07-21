@@ -1,0 +1,76 @@
+{
+  "run_id": "static_occupancy_proxy_s42_012630",
+  "config_source": "/opt/projects/g1_ur10e_disturbance/paper_scenarios_b0b1/static_occupancy_proxy.yaml",
+  "config_yaml_snapshot": {
+    "name": "static_occupancy_proxy",
+    "description": "B1 static occupancy \u2014 proxy hand blocks transit corridor, triggers STOP/SLOW/replan, task resumes after retreat",
+    "mode": "constrained_wander",
+    "scenario": "constrained_wander",
+    "per_part_protocol": true,
+    "safety": {
+      "config_path": "configs/safety_fusion.yaml",
+      "enable_envelope": true,
+      "enable_replan": true,
+      "replan": {
+        "held_critical_replan_enabled": true
+      }
+    },
+    "virtual_hand": {
+      "reach_radius": 0.55,
+      "transit_proxy_radius": 0.4,
+      "pick_place_proxy_radius": 0.08,
+      "reset_proxy_radius": 0.3,
+      "speed": 0.12,
+      "height_mode": "table",
+      "retreat_steps": 200
+    },
+    "episode": {
+      "max_steps": 15000,
+      "num_parts": 20
+    },
+    "disturbance": {
+      "workspace_x": [
+        0.0,
+        0.15
+      ],
+      "workspace_y": [
+        -0.5,
+        0.5
+      ],
+      "cautious_threshold": 0.15,
+      "moderate_threshold": 0.55,
+      "g1_spawn_x": -1.45,
+      "g1_spawn_y": 0.0,
+      "g1_spawn_yaw": 0.0,
+      "g1_spawn_jitter_xy": 0.0
+    },
+    "batch": {
+      "max_steps": 15000,
+      "output_csv": ""
+    },
+    "seed": 42,
+    "repeat": 3
+  },
+  "cli_command": "/isaac-sim/kit/python/bin/python3 -u /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py --max_steps 15000 --output_csv /opt/projects/g1_ur10e_disturbance/results/final_six_ordered/static_occupancy_proxy_s42_012630/static_occupancy_proxy_s42_012630.csv --config /opt/projects/g1_ur10e_disturbance/paper_scenarios_b0b1/static_occupancy_proxy.yaml --safety-config /opt/projects/GMRobot/configs/safety_fusion.yaml --replan --virtual-hand 0.55 --virtual-hand-speed 0.12 --vhand-retreat 200 --per-part-protocol --num-parts 20 --seed 42 --disturbance-scenario-label static_occupancy_proxy",
+  "seed": 42,
+  "seeds": {
+    "cli_seed": 42,
+    "env_seed": 42,
+    "controller_seed": 42,
+    "virtual_hand_seed": 42,
+    "physx_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit."
+  },
+  "physx_reproducibility_note": "GPU PhysX / Isaac Sim may still produce frame-level non-determinism; paper runs should rely on scenario margin for statistical stability and record these seed fields for audit.",
+  "g1_spawn": {
+    "g1_spawn_requested_x": -1.45,
+    "g1_spawn_requested_y": 0.0,
+    "g1_spawn_requested_yaw": 0.0,
+    "g1_spawn_jitter_xy": 0.0
+  },
+  "git_dirty": false,
+  "python_version": "3.11.13 (tags/v3.11.13-dirty:498b971, Jun  9 2025, 16:37:36) [GCC 7.3.1 20180303 (Red Hat 7.3.1-5)]",
+  "torch_version": "2.7.0+cu128",
+  "cuda_available": true,
+  "cuda_version": "12.8",
+  "gpu_name": "NVIDIA GeForce RTX 5090 Laptop GPU"
+}

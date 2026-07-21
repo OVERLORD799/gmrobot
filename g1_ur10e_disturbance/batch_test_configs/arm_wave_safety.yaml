@@ -1,6 +1,7 @@
 name: "arm_wave_safety"
 description: "arm_wave scripted scenario + safety_fusion (dynamic obstacle test)"
 mode: "scripted"
+scenario: "arm_wave"
 safety:
   config_path: "configs/safety_fusion.yaml"
   enable_envelope: true

@@ -1,0 +1,5 @@
+attempt_id,retreat_step,redeploy_step,policy_delta_after_retreat,parts_delta_after_retreat,recovered,terminal_success,close_reason
+1,202,787,546,1,True,False,redeploy
+2,888,1473,546,1,True,False,redeploy
+3,1574,2159,546,1,True,False,redeploy
+4,2260,2790,491,1,True,False,redeploy

@@ -110,21 +110,37 @@ class PerPartTester:
     # Phase timeouts (steps @ 50 Hz).  PICK/PLACE have generous safety-net
     # timeouts — the protocol prefers stage-name transitions over timeouts.
     # TRANSIT gets a moderate timeout; RESET is the longest.
+    # When replan is preferred, TRANSIT timeout is extended so TTC/replan
+    # can fire while the hand still occupies the corridor.
     _TIMEOUT_PICK = 600      # 12 s safety net (prefer natural lift_slot transition)
     _TIMEOUT_TRANSIT = 200   # 4 s — short: if UR10e frozen, retreat quickly
+    _TIMEOUT_TRANSIT_REPLAN = 1000  # 20 s — wait for SLOW→TTC→replan first
     _TIMEOUT_PLACE = 600     # 12 s safety net
     _TIMEOUT_RESET = 900     # 18 s — generous: let UR10e complete freely
 
-    def __init__(self, user_commands: list[dict[str, str]]):
+    def __init__(
+        self,
+        user_commands: list[dict[str, str]],
+        *,
+        prefer_replan: bool = False,
+    ):
         """*user_commands* from ``SingleEnvPickAndPlacePolicy.user_commands``.
 
         Each entry: ``{"pick": "A@3", "place": "B@5"}``.
         """
         self._parts = _parse_commands(user_commands)
         self._total_parts = len(self._parts)
+        self.prefer_replan = bool(prefer_replan)
         self.state = PhaseState()
         self._last_stage: str = ""
         self._last_real_stage: str = ""  # R7: last non-replan stage name
+
+    def _transit_timeout(self) -> int:
+        return (
+            self._TIMEOUT_TRANSIT_REPLAN
+            if self.prefer_replan
+            else self._TIMEOUT_TRANSIT
+        )
 
     # ------------------------------------------------------------------
     # Public API
@@ -152,6 +168,11 @@ class PerPartTester:
     @property
     def timed_out(self) -> bool:
         return self.state.timed_out
+
+    @property
+    def phase_entered_via_timeout(self) -> bool:
+        """True while the current phase was entered by a timeout escape."""
+        return bool(self.state._timeout_forced)
 
     def update(
         self,
@@ -244,7 +265,7 @@ class PerPartTester:
             s.attractor_xy = ee_pos[:2].copy()
 
         elif s.phase == Phase.TRANSIT:
-            s.timeout_steps = self._TIMEOUT_TRANSIT
+            s.timeout_steps = self._transit_timeout()
             if part is not None:
                 pick_xy = _slot_world_xy(part.pick_container, part.pick_slot)
                 place_xy = _slot_world_xy(part.place_container, part.place_slot)
@@ -285,7 +306,7 @@ class PerPartTester:
             s.phase = Phase.TRANSIT
             s.step_in_phase = 0
             s.timed_out = False
-            s.timeout_steps = self._TIMEOUT_TRANSIT
+            s.timeout_steps = self._transit_timeout()
             part = self._parts[s.part_index] if 0 <= s.part_index < self._total_parts else None
             if part is not None:
                 pick_xy = _slot_world_xy(part.pick_container, part.pick_slot)

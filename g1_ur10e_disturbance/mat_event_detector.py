@@ -31,7 +31,9 @@ FORCE_THRESHOLD = 5.0        # N — minimum per-taxel force for a "contact"
 COLLISION_FORCE = 50.0       # N — cluster total force suggesting collision
 DROP_THRESHOLD = 30.0        # N — force change suggesting object drop (F3 fix: was 10N, too low — footsteps triggered 2377 false positives in 3000 steps)
 DROP_MAX_AREA = 4            # taxels — small cluster characteristic of dropped part
-FOOT_PROXIMITY = 0.3         # m — max distance from FK foot to classify as footstep
+FOOT_PROXIMITY = 0.45        # m — FK ankle ↔ mat cluster (raised from 0.3; B1 had footstep=0)
+# G1 walks near the table edge; contacts here are gait, not UR10e collisions.
+GAIT_ZONE_X_MAX = 0.30       # m — world x below this prefers footstep over collision
 # Workspace filter for collision classification (ARCHITECTURE.md §MatEventDetector):
 # collision_impact is only valid inside the UR10e operating area.
 WORKSPACE_X_RANGE = (0.3, 1.0)  # m — UR10e + table + container zone in world x
@@ -82,6 +84,7 @@ class MatEventDetector:
         left_foot_pos: np.ndarray,            # (2,) or (3,) world XY
         right_foot_pos: np.ndarray,           # (2,) or (3,) world XY
         part_positions: dict[str, np.ndarray] | None = None,  # part_name → (3,) world pos (M2 fix)
+        ee_pos: np.ndarray | None = None,     # UR10e EE for robot-object collision tag
     ) -> list[MatEvent]:
         """Run detection on the current tactile frame.
 
@@ -91,6 +94,7 @@ class MatEventDetector:
             right_foot_pos: FK position of right ankle in world frame.
             part_positions: dict of part_name → (3,) world positions for
                 nearest-neighbor matching of object drops (optional).
+            ee_pos: optional UR10e EE position for robot-object collision tagging.
 
         Returns:
             List of :class:`MatEvent` objects for this frame.
@@ -118,6 +122,7 @@ class MatEventDetector:
             "left":  left_foot_pos[:2].astype(np.float32),
             "right": right_foot_pos[:2].astype(np.float32),
         }
+        ee_xy = None if ee_pos is None else np.asarray(ee_pos, dtype=np.float32)
 
         for feat_id in range(1, n_features + 1):
             mask = labelled == feat_id
@@ -138,6 +143,7 @@ class MatEventDetector:
                 foot_xy=foot_xy,
                 total_force=total_force,
                 area=area,
+                ee_xy=ee_xy,
             )
 
             events.append(MatEvent(
@@ -175,19 +181,36 @@ class MatEventDetector:
         foot_xy: dict[str, np.ndarray],
         total_force: float,
         area: int,
+        ee_xy: np.ndarray | None = None,
     ) -> str:
         """Classify a single connected component."""
-        # Check proximity to feet
+        # Check proximity to feet first — never call gait contacts collisions.
         pos = np.array(world_xy, dtype=np.float32)
+        best_side = None
+        best_dist = float("inf")
         for side, fpos in foot_xy.items():
-            if np.linalg.norm(pos - fpos) < FOOT_PROXIMITY:
-                return f"footstep_{side}"
+            d = float(np.linalg.norm(pos - fpos))
+            if d < best_dist:
+                best_dist = d
+                best_side = side
+        if best_dist < FOOT_PROXIMITY and best_side is not None:
+            return f"footstep_{best_side}"
+
+        wx, wy = world_xy
+        # Gait corridor near G1 (protocol keeps body at x≲0.15): high force
+        # here is foot contact even when ankle FK is briefly unmatched.
+        if wx < GAIT_ZONE_X_MAX:
+            side = best_side if best_side is not None else "left"
+            return f"footstep_{side}"
 
         # Large force + in workspace → collision (R3 fix: workspace filter; M4 fix: y-axis)
-        wx, wy = world_xy
         if (total_force >= COLLISION_FORCE
                 and WORKSPACE_X_RANGE[0] <= wx <= WORKSPACE_X_RANGE[1]
                 and WORKSPACE_Y_RANGE[0] <= wy <= WORKSPACE_Y_RANGE[1]):
+            # Tag near-EE contacts for robot_object_collision accounting.
+            if ee_xy is not None:
+                if float(np.linalg.norm(pos - np.asarray(ee_xy[:2], dtype=np.float32))) < 0.35:
+                    return "collision_impact_robot"
             return "collision_impact"
 
         return "unknown"

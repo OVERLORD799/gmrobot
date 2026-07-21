@@ -39,6 +39,13 @@ class DisturbanceConfig:
     workspace_y: Tuple[float, float] = (-0.5, 0.5)
     vy_scale: float = 0.0       # 0 = disabled (safe); 0.05 = narrow lateral exploration
     resample_interval: int = 200
+    # Deprecated: post-reset write_root_state_to_sim park — do not use for paper.
+    park_g1_at_workspace: bool = False
+    # B1 spawn (applied to env_cfg *before* gym.make — not a post-reset teleport).
+    g1_spawn_x: float | None = None
+    g1_spawn_y: float = 0.0
+    g1_spawn_yaw: float = 0.0
+    g1_spawn_jitter_xy: float = 0.0
 
 
 @dataclass(frozen=True)
@@ -53,13 +60,32 @@ class ArmConfig:
 class VirtualHandConfig:
     """Virtual hand tunables actually consumed by G1VirtualHand / run_phase3.py.
 
-    All other behaviour (velocity persistence, attractor strength, corridor
-    geometry, table obstacle margins, reflection damping) is controlled by
-    module-level constants in ``g1_virtual_hand.py``.  Those constants are
-    tuned for the standard GMDisturb scene and rarely need changing.
+    ``reach_radius`` is kinematic reach of the proxy *centre* from G1 head.
+    ``*_proxy_radius`` values are occupancy / safety envelopes for surface
+    projection — paper geometry, not ``safe_dist_warn``.
     """
-    default_radius: float = 0.45
+    reach_radius: float = 0.45
     height_mode: str = "table"
+    transit_proxy_radius: float = 0.40
+    pick_place_proxy_radius: float = 0.08
+    reset_proxy_radius: float = 0.30
+
+    # Legacy aliases exposed for older call sites / tests.
+    @property
+    def default_radius(self) -> float:
+        return self.reach_radius
+
+    @property
+    def transit_radius(self) -> float:
+        return self.transit_proxy_radius
+
+    @property
+    def pick_place_radius(self) -> float:
+        return self.pick_place_proxy_radius
+
+    @property
+    def reset_radius(self) -> float:
+        return self.reset_proxy_radius
 
 
 @dataclass(frozen=True)
@@ -100,10 +126,25 @@ class VLMConfig:
 
 
 @dataclass(frozen=True)
+class DynamicSweepConfig:
+    """B2 world-coordinate lateral sweep (phase-triggered)."""
+
+    enabled: bool = False
+    start_xyz: Tuple[float, float, float] = (0.55, -0.35, 0.45)
+    end_xyz: Tuple[float, float, float] = (0.55, 0.35, 0.45)
+    duration_steps: int = 70
+    retreat_duration_steps: int = 50
+    trigger_phase: str = "transit"
+
+
+@dataclass(frozen=True)
 class ReplanConfig:
     trigger_threshold: int = 5   # synced with default.yaml (was 25 — stale GMRobot default)
     detour_lateral_m: float = 0.10
     detour_duration: int = 55
+    # B1 paper: allow TRANSIT held_critical STOP → immediate replan.
+    # Default False so B0 / non-paper runs stay SLOW-path only.
+    held_critical_replan_enabled: bool = False
     # ponytail: cooldown_steps / slow_decay / detour_raise_m removed —
     # GMRobot ReplanTriggerConfig manages its own cooldown (200 steps),
     # sustained_slow decay is handled internally by the trigger, and
@@ -122,6 +163,8 @@ class SafetyConfig:
     control_dt: float = 0.02
     tilt_threshold_rad: float = 0.35
     collapse_z: float = -1.0
+    # active | shadow | off — default active; B0/B1 omit field → unchanged.
+    enforcement_mode: str = "active"
     replan: ReplanConfig = field(default_factory=ReplanConfig)
     ee_track: EETrackConfig = field(default_factory=EETrackConfig)
 
@@ -143,6 +186,8 @@ class Phase3Config:
     vlm: VLMConfig = field(default_factory=VLMConfig)
     safety: SafetyConfig = field(default_factory=SafetyConfig)
     batch: BatchConfig = field(default_factory=BatchConfig)
+    dynamic_sweep: DynamicSweepConfig = field(default_factory=DynamicSweepConfig)
+    per_part_protocol: bool = False
 
     # ------------------------------------------------------------------
     # Convenience accessors that return np.array-ready values for
@@ -188,13 +233,47 @@ def _build_config(raw: dict) -> Phase3Config:
         workspace_y=tuple(d_raw.get("workspace_y", (-0.5, 0.5))),
         vy_scale=float(d_raw.get("vy_scale", 0.0)),
         resample_interval=int(d_raw.get("resample_interval", 200)),
+        park_g1_at_workspace=bool(d_raw.get("park_g1_at_workspace", False)),
+        g1_spawn_x=(
+            float(d_raw["g1_spawn_x"]) if d_raw.get("g1_spawn_x") is not None else None
+        ),
+        g1_spawn_y=float(d_raw.get("g1_spawn_y", 0.0)),
+        g1_spawn_yaw=float(d_raw.get("g1_spawn_yaw", 0.0)),
+        g1_spawn_jitter_xy=float(d_raw.get("g1_spawn_jitter_xy", 0.0)),
     )
 
     # --- virtual_hand (only fields consumed by run_phase3.py / G1VirtualHand) ---
     vh_raw = raw.get("virtual_hand", {})
+    _reach = float(
+        vh_raw.get(
+            "reach_radius",
+            vh_raw.get("default_radius", vh_raw.get("radius", 0.45)),
+        )
+    )
+    _transit_proxy = float(
+        vh_raw.get(
+            "transit_proxy_radius",
+            vh_raw.get("transit_radius", 0.40),
+        )
+    )
+    _pick_proxy = float(
+        vh_raw.get(
+            "pick_place_proxy_radius",
+            vh_raw.get("pick_place_radius", 0.08),
+        )
+    )
+    _reset_proxy = float(
+        vh_raw.get(
+            "reset_proxy_radius",
+            vh_raw.get("reset_radius", 0.30),
+        )
+    )
     virtual_hand = VirtualHandConfig(
-        default_radius=float(vh_raw.get("default_radius", 0.45)),
+        reach_radius=_reach,
         height_mode=str(vh_raw.get("height_mode", "table")),
+        transit_proxy_radius=_transit_proxy,
+        pick_place_proxy_radius=_pick_proxy,
+        reset_proxy_radius=_reset_proxy,
     )
 
     # --- vlm ---
@@ -241,14 +320,33 @@ def _build_config(raw: dict) -> Phase3Config:
         trigger_threshold=int(r_raw.get("trigger_threshold", 5)),
         detour_lateral_m=float(r_raw.get("detour_lateral_m", 0.10)),
         detour_duration=int(r_raw.get("detour_duration", 55)),
+        held_critical_replan_enabled=bool(
+            r_raw.get("held_critical_replan_enabled", False)
+        ),
     )
     safety = SafetyConfig(
         control_dt=float(s_raw.get("control_dt", 0.02)),
         tilt_threshold_rad=float(s_raw.get("tilt_threshold_rad", 0.35)),
         collapse_z=float(s_raw.get("collapse_z", -1.0)),
+        enforcement_mode=str(s_raw.get("enforcement_mode", "active")).lower(),
         replan=replan,
         ee_track=ee_track,
     )
+
+    # --- dynamic_sweep (B2) ---
+    ds_raw = raw.get("dynamic_sweep", {})
+    _start = ds_raw.get("start_xyz", [0.55, -0.35, 0.45])
+    _end = ds_raw.get("end_xyz", [0.55, 0.35, 0.45])
+    dynamic_sweep = DynamicSweepConfig(
+        enabled=bool(ds_raw.get("enabled", False)),
+        start_xyz=(float(_start[0]), float(_start[1]), float(_start[2])),
+        end_xyz=(float(_end[0]), float(_end[1]), float(_end[2])),
+        duration_steps=int(ds_raw.get("duration_steps", 70)),
+        retreat_duration_steps=int(ds_raw.get("retreat_duration_steps", 50)),
+        trigger_phase=str(ds_raw.get("trigger_phase", "transit")),
+    )
+
+    per_part_protocol = bool(raw.get("per_part_protocol", False))
 
     # --- batch ---
     b_raw = raw.get("batch", {})
@@ -276,6 +374,8 @@ def _build_config(raw: dict) -> Phase3Config:
         vlm=vlm,
         safety=safety,
         batch=batch,
+        dynamic_sweep=dynamic_sweep,
+        per_part_protocol=per_part_protocol,
     )
 
 

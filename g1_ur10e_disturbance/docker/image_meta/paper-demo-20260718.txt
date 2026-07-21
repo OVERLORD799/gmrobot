@@ -1,0 +1,5 @@
+tag=gmdisturb:paper-demo-20260718
+image_id=sha256:0320fd6e9d7c061c48fdb51bf44a738bbee5e6bd469f8e5f2e52c05963ae0ca6
+base_image=nvcr.io/nvidia/isaac-sim:5.1.0
+base_image_digest=nvcr.io/nvidia/isaac-sim@sha256:f3563cb2ba0c18af0b2fb321360dcb73a917b899f879e3213623d6bee484fa54
+built_at=2026-07-19T15:53:50Z

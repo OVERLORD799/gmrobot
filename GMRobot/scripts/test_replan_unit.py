@@ -1787,6 +1787,7 @@ def test_executor_poll_does_not_leave_stale_completed():
         trigger_source="l1_warn",
         trigger_rule="static_warn",
         dist_ee_human=0.15,
+        dist_min=0.15,
         g_rule=2,
         ee_pos=(0.8, 0.0, 0.35),
         human_hand_pos=(0.72, 0.22, 0.2),
@@ -1805,6 +1806,7 @@ def test_executor_poll_does_not_leave_stale_completed():
         trigger_source="l1_warn",
         trigger_rule="static_warn",
         dist_ee_human=0.15,
+        dist_min=0.15,
         g_rule=2,
         ee_pos=(0.8, 0.0, 0.35),
         human_hand_pos=(0.72, 0.22, 0.2),
@@ -1893,6 +1895,7 @@ def test_approach_place_post_replan_advance_disabled():
         trigger_source="l1_warn",
         trigger_rule="static_warn",
         dist_ee_human=0.25,
+        dist_min=0.25,
         g_rule=2,
         ee_pos=(0.8, 0.0, 0.35),
         human_hand_pos=(0.82, 0.02, 0.2),
@@ -1928,6 +1931,7 @@ def test_place_phase_replan_disables_post_replan_advance():
         trigger_source="l1_warn",
         trigger_rule="static_warn",
         dist_ee_human=0.15,
+        dist_min=0.15,
         g_rule=2,
         ee_pos=(0.8, 0.0, 0.13),
         human_hand_pos=(0.82, 0.02, 0.2),
@@ -1948,6 +1952,11 @@ def _load_replan_strategy():
 
 
 def test_select_lateral_first_when_z_headroom_low():
+    """LATERAL_FIRST wins when z headroom is tight (ee near ceiling).
+
+    Uses explicit z_max=0.75 (original transit ceiling before R7 raised to 0.90)
+    so the test is invariant to future ceiling adjustments.
+    """
     strategy_mod = _load_replan_strategy()
     plan = strategy_mod.select_detour_strategy(
         transport_phase="transit",
@@ -1956,6 +1965,7 @@ def test_select_lateral_first_when_z_headroom_low():
         lateral_m=0.10,
         dist_min_held=0.18,
         closest_primitive_id="arm:shoulder_link",
+        z_max=0.75,  # low ceiling → headroom=0.05 < 0.08 → lateral_first
         ee_pos=(0.7, 0.0, 0.70),
         human_hand_pos=(0.72, 0.02, 0.2),
     )
@@ -2386,6 +2396,7 @@ def test_perception_track_bonus_ignored_when_flag_off():
         trigger_rule="static_warn",
         perception_track_speed_px_s=40.0,
         perception_track_direction_deg=90.0,
+        z_max=0.75,  # low ceiling → headroom=0.07 < 0.08 → lateral_first base
     )
     off = strategy_mod.select_detour_strategy(use_perception_track_strategy=False, **kwargs)
     on = strategy_mod.select_detour_strategy(use_perception_track_strategy=True, **kwargs)

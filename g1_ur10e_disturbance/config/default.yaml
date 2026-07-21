@@ -28,8 +28,13 @@ disturbance:
 
 # ---- virtual hand (safety proxy sphere drifting near G1 head) ----
 virtual_hand:
-  default_radius: 0.45          # m — max distance from head (arm reach)
+  # Kinematic reach of the proxy *centre* from G1 head (not occupancy size).
+  reach_radius: 0.45
   height_mode: "table"          # "table"=EE height; "head"=head+0.2m
+  # Occupancy / safety envelopes (paper geometry; not safe_dist_warn).
+  transit_proxy_radius: 0.40
+  pick_place_proxy_radius: 0.08
+  reset_proxy_radius: 0.30
   # ponytail: all other behaviour (velocity persistence, attractor strength,
   # corridor geometry, table obstacle margins, reflection damping) lives in
   # g1_virtual_hand.py module-level constants — tuned for the standard scene.

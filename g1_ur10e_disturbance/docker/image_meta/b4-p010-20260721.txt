@@ -1,0 +1,5 @@
+tag=gmdisturb:b4-p010-20260721
+image_id=sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68
+base_image=nvcr.io/nvidia/isaac-sim:5.1.0
+base_image_digest=nvcr.io/nvidia/isaac-sim@sha256:f3563cb2ba0c18af0b2fb321360dcb73a917b899f879e3213623d6bee484fa54
+built_at=2026-07-21T03:33:44Z
