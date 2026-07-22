@@ -1,0 +1,171 @@
+{
+  "phase": "V1-E0",
+  "date": "2026-07-22",
+  "post_count": 0,
+  "frozen_conclusions": {
+    "D1A": "visual_semantic_low + geometry_not_allow_throughout FAIL",
+    "D1B": "functional visual established; GEOMETRY_OVERLAP",
+    "D1B-S_v1": "static@0.3/0.7 SEMANTIC_SCREEN_FAIL",
+    "D2B_v2": "static@0.8/0.8 D2B_TASK_CONTEXT_FAIL",
+    "slow_down_alone_not_positive": true,
+    "semantic_key_inconsistent": true,
+    "confidence_gate": 0.85,
+    "confidence_not_lowered": true,
+    "do_not_treat_0_8_as_pass": true,
+    "active_not_ready": true,
+    "V1_D_active": "paused",
+    "project_boundary": {
+      "five_stage_real_shadow": "PASS",
+      "semantic_supervisor_isolation": "PASS",
+      "safe_reject_low_conf_wrong_type": "PASS",
+      "real_vlm_active_feedback": "not_ready"
+    }
+  },
+  "artifact_inventory": {
+    "unique_real_isaac_rgb": 14,
+    "by_category": {
+      "SAFE_NEGATIVE": 8,
+      "STATIC_GEOMETRY": 3,
+      "AMBIGUOUS_EXCLUDED": 1,
+      "FUNCTIONAL_POSITIVE": 2
+    },
+    "non_rgb_excluded_notes": [
+      {
+        "sample_id": "v0c3_shadow_no_rgb",
+        "category": "AMBIGUOUS_EXCLUDED",
+        "reason": "Five-stage PASS with VLM+track logs but no saved scene RGB; cannot use for image eval",
+        "has_sam2_track_in_logs": true,
+        "real_isaac_rgb": false,
+        "eval_suitable": false
+      },
+      {
+        "sample_id": "v1c1r_p1_shadow_no_rgb",
+        "category": "AMBIGUOUS_EXCLUDED",
+        "reason": "Semantic shadow PASS accepted=0; track speeds logged; no RGB dump",
+        "has_sam2_track_in_logs": true,
+        "real_isaac_rgb": false,
+        "eval_suitable": false
+      },
+      {
+        "sample_id": "b0_b4_runs",
+        "category": "AMBIGUOUS_EXCLUDED",
+        "reason": "Physical B0–B4 result trees contain no PNG RGB artifacts",
+        "real_isaac_rgb": false,
+        "eval_suitable": false
+      }
+    ],
+    "b0_b4_rgb": 0,
+    "v0c3_rgb": 0,
+    "v1c1r_p1_rgb": 0
+  },
+  "usable_positives": {
+    "FUNCTIONAL_POSITIVE": 2,
+    "DYNAMIC_POSITIVE": 0,
+    "functional_scene_groups": 1,
+    "dynamic_scene_groups": 0
+  },
+  "dataset_status": "DATASET_INSUFFICIENT",
+  "dataset_insufficient_reason": "Only one functional scene-group (D1B) with 2 provisional positive frames; DYNAMIC_POSITIVE with real RGB+SAM2 = 0; V0-C3/P1 have track but no RGB. Do not approve V1-E1 live prompt matrix; collect more evidenced scenes first.",
+  "worthy_of_v1e1_live_prompt_eval": false,
+  "splits": {
+    "rule": "group_by_scene_group; D1B frames never split; no adjacent-frame leakage across development/held-out",
+    "prompt_development": [
+      "v0b1_step000000",
+      "v0b1_step000010",
+      "v0b1_step000020"
+    ],
+    "held_out_evaluation": [
+      "v0b1_step000030",
+      "v0b1_step000040",
+      "d1b_step000000",
+      "d1b_step000100",
+      "d1b_step000200"
+    ],
+    "negative_regression": [
+      "v0b1_step000050",
+      "v0b1_step000060",
+      "v0b1_step000070",
+      "d1a_step000000",
+      "d1a_step000100",
+      "d1a_step000200"
+    ]
+  },
+  "prompts": {
+    "P0": {
+      "prompt_version": "five_stage_safety_v2_temporal",
+      "preamble_sha256": "698a8697ce2a263fd7b3ce93094095bb8b4fa82f424ff4a02bedd825a93dbecc",
+      "empty_context_prompt_sha256": "40c9d7e9a1fc3c649b6e0e48673b9f87c8788db788acba5549c9f2b38037a084",
+      "schema_version": "five_stage_vlm_v2"
+    },
+    "P1": {
+      "prompt_version": "five_stage_safety_v2_ontology_p1",
+      "sha256": "dbf33bc056adfd629be6453860f89d0f4b55f5ca6380184857452853289aec69",
+      "schema_version": "five_stage_vlm_v2"
+    },
+    "P2": {
+      "prompt_version": "five_stage_safety_v2_evidence_p2",
+      "sha256": "46ae06ca33c9bcd66a2d4f5b7fd8ecfa710c5e9c1da008921fe816341d5498bb",
+      "schema_version": "five_stage_vlm_v2_evidence"
+    },
+    "P3": {
+      "prompt_version": "five_stage_safety_v2_temporal_p3",
+      "sha256": "a8fd56a92fa42fb499f6db1b699b1ba850ec1217064e53917566d66cc2e0f45b",
+      "schema_version": "five_stage_vlm_v2",
+      "requires_real_sam2_prev_frame": true
+    }
+  },
+  "prompt_full_path": "results/paper_demo/v1e0_prompt_candidates_20260722.json",
+  "metrics_and_gates": {
+    "metrics": [
+      "risk_type_exact_accuracy",
+      "accepted_precision",
+      "accepted_recall",
+      "false_accept_count",
+      "safe_negative_false_accept",
+      "static_geometry_false_elevation",
+      "confidence_calibration",
+      "same_scene_semantic_key_consistency",
+      "schema_parse_rate",
+      "latency",
+      "hallucinated_evidence_count"
+    ],
+    "control_grade_min_gates": {
+      "SAFE_NEGATIVE_false_accept": 0,
+      "STATIC_GEOMETRY_false_elevation": 0,
+      "same_scene_key_consistent": true,
+      "parse_rate": 1.0,
+      "accepts_require_traceable_evidence": true,
+      "forbid_threshold_lowering": true,
+      "min_confidence": 0.85
+    },
+    "small_n_must_mark_pilot": true
+  },
+  "post_budget_design": {
+    "executed": false,
+    "min_matrix_if_dataset_sufficient": {
+      "negatives": 2,
+      "evidenced_positives": 2,
+      "prompts": [
+        "P0",
+        "P1",
+        "P2"
+      ],
+      "max_posts": 12,
+      "retries": 0,
+      "order_seed": 20260722
+    },
+    "current_approval": "NOT_APPROVED_DATASET_INSUFFICIENT"
+  },
+  "remote_boundary": {
+    "P1_local_gateway_ok": true,
+    "P2_local_gateway_ok": true,
+    "P3_local_gateway_ok": true,
+    "needs_multi_image_remote": false,
+    "needs_remote_new_schema_fields": false,
+    "needs_model_change_now": false,
+    "default": "no_remote_change_no_model_swap_first"
+  },
+  "manifest_jsonl": "results/paper_demo/v1e0_semantic_dataset_manifest_20260722.jsonl",
+  "entered_v1e1": false,
+  "git_diff_stat_tracked": "10 files changed, 628 insertions(+), 80 deletions(-)"
+}

@@ -1,0 +1,155 @@
+{
+  "phase": "V1-C1R-P2",
+  "date": "2026-07-22",
+  "classification": "LAZY_LOAD_EXPECTED",
+  "confidence": "high",
+  "post_count": 0,
+  "formal_v1c1r_executed": false,
+  "remote_shell": {
+    "control_path": "/tmp/gmrobot-v0b2-tunnel.sock",
+    "reused_existing_master": true,
+    "blocked_remote_shell": false,
+    "credentials_read": false,
+    "new_tunnel": false,
+    "host_redacted_in_report": true
+  },
+  "service": {
+    "supervisord_program_perception_service": "not_registered_empty_status_exit_0",
+    "listen": "127.0.0.1:8082",
+    "pid": 465,
+    "cwd": "/root/gpufree-data/perception-service",
+    "started_local": "2026-07-22T12:43:40+08:00",
+    "cmd": "python app.py",
+    "vlm_pid": 494
+  },
+  "gpu": {
+    "name": "NVIDIA L40S",
+    "memory_total_mib": 46068,
+    "memory_used_mib": 8136,
+    "memory_free_mib": 37322,
+    "utilization_pct": 0,
+    "compute_apps": [
+      {"pid": 260197, "process_name": "[Not Found]", "used_gpu_memory_mib": 8058}
+    ],
+    "gpu_resource_blocked": false,
+    "sufficient_for_vlm_gdino_sam2": true
+  },
+  "health_get_once_remote_localhost": {
+    "url": "http://127.0.0.1:8082/health",
+    "http": 200,
+    "status": "warming",
+    "models_loaded": false,
+    "gdino_model_id": "IDEA-Research/grounding-dino-base",
+    "sam2_checkpoint": "sam2.1_hiera_small.pt",
+    "backend_available_field": null
+  },
+  "logs": {
+    "supervisor_out_log": {
+      "path": "/root/gpufree-data/perception-service/supervisor.out.log",
+      "size_bytes": 220319,
+      "note": "historical ground/track 200; recent mostly GET /health"
+    },
+    "supervisor_err_log": {
+      "path": "/root/gpufree-data/perception-service/supervisor.err.log",
+      "size_bytes": 7797902,
+      "current_pid_traceback": false,
+      "current_pid_oom": false
+    },
+    "server_log_stale_errors": "historical_only_not_current_process"
+  },
+  "lazy_load_control_flow": {
+    "models_initial_none": true,
+    "startup_loads_models": false,
+    "lifespan_comment": "Lazy load on first /ground to keep VLM startup unaffected.",
+    "health_warming_when_unloaded": true,
+    "ensure_models_on_ground": true,
+    "ensure_models_on_track": true,
+    "background_preload_thread": false,
+    "lock": "threading.Lock double-checked",
+    "persistent_load_error_field_in_health": false,
+    "track_requires_prior_ground": false,
+    "warming_permanent_without_post": true
+  },
+  "checkpoints": {
+    "sam2_path": "/root/gpufree-data/perception-service/checkpoints/sam2.1_hiera_small.pt",
+    "sam2_readable": true,
+    "sam2_size_bytes": 184416285,
+    "gdino_hf_cache_present": true,
+    "gdino_hf_cache_du": "892M",
+    "sam2_config_yaml_present": true
+  },
+  "answers": {
+    "warming_permanent_without_post": true,
+    "first_ground_triggers_load": true,
+    "estimated_first_ground_extra_latency_s": {
+      "historical_cold_ground_wall_s": 7.49,
+      "historical_cold_ground_latency_ms": 7312.8,
+      "source": "v0b2b_legacy_probe_20260721",
+      "warm_ground_stage_s_approx": 0.45,
+      "not_measured_this_round": true
+    },
+    "drain_15s_sufficient": {
+      "http_client_timeout_s": 300.0,
+      "shutdown_drain_timeout_s_current": 15.0,
+      "adequate_for_mid_run_cold_load_historically": true,
+      "margin_thin_recommend_bump_for_plan_A": true,
+      "recommended_drain_s_for_plan_A": 60.0
+    },
+    "formal_pipeline_can_warmup_within_6_posts": true,
+    "separate_warmup_post_required": false,
+    "separate_warmup_post_optional_for_clean_latency": true,
+    "real_load_failure_now": false,
+    "l40s_vram_enough": true
+  },
+  "rejected_classes": {
+    "MODEL_LOAD_IN_PROGRESS": false,
+    "MODEL_LOAD_FAILED": false,
+    "SERVICE_STALE_STATE": false,
+    "GPU_RESOURCE_BLOCKED": false,
+    "INSUFFICIENT_EVIDENCE": false
+  },
+  "recommendation": {
+    "preferred": "A",
+    "plan_A": {
+      "description": "First formal /ground performs lazy load; keep total POST<=6; raise shutdown_drain_timeout_s>=60 via approved runtime config only",
+      "extra_post": 0,
+      "remote_modification_required": false,
+      "local_config_change_requires_approval": true
+    },
+    "plan_B": {
+      "description": "Separately approve 1 warmup POST then formal run with own <=6 POST budget",
+      "extra_post": 1,
+      "remote_modification_required": false
+    },
+    "do_not_require_models_loaded_true_before_formal": true,
+    "executed": false
+  },
+  "remote_modification_required": false,
+  "commands_exit_codes": [
+    {"cmd": "ssh ControlMaster remote shell", "exit": 0},
+    {"cmd": "supervisord ctl status perception-service", "exit": 0, "note": "empty"},
+    {"cmd": "pgrep -af gpufree-data/perception-service", "exit": 1, "note": "narrow pattern; pid found via ss"},
+    {"cmd": "ss listen :8082", "exit": 0},
+    {"cmd": "nvidia-smi", "exit": 0},
+    {"cmd": "nvidia-smi query-compute-apps", "exit": 0},
+    {"cmd": "curl GET :8082/health once", "exit": 0},
+    {"cmd": "stat/tail/grep app.py start.sh logs", "exit": 0},
+    {"cmd": "test -r sam2 checkpoint", "exit": 0}
+  ],
+  "constraints_honored": {
+    "no_post": true,
+    "no_isaac": true,
+    "no_docker": true,
+    "no_remote_file_modify": true,
+    "no_service_restart": true,
+    "no_kill": true,
+    "no_model_download": true,
+    "no_smoke_test": true,
+    "no_v1c1r": true,
+    "no_overwrite_prior_evidence_docs": true
+  },
+  "docs": {
+    "md": "docs/cross-project/vlm-v1c1r-perception-warming-audit-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1c1r-perception-warming-audit-2026-07-22.json"
+  }
+}

@@ -1,0 +1,37 @@
+{
+  "phase": "V1-C1",
+  "date": "2026-07-22",
+  "verdict": "NOT_RUN",
+  "reason": "preflight_blocked_tunnel_health_unavailable",
+  "isaac_run": false,
+  "real_post_count": 0,
+  "image_tag": "gmdisturb:semantic-shadow-v1c0-20260722",
+  "image_id": "sha256:e516c78ecc3c8e365763158f1b01ec6effba9aac1290ae0e1f4d1539c2ccf1da",
+  "image_id_matched": true,
+  "five_stage_runtime_config": "GMRobot/configs/five_stage_shadow_legacy_gateway_v1c1.yaml",
+  "five_stage_runtime_config_sha256": "280ab4daad839090a49e7f1bc11e0d13f73b75679b6803ba981d74f9f4b0b073",
+  "semantic_config": "GMRobot/configs/semantic_safety_supervisor_shadow_live.yaml",
+  "semantic_config_sha256": "5bb418e2d827559ad7706f611f390c880afeae10556078ed8feef6da24ec9024",
+  "preflight": {
+    "tunnel_sock_present": false,
+    "tunnel_sock_path": "/tmp/gmrobot-v0b2-tunnel.sock",
+    "health_18080": false,
+    "health_18082": false,
+    "out_dir_created": false,
+    "out_dir": "results/paper_demo/v1c1_isaac_semantic_shadow_20260722"
+  },
+  "constraints_honored": {
+    "no_image_rebuild": true,
+    "no_code_change_for_run": true,
+    "no_threshold_retune": true,
+    "no_tunnel_create_or_modify": true,
+    "no_credentials_read": true,
+    "no_remote_modify": true,
+    "no_enable_vlm": true,
+    "no_enable_replan": true,
+    "single_run_not_started": true
+  },
+  "correct_statement": "真实语义 advisory 在线评估未开始：前置 tunnel/health 阻塞；无控制副作用、无 POST。",
+  "paper_five_stage_complete": false,
+  "v1d_not_started": true
+}

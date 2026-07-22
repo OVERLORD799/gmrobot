@@ -1,0 +1,230 @@
+{
+  "phase": "V1-D2",
+  "date": "2026-07-22",
+  "mode": "read_only_audit_and_design",
+  "no_code_change": true,
+  "no_remote_change": true,
+  "no_post": true,
+  "no_isaac": true,
+  "no_docker": true,
+  "no_threshold_change": true,
+  "no_history_rewrite": true,
+  "no_scene_search": true,
+  "no_active_control": true,
+  "frozen_evidence": {
+    "V0-C3": {
+      "role": "real_negative_sample_pipeline_pass",
+      "result_dir": "results/paper_demo/v0c3_isaac_shadow_20260721/",
+      "vlm_frames": [
+        {
+          "sim_step": 0,
+          "risk_type": "static",
+          "risk_confidence": 0.3,
+          "suggested_action": "slow_down",
+          "semantic_key": "static|slow_down|device|robotic arm|collision|left",
+          "track_speed_px_s": 0.0
+        },
+        {
+          "sim_step": 50,
+          "risk_type": "dynamic",
+          "risk_confidence": 0.7,
+          "suggested_action": "slow_down",
+          "semantic_key": "dynamic|slow_down|container|robotic arm|collision|left",
+          "track_speed_px_s": 35.35533905932738,
+          "track_direction_deg": -45.0,
+          "note": "track motion exists after VLM but is not fed to next VLM"
+        }
+      ]
+    },
+    "V1-C1R-P1": {
+      "verdict": "PASS_pipeline_accepted_0",
+      "rejection": "risk_type_not_allowed_x2",
+      "result_dir": "results/paper_demo/v1c1r_p1_isaac_semantic_shadow_20260722/",
+      "vlm_frames": [
+        {
+          "sim_step": 0,
+          "risk_type": "static",
+          "risk_confidence": 0.3,
+          "suggested_action": "slow_down",
+          "semantic_key": "static|slow_down|device|robotic arm|collision|left",
+          "track_speed_px_s": 0.0
+        },
+        {
+          "sim_step": 50,
+          "risk_type": "static",
+          "risk_confidence": 0.2,
+          "suggested_action": "slow_down",
+          "semantic_key": "static|slow_down|container|robotic arm|collision|above",
+          "track_speed_px_s": 25.0,
+          "track_direction_deg": 180.0
+        }
+      ],
+      "note": "slow_down alone is not a positive example"
+    },
+    "V1-D1A": {
+      "verdict": "FAIL",
+      "reasons": ["geometry_not_allow_throughout", "visual_semantic_risk=low"],
+      "vlm_posts": 0
+    },
+    "V1-D1B": {
+      "verdict": "GEOMETRY_OVERLAP",
+      "vlm_posts": 0,
+      "not_rewritten_to_pass": true
+    },
+    "V1-D1B-S": {
+      "verdict": "SEMANTIC_SCREEN_FAIL",
+      "fail_reasons": [
+        "5_risk_type_functional_or_dynamic",
+        "6_confidence_ge_0_85",
+        "8_semantic_key_identical"
+      ],
+      "frames": [
+        {
+          "sim_step": 100,
+          "risk_type": "static",
+          "risk_confidence": 0.3,
+          "suggested_action": "slow_down",
+          "semantic_key": "static|slow_down|orange sphere|robotic arm|collision|left",
+          "geometry": "ALLOW_ttc_inf"
+        },
+        {
+          "sim_step": 200,
+          "risk_type": "static",
+          "risk_confidence": 0.7,
+          "suggested_action": "slow_down",
+          "semantic_key": "static|slow_down|container|robotic arm|small objects|spherical object|collision|right",
+          "geometry": "ALLOW_ttc_inf"
+        }
+      ]
+    }
+  },
+  "current_interface": {
+    "prompt_version": "five_stage_safety_v1",
+    "schema_version": "five_stage_vlm_v1",
+    "contract_mode": "legacy_v2",
+    "vlm_sees_single_rgb_only": true,
+    "task_goal_in_vlm": false,
+    "target_occupancy_in_vlm": false,
+    "cross_frame_velocity_in_vlm": false,
+    "detections_in_vlm": false,
+    "call_order": ["vlm", "ground", "track"],
+    "risk_confidence_source": "vlm_native_text_json",
+    "legacy_vlm_star_fill_forbidden": true,
+    "risk_type_mutex_definitions_in_prompt": false,
+    "semantic_key_includes_free_text_entities": true,
+    "semantic_key_includes_spatial_hint_verbatim": true
+  },
+  "audit_answers": {
+    "1_single_rgb_only": true,
+    "2_knows_place_into_B": false,
+    "3_knows_B_occupied": false,
+    "4_has_cross_frame_motion": false,
+    "5_confidence_native_not_local_fill": true,
+    "6_mutex_definitions": false,
+    "7_static_likely_means_scene_still_not_safety_class": true,
+    "8_slow_down_without_type_conf_pass": "model_conservative_action_plus_proximity_as_static_plus_low_conf",
+    "9_key_inconsistency": "free_text_entities_and_hint_wording_drift"
+  },
+  "root_cause_ranking": [
+    {"category": "missing_context", "severity": "high"},
+    {"category": "prompt_definition", "severity": "high"},
+    {"category": "semantic_key_oversensitive", "severity": "high"},
+    {"category": "model_capability", "severity": "medium"},
+    {"category": "five_stage_timing", "severity": "medium", "note": "orthogonal to type failure on P1"},
+    {"category": "schema_parser", "severity": "low"}
+  ],
+  "schemes": {
+    "A_single_frame_prompt_v2": {
+      "remote_change_required": false,
+      "local_only": true,
+      "prompt_version": "five_stage_safety_v2",
+      "schema_change": "optional_audit_fields_or_unchanged_enums",
+      "compatibility_v0c3_b0b4": "prompt_regression_needed; physics_frozen",
+      "false_positive_risk": "medium",
+      "post_budget_d2b": "2-4",
+      "recommended_as": "complement_for_functional"
+    },
+    "B_temporal_fusion": {
+      "priority": true,
+      "remote_change_required": false,
+      "local_only": true,
+      "prompt_version": "five_stage_safety_v2_temporal",
+      "schema_change": "add_source_provenance_fields",
+      "false_positive_risk": "lower_than_C",
+      "post_budget_live": "6_per_2frame_shadow",
+      "recommended_as": "primary"
+    },
+    "C_allow_static": {
+      "recommended": false,
+      "reason": "high_false_positive_and_duplicates_geometry; must_not_use_to_pass_D1",
+      "remote_change_required": false
+    }
+  },
+  "recommendation": {
+    "primary": "B_temporal_fusion",
+    "secondary": "A_task_context",
+    "reject": "C_allow_static",
+    "remote_service_change_required": false,
+    "gates": {
+      "no_lower_confidence_threshold": true,
+      "no_forge_risk_type": true,
+      "no_synthetic_paper_positive": true,
+      "record_vlm_and_tracker_separately": true,
+      "risk_type_source_enum": ["vlm_native", "temporal_fusion", "task_context_fusion"],
+      "motion_evidence_source_enum": ["sam2_track", "none"],
+      "geometry_highest_priority": true,
+      "would_slow_only": true,
+      "stop_replan_forbidden": true,
+      "active_requires_real_shadow_positive": true,
+      "old_negatives_must_not_false_accept": true
+    }
+  },
+  "semantic_key_v2_design": {
+    "implemented": false,
+    "fields": [
+      "normalized_risk_type",
+      "normalized_recommended_action",
+      "canonical_entity_class",
+      "task_target_id",
+      "task_phase",
+      "motion_dir_bucket"
+    ],
+    "forbidden": [
+      "full_explanation",
+      "verbatim_free_text_hint",
+      "wording_sensitive_entity_aliases_as_distinct_keys"
+    ]
+  },
+  "follow_on_phases": {
+    "V1-D2A": {
+      "scope": "offline_prompt_schema_fusion_fixtures",
+      "post_budget": 0,
+      "isaac": false
+    },
+    "V1-D2B": {
+      "scope": "fixed_historical_rgb_limited_replay",
+      "max_vlm_posts": 4,
+      "isaac": false
+    },
+    "V1-D2C": {
+      "scope": "real_isaac_positive_shadow",
+      "accepted_min": 1,
+      "live_loop": true,
+      "geometry_allow_at_decision": true,
+      "no_control_effect": true,
+      "active_discussion_allowed_only_after_pass": true
+    }
+  },
+  "effort_estimate_person_days": {
+    "D2A": "1.5-2.5",
+    "D2B": "0.5-1",
+    "D2C": "1-2",
+    "total_before_active_discussion": "3-5.5"
+  },
+  "post_budget_total_suggested_cap": 10,
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d2-semantic-interface-audit-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d2-semantic-interface-audit-2026-07-22.json"
+  },
+  "git_diff_stat_tracked": "10 files changed, 616 insertions(+), 80 deletions(-)"
+}

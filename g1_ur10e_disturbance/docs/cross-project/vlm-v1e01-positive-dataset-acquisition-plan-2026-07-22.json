@@ -1,0 +1,250 @@
+{
+  "phase": "V1-E0.1",
+  "date": "2026-07-22",
+  "title": "positive_dataset_acquisition_feasibility_design",
+  "status": "DESIGN_READY_AWAITING_CAPTURE_APPROVAL",
+  "boundaries": {
+    "design_only": true,
+    "post_count": 0,
+    "isaac_runs": 0,
+    "docker_runs": 0,
+    "network": 0,
+    "vlm_post": false,
+    "perception_post": false,
+    "active_control": false,
+    "safety_threshold_changes": false,
+    "gloves_ppe": false,
+    "rewrite_historical_fails": false,
+    "create_results_dirs": false
+  },
+  "targets": {
+    "min_dynamic_scene_groups": 2,
+    "min_functional_scene_groups_new": 1,
+    "min_frames_per_group": 2,
+    "rgb_source": "real_isaac_scene_camera",
+    "dynamic_sam2_verifiable_later": true
+  },
+  "readonly_checklist": {
+    "q1_g1_script_reuse": {
+      "arm_wave_reusable": true,
+      "arm_wave_is_joint_wave": false,
+      "arm_wave_actual": "scripted_g1_locomotion_velocity_phases",
+      "constrained_wander_reusable": true,
+      "upper_limb_joint_script_exists": false,
+      "walk_policy_supports_arm_joints": false,
+      "source": "g1_ur10e_disturbance/g1_disturbance_controller.py::ARM_WAVE_PHASES"
+    },
+    "q2_whole_body_needed": {
+      "required": false,
+      "reason": "Eval needs reproducible screen-space motion of visible G1 body/wrists for VLM/SAM2; scripted locomotion suffices; whole-body policy adds non-reproducibility without helping pixel evidence."
+    },
+    "q3_scene_camera_covisibility": {
+      "gmrobot_standalone_sees_g1": false,
+      "dual_default_sees_ur10e_context": true,
+      "dual_g1_init_in_footprint": false,
+      "g1_init_pos": [-1.5, 0.0, -0.25],
+      "dual_camera_default": {"pos": [1.0, 0.0, 3.0], "approx_footprint_x": [-0.75, 2.75]},
+      "covisible_after_g1_approaches_x0": true
+    },
+    "q4_independent_camera_pose": {
+      "dynamic_recommended": true,
+      "recommended_pose": {"pos": [0.2, 0.0, 3.2], "rot": [0.7071, 0.0, 0.7071, 0.0]},
+      "functional_c_keep_default": true,
+      "gmrobot_default": {"pos": [0.35, 0.0, 2.5]}
+    },
+    "q5_envelope_min_distance_estimate_m": {
+      "historical_phase5_arm_wave_min_dist": [0.5, 0.95],
+      "estimate_g1_at_corridor_outside": [0.9, 1.3],
+      "estimate_g1_at_x0": [0.7, 1.0],
+      "vs_warn_0_16": "much_larger",
+      "capture_margin_target_vs_warn_m": 0.45,
+      "caveat": "Phase5 STOP/SLOW often from UR10e internal/TTC rules, not G1 proximity; must filter capture steps"
+    },
+    "q6_reusable_assets": {
+      "containers": [
+        "GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+        "GMRobot/source/GMRobot/GMRobot/assets/container_full.usd",
+        "GMRobot/source/GMRobot/GMRobot/assets/container_with_grid.usd",
+        "GMRobot/source/GMRobot/GMRobot/assets/container_part.usd"
+      ],
+      "parts": ["GMRobot/source/GMRobot/GMRobot/assets/part/part_5000.usd"],
+      "forbidden_dynamic_evidence": ["human_hand_red_sphere"]
+    },
+    "q7_expected_roi_displacement_margin": {
+      "dyn_a": {"roi_px2_min": 400, "roi_px2_expected": 800, "displacement_px_min": 40, "geometry_margin_m": 0.45},
+      "dyn_b": {"roi_px2_min": 400, "roi_px2_expected": 600, "displacement_px_min": 60, "geometry_margin_m": 0.50},
+      "func_c": {"roi_px2_min": 2500, "displacement_not_required": true, "geometry_window": "ALLOW_throughout_capture"}
+    },
+    "q8_code_vs_yaml": {
+      "dyn_a": "mostly_cli_yaml_plus_camera_override",
+      "dyn_b": "small_new_scripted_phases_code",
+      "func_c": "small_env_flag_plus_yaml_like_d1b",
+      "yaml_only_sufficient": false
+    },
+    "q9_isaac_runtime_estimate_s": {
+      "dyn_a_wall_clock": [45, 70],
+      "dyn_b_wall_clock": [50, 80],
+      "func_c_wall_clock": [40, 60],
+      "includes_kit_cold_start_s": [20, 25],
+      "total_serial_min": [3, 5]
+    },
+    "q10_later_sam2_post_budget": {
+      "during_capture": 0,
+      "after_capture_dynamic_two_groups": {
+        "track_init": 2,
+        "track_step": 2,
+        "optional_ground": [0, 2],
+        "recommended_cap": 6,
+        "excludes_vlm": true
+      }
+    }
+  },
+  "hard_gates_for_future_capture": [
+    "g1_or_functional_object_clearly_visible_in_scene_rgb",
+    "roi_area_ge_preset_minimum",
+    "dynamic_screen_displacement_obvious",
+    "capture_window_geometry_allow",
+    "stop_slow_replan_eq_0_at_capture_steps",
+    "no_safety_threshold_edits",
+    "no_gloves_ppe",
+    "no_vlm_perception_post",
+    "no_active_control",
+    "no_rewrite_historical_fails"
+  ],
+  "recommended_candidates": [
+    {
+      "id": "E01-Dyn-A",
+      "type": "dynamic",
+      "recommended": true,
+      "platform": "G1-UR10e-Disturbance-v0",
+      "asset_paths": {
+        "robot_g1": "vendored G1_927_WALK_CFG / Robot_G1",
+        "robot_ur10e": "dual_env UR10e",
+        "containers": "container.usd A/B",
+        "parts": "part_5000 default layout",
+        "forbidden_evidence": "human_hand red sphere"
+      },
+      "motion_source": {
+        "name": "arm_wave",
+        "code": "g1_disturbance_controller.py::ARM_WAVE_PHASES",
+        "label": "scripted_g1_locomotion_arm_wave",
+        "claims_forbidden": ["whole_body_policy", "joint_space_arm_wave"]
+      },
+      "camera_pose": {"pos": [0.2, 0.0, 3.2], "rot": [0.7071, 0.0, 0.7071, 0.0], "fallback_default": [1.0, 0.0, 3.0]},
+      "seed": 42,
+      "capture_steps": [210, 280],
+      "geometry_precheck": {
+        "g_rule": "ALLOW",
+        "stop_slow_replan": 0,
+        "min_margin_vs_warn_m": 0.45
+      },
+      "expected_artifacts": [
+        "scene/frame_*.png (>=2)",
+        "manifest.jsonl with ROI centroid displacement SHA motion_label",
+        "safety step summary"
+      ],
+      "fail_stop_conditions": [
+        "g1_not_recognizable",
+        "roi_lt_400",
+        "displacement_lt_40px",
+        "capture_step_not_allow",
+        "red_sphere_as_evidence",
+        "any_post"
+      ],
+      "paper_interpretability": true,
+      "paper_interpretability_note": "Real humanoid enters overhead task view; must disclose scripted walk not arm-joint wave"
+    },
+    {
+      "id": "E01-Dyn-B",
+      "type": "dynamic",
+      "recommended": true,
+      "platform": "G1-UR10e-Disturbance-v0",
+      "asset_paths": {
+        "robot_g1": "Robot_G1",
+        "robot_ur10e": "dual_env UR10e",
+        "containers": "container.usd A/B",
+        "forbidden_evidence": ["red_sphere", "invisible_proxy", "filename_as_evidence"]
+      },
+      "motion_source": {
+        "name": "lateral_outside_corridor",
+        "status": "to_be_added_small_code",
+        "label": "scripted_g1_lateral_outside_corridor",
+        "constraint": "x<=0 stay outside A↔B channel; approach/leave"
+      },
+      "camera_pose": {"pos": [0.2, 0.0, 3.2], "rot": [0.7071, 0.0, 0.7071, 0.0]},
+      "seed": 43,
+      "capture_steps": ["t0_lateral_mid", "t1_retreat"],
+      "geometry_precheck": {
+        "g_rule": "ALLOW",
+        "stop_slow_replan": 0,
+        "min_margin_vs_warn_m": 0.50,
+        "outside_task_corridor": true
+      },
+      "expected_artifacts": [
+        "scene/frame_*.png (>=2)",
+        "manifest.jsonl proxy_type=none evidence=g1_upper_body_rgb"
+      ],
+      "fail_stop_conditions": [
+        "red_sphere_in_evidence_chain",
+        "insufficient_displacement",
+        "enters_corridor_margin_collapse",
+        "same_run_or_adjacent_to_dyn_a"
+      ],
+      "paper_interpretability": true,
+      "paper_interpretability_note": "Dynamic approach outside task corridor; orthogonal motion primitive to Dyn-A"
+    },
+    {
+      "id": "E01-Func-C",
+      "type": "functional",
+      "recommended": true,
+      "platform": "GMRobot gm_state_machine_agent",
+      "asset_paths": {
+        "box_B": "GMRobot/source/GMRobot/GMRobot/assets/container_full.usd",
+        "box_A": "GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+        "parts": "default A slots; do NOT enable GMROBOT_V1D1B_FUNCTIONAL_BLOCK",
+        "human_hand": "parked_far_not_evidence"
+      },
+      "motion_source": {
+        "name": "nominal_ur10e_pick_place",
+        "hand": "static_far_hold",
+        "independent_of_d1b": true
+      },
+      "camera_pose": {"pos": [0.35, 0.0, 2.5], "rot": [0.7071, 0.0, 0.7071, 0.0]},
+      "seed": 51,
+      "capture_steps": [100, 200],
+      "geometry_precheck": {
+        "g_rule": "ALLOW_throughout_capture_window",
+        "stop_slow_replan": 0,
+        "lesson_from_d1b": "distance_margin_positive_insufficient_if_TTC_trips; filter window without changing thresholds"
+      },
+      "expected_artifacts": [
+        "scene/frame_*.png (>=2)",
+        "manifest.jsonl blocker_asset=container_full.usd scene_group=e01_func_c independent_of=d1b"
+      ],
+      "fail_stop_conditions": [
+        "same_run_or_adjacent_frame_group_as_d1b",
+        "primary_evidence_still_part_at_B10",
+        "geometry_window_not_allow",
+        "post_ne_0"
+      ],
+      "paper_interpretability": true,
+      "paper_interpretability_note": "Target placement container visually full/unavailable; asset combo orthogonal to D1B part occupancy"
+    }
+  ],
+  "rejected_or_deferred": [
+    {"id": "d1a_red_sphere", "reason": "visual_semantic_risk=low; forbidden dynamic positive"},
+    {"id": "reuse_d1b_adjacent", "reason": "not a new independent functional scene group"},
+    {"id": "ivj_functional_misgrasp", "reason": "near-field hand; high STOP/geometry risk"},
+    {"id": "claim_arm_wave_joint", "reason": "code fact: locomotion phases only"}
+  ],
+  "post_approval_wiring_not_done_this_round": [
+    "dual_camera_pose_override",
+    "SCENARIOS.lateral_outside_corridor",
+    "GMROBOT_V1E01_TARGET_FULL + ivj_v1e01_target_container_full.yaml",
+    "zero_post_capture_runner",
+    "offline_roi_displacement_geometry_gate"
+  ],
+  "recommended_execution_order_if_approved": ["E01-Dyn-A", "E01-Func-C", "E01-Dyn-B"],
+  "md_path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.md",
+  "next_action": "stop_await_user_capture_decision"
+}

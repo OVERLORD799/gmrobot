@@ -1,0 +1,158 @@
+{
+  "phase": "V1-C1.1",
+  "date": "2026-07-22",
+  "audit_type": "readonly_gpu_isaac_failure",
+  "classification": "NVIDIA_XID_CONFIRMED",
+  "confidence": "high",
+  "xid": {
+    "code": 109,
+    "error_string": "CTX SWITCH TIMEOUT",
+    "info": "0x3c009",
+    "pci": "0000:02:00",
+    "pid": 50754,
+    "process_name": "python3",
+    "timestamp_local": "2026-07-22T12:52:15+08:00",
+    "timestamp_utc": "2026-07-22T04:52:15Z"
+  },
+  "application_symptom": {
+    "vk_result": "ERROR_DEVICE_LOST",
+    "gpu_crash": true,
+    "gpu_pagefault": true,
+    "first_error_offset_ms": 32251
+  },
+  "exit": {
+    "isaac_exit_code": 137,
+    "oom_killed_host": false,
+    "oom_killed_container": null,
+    "exit_137_interpretation": "docker_stop_sigkill_after_hang",
+    "container_memory_peak": "5.2G",
+    "container_id": "62160c9838a2b6d5ac2e4b06f437319c23969d512514bdb16e582284c0b78209",
+    "docker_inspect": "unavailable_rm"
+  },
+  "candidate_root_causes": {
+    "nvidia_xid_driver_reset": "CONFIRMED",
+    "gpu_memory_exhaustion": "NOT_SUPPORTED",
+    "host_ram_oom": "REJECTED",
+    "docker_shm_insufficient": "INSUFFICIENT_EVIDENCE",
+    "concurrent_gpu_processes": "NOT_SUPPORTED_AT_CRASH",
+    "renderer_camera_init_failure": "SYMPTOM_CONFIRMED",
+    "container_runtime_device_mapping": "NOT_SUPPORTED",
+    "unknown_transient_device_lost": "SUPERSEDED_BY_XID"
+  },
+  "host_snapshot_post_crash": {
+    "gpu_name": "NVIDIA GeForce RTX 5090 Laptop GPU",
+    "driver_version": "580.159.03",
+    "cuda_version": "13.0",
+    "memory_total_mib": 24463,
+    "memory_used_mib": 82,
+    "temperature_c": 40,
+    "power_draw_w": 15.21,
+    "ecc": "N/A",
+    "compute_apps": [],
+    "ram_available_gi": 110,
+    "shm_host": "62G_1pct_used",
+    "disk_root_used_pct": 30
+  },
+  "timeline": [
+    {"t_utc": "2026-07-22T04:51:43Z", "event": "container_start_kit_boot"},
+    {"t_utc": "2026-07-22T04:51:43Z", "event": "cuda_vulkan_device_enum"},
+    {"t_utc": "2026-07-22T04:52:01Z", "event": "isaaclab_env_create_physx"},
+    {"t_utc": "2026-07-22T04:52:08Z", "event": "physx_schema_errors_nonfatal"},
+    {"t_utc": "2026-07-22T04:52:11Z", "event": "renderer_dlss_warning"},
+    {"t_utc": "2026-07-22T04:52:15Z", "event": "xid_109_and_error_device_lost"},
+    {"t_local": "2026-07-22T13:07:15+08:00", "event": "docker_force_stop_sigkill"},
+    {"t_local": "2026-07-22T13:07:16+08:00", "event": "container_stopped_exit_137"}
+  ],
+  "parameter_diff_factual": {
+    "v0c3_pass": {
+      "image_id": "sha256:cab6bf5cf637a1f16bd1ac4b14cd6611bb85c7c75ec71cacfddffc963b6ed452",
+      "max_steps": 120,
+      "enable_cameras": true,
+      "enable_five_stage_shadow": true,
+      "enable_safety": false,
+      "enable_semantic_supervisor_shadow": false
+    },
+    "v1c0_smoke_pass": {
+      "image_id": "sha256:e516c78ecc3c8e365763158f1b01ec6effba9aac1290ae0e1f4d1539c2ccf1da",
+      "max_steps": 1,
+      "enable_cameras": true,
+      "enable_five_stage_shadow": false,
+      "enable_safety": false,
+      "enable_semantic_supervisor_shadow": false
+    },
+    "v1c1_fail": {
+      "image_id": "sha256:e516c78ecc3c8e365763158f1b01ec6effba9aac1290ae0e1f4d1539c2ccf1da",
+      "max_steps": 120,
+      "enable_cameras": true,
+      "enable_five_stage_shadow": true,
+      "enable_safety": true,
+      "enable_semantic_supervisor_shadow": true
+    },
+    "docker_run_common": {
+      "gpus": "all",
+      "rm": true,
+      "shm_size_explicit": false,
+      "memory_limit_explicit": false
+    },
+    "causal_link_of_flag_diff_to_xid": "not_established"
+  },
+  "perception_health_get_once": {
+    "url": "http://127.0.0.1:18082/health",
+    "http_code": 200,
+    "status": "warming",
+    "models_loaded": false,
+    "backend_available_field_present": false,
+    "not_root_cause_of_device_lost": true
+  },
+  "commands_executed_readonly": [
+    {"cmd": "nvidia-smi", "exit": 0},
+    {"cmd": "nvidia-smi -q (filtered)", "exit": 0},
+    {"cmd": "nvidia-smi --query-gpu=...", "exit": 0},
+    {"cmd": "nvidia-smi --query-compute-apps=...", "exit": 0},
+    {"cmd": "free -h", "exit": 0},
+    {"cmd": "df -h / /dev/shm", "exit": 0},
+    {"cmd": "docker inspect 62160c...", "exit": 1, "note": "no such object"},
+    {"cmd": "journalctl NVRM/Xid/OOM window", "exit": 0},
+    {"cmd": "journalctl -k OOM filter rg", "exit": 1, "note": "no OOM matches"},
+    {"cmd": "curl GET :18082/health once", "exit": 0}
+  ],
+  "artifacts": {
+    "fail_results_dir": "results/paper_demo/v1c1_isaac_semantic_shadow_20260722",
+    "fail_run_doc": "docs/cross-project/vlm-v1c1-isaac-semantic-shadow-run-2026-07-22.md",
+    "not_run_doc_preserved": "docs/cross-project/vlm-v1c1-isaac-semantic-shadow-result-2026-07-22.md",
+    "audit_md": "docs/cross-project/vlm-v1c1-gpu-failure-audit-2026-07-22.md",
+    "audit_json": "docs/cross-project/vlm-v1c1-gpu-failure-audit-2026-07-22.json",
+    "terminal_capture": "~/.cursor/projects/home-czz-GMrobot/terminals/220933.txt",
+    "cmd_log": "/tmp/v1c11_audit_cmds_final.txt"
+  },
+  "constraints_honored": {
+    "no_v1c1_rerun": true,
+    "no_isaac_or_new_container": true,
+    "no_post": true,
+    "no_image_rebuild": true,
+    "no_code_config_driver_docker_remote_change": true,
+    "no_gpu_docker_cache_clear": true,
+    "no_kill_process": true,
+    "no_overwrite_fail_or_not_run_evidence": true,
+    "no_v1d": true
+  },
+  "v1c1r_eligibility": {
+    "eligible_to_request": true,
+    "reasons": [
+      "root_cause_classified_xid_109",
+      "fail_artifacts_preserved",
+      "host_gpu_ram_currently_idle",
+      "no_evidence_of_persistent_host_oom"
+    ],
+    "destructive_recovery_requires_user_approval": [
+      "nvidia_driver_reset",
+      "host_reboot",
+      "kill_gpu_processes",
+      "clear_docker_or_gpu_cache",
+      "module_reload"
+    ],
+    "v1c1r_not_started": true
+  },
+  "paper_five_stage_complete": false,
+  "v1d_not_started": true
+}

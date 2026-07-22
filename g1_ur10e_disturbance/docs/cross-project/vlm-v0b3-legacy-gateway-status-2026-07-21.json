@@ -1,0 +1,26 @@
+{
+  "phase": "V0-B3.1+B4.1",
+  "date": "2026-07-21",
+  "gateway_implemented": true,
+  "offline_tested": true,
+  "live_wiring_correction": "keyword_forward_to_track_callback",
+  "formal_gateway_live_replay": true,
+  "live_probe_evidence": "COMPOSITE",
+  "negative_scene_only": true,
+  "stale_metric_bug_fixed": true,
+  "replay_validator_bug_fixed": true,
+  "human_tool_ppe_validated": false,
+  "isaac_shadow_validated": false,
+  "paper_five_stage_complete": false,
+  "formal_gateway_six_post_replay_approved": true,
+  "contract_modes": {
+    "default": "canonical_v0a",
+    "legacy_config": "legacy_v2",
+    "auto_switch_from_health": false
+  },
+  "canonical_regression": "pass",
+  "leakage_counters_required_zero": true,
+  "real_post_this_round": false,
+  "network_isaac_docker_credentials": false,
+  "b0_b4_untouched": true
+}

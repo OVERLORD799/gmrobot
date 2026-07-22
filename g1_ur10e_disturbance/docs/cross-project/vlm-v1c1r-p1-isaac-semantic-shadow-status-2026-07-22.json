@@ -1,0 +1,183 @@
+{
+  "phase": "V1-C1R-P1",
+  "date": "2026-07-22",
+  "verdict": "PASS",
+  "reason": "all_formal_gates_met; negative_scene_accepted_0_legal",
+  "formal_run_consumed": true,
+  "retries": 0,
+  "no_rerun": true,
+  "no_retune": true,
+  "no_code_change_this_round": true,
+  "no_image_rebuild": true,
+  "v1d_not_started": true,
+  "lazy_load_plan": "A",
+  "no_warmup_post": true,
+  "image_tag": "gmdisturb:semantic-shadow-v1c0p1-20260722",
+  "image_id": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+  "canonical_module_root": "/opt/projects/GMRobot/source/GMRobot/GMRobot/",
+  "five_stage_runtime_config": "GMRobot/configs/five_stage_shadow_legacy_gateway_v1c1r_p1.yaml",
+  "five_stage_runtime_config_sha256": "33e7a4d9bf45131f38742acc2f9f6df2c8e939a86d94af1098d278c3353d5e9a",
+  "semantic_runtime_config": "GMRobot/configs/semantic_safety_supervisor_shadow_v1c1r_p1.yaml",
+  "semantic_runtime_config_sha256": "9915617928d7743e4b4b719e2d33fedde32caac9a2dd0447790df228fae95de5",
+  "shutdown_drain_timeout_s": 60.0,
+  "max_submissions": 2,
+  "num_envs": 1,
+  "max_steps": 120,
+  "enable_vlm": false,
+  "enable_replan": false,
+  "enable_safety": true,
+  "enable_five_stage_shadow": true,
+  "enable_semantic_supervisor_shadow": true,
+  "semantic_active_enforcement": false,
+  "preflight": {
+    "image_sha_ok": true,
+    "tunnel_socket": "/tmp/gmrobot-v0b2-tunnel.sock",
+    "ports_18080_18082_ok": true,
+    "vlm_health": {"http": 200, "status": "ok"},
+    "perception_health": {"http": 200, "status": "warming", "models_loaded": false, "allowed_lazy_load_initial": true},
+    "xid_before": 0,
+    "no_residual_isaac_compute": true
+  },
+  "isaac_exit_code": 0,
+  "progress_120": true,
+  "scene_rgb_ready": true,
+  "module_not_found": false,
+  "traceback": false,
+  "device_lost": false,
+  "gpu_pagefault": false,
+  "xid_before": 0,
+  "xid_after": 0,
+  "post_count": 6,
+  "post_retries": 0,
+  "third_frame": false,
+  "post_order": [
+    {"frame": 0, "sim_step": 0, "stages": ["VLM", "ground", "track_init"]},
+    {"frame": 1, "sim_step": 50, "stages": ["VLM", "ground", "track_step"]}
+  ],
+  "submitted_count": 2,
+  "processed_count": 2,
+  "logged_count": 2,
+  "pipeline": [
+    {
+      "sim_step": 0,
+      "request_id": "c77479c0-ce9a-4303-b7c9-ac05912653ae",
+      "pipeline_ok": true,
+      "ground_detections": 10,
+      "track_state": "initialized",
+      "track_id": 0,
+      "session_match": null,
+      "session_continuity_verified": false,
+      "vlm_latency_ms": 6195.9796480005025,
+      "ground_latency_ms": 13118.060333999892,
+      "ground_remote_latency_ms": 12882.6,
+      "track_latency_ms": 246.67672900068283,
+      "end_to_end_latency_ms": 19560.825484000816
+    },
+    {
+      "sim_step": 50,
+      "request_id": "adc69ec4-ef77-4895-ba82-95c8566c1821",
+      "pipeline_ok": true,
+      "ground_detections": 2,
+      "track_state": "tracking",
+      "track_id": 0,
+      "session_match": true,
+      "session_continuity_verified": true,
+      "vlm_latency_ms": 4799.499773998832,
+      "ground_latency_ms": 472.6907799995388,
+      "ground_remote_latency_ms": 236.1,
+      "track_latency_ms": 230.1686390001123,
+      "end_to_end_latency_ms": 21453.658034999535
+    }
+  ],
+  "cold_start": {
+    "perception_health_before": "warming",
+    "models_loaded_before": false,
+    "frame0_cold_ground_latency_ms": 13118.060333999892,
+    "frame1_warm_ground_latency_ms": 472.6907799995388,
+    "perception_health_after": "ok",
+    "models_loaded_after": true,
+    "post_run_health_get_count": 1
+  },
+  "session_track": {
+    "initialized_to_tracking": true,
+    "track_id_sequence": [0, 0],
+    "frame1_session_match": true,
+    "frame1_session_continuity_verified": true,
+    "session_ref": "session_1",
+    "session_generation": 1
+  },
+  "semantic_advisory": {
+    "accepted_count": 0,
+    "rejection_reasons": {"risk_type_not_allowed": 2},
+    "request_id_consume_counts": {
+      "c77479c0-ce9a-4303-b7c9-ac05912653ae": 1,
+      "adc69ec4-ef77-4895-ba82-95c8566c1821": 1
+    },
+    "intentional_control_effect_count": 0,
+    "decisions": [
+      {
+        "request_id": "c77479c0-ce9a-4303-b7c9-ac05912653ae",
+        "source_capture_sim_step": 0,
+        "decision_sim_step": 120,
+        "result_age": 0.007902033999926061,
+        "geometry_gate": "SLOW_DOWN",
+        "geometry_gate_reason": "shutdown_drain",
+        "evaluated_semantic_gate": "",
+        "effective_control_gate": "SLOW_DOWN",
+        "accepted": false,
+        "rejection_reason": "risk_type_not_allowed"
+      },
+      {
+        "request_id": "adc69ec4-ef77-4895-ba82-95c8566c1821",
+        "source_capture_sim_step": 50,
+        "decision_sim_step": 120,
+        "result_age": 0.0034055530013574753,
+        "geometry_gate": "SLOW_DOWN",
+        "geometry_gate_reason": "shutdown_drain",
+        "evaluated_semantic_gate": "",
+        "effective_control_gate": "SLOW_DOWN",
+        "accepted": false,
+        "rejection_reason": "risk_type_not_allowed"
+      }
+    ]
+  },
+  "control_hash_mismatch_count": 0,
+  "control_decision_hash": "eea9f3ee92df99a9cd579145364390627fd5eba8fdcbd608a4969b7dc11de082",
+  "semantic_leakage": {
+    "semantic_gate_apply_count": 0,
+    "semantic_action_apply_count": 0,
+    "semantic_clock_block_count": 0,
+    "semantic_replan_apply_count": 0,
+    "semantic_protocol_mutation_count": 0
+  },
+  "five_stage_leakage": {
+    "shadow_gate_override_count": 0,
+    "shadow_action_override_count": 0,
+    "shadow_clock_blocked_steps": 0,
+    "shadow_replan_applied_count": 0,
+    "shadow_protocol_override_count": 0
+  },
+  "drain": {
+    "shutdown_drain_complete": true,
+    "shutdown_drain_elapsed_s": 16.469622530999914,
+    "pending_at_shutdown_end": 0,
+    "worker_thread_alive_after_stop": false,
+    "stopped_cleanly": true,
+    "dropped_frames": 0,
+    "stale_result_count": 0,
+    "stale_unique_count": 0,
+    "queue_depth_end": 0
+  },
+  "secret_leak_scan": {
+    "raw_session_id_leaks": 0,
+    "credential_pattern_leaks": 0
+  },
+  "results_dir": "results/paper_demo/v1c1r_p1_isaac_semantic_shadow_20260722",
+  "historical_evidence_untouched": true,
+  "historical_evidence_sha_snapshot": "results/paper_demo/v1c1r_p1_isaac_semantic_shadow_20260722/historical_evidence_sha256.txt",
+  "paper_five_stage_complete": false,
+  "docs": {
+    "md": "docs/cross-project/vlm-v1c1r-p1-isaac-semantic-shadow-result-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1c1r-p1-isaac-semantic-shadow-status-2026-07-22.json"
+  }
+}

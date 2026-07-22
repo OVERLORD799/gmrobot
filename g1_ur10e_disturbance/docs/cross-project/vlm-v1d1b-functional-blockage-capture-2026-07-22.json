@@ -1,0 +1,98 @@
+{
+  "phase": "V1-D1B",
+  "date": "2026-07-22",
+  "verdict": "GEOMETRY_OVERLAP",
+  "reason": "capture_live_window_not_allow",
+  "d1a_preserved": true,
+  "d1a_not_retuned": true,
+  "ready_for_2post_semantic_filter": false,
+  "no_vlm_post": true,
+  "no_full_d1": true,
+  "no_active_control": true,
+  "no_image_rebuild": true,
+  "asset_screen": {
+    "no_semantic_asset": false,
+    "selected": "A_part20_to_B10",
+    "candidates": [
+      {
+        "id": "A",
+        "assets": ["part/part_5000.usd", "container.usd"],
+        "selected": true,
+        "notes": "Relocate part_20 to B@10 via GMROBOT_V1D1B_FUNCTIONAL_BLOCK=1"
+      },
+      {
+        "id": "B",
+        "assets": ["container_full.usd"],
+        "selected": false
+      },
+      {
+        "id": "C",
+        "assets": ["human_hand_sphere"],
+        "selected": false,
+        "rejected": "primitive semantic evidence / D1A lesson"
+      }
+    ]
+  },
+  "scene_semantics": "Target placement container B occupied by existing industrial part while EE remains far; functional blockage without relying on red sphere.",
+  "image_tag": "gmdisturb:semantic-shadow-v1c0p1-20260722",
+  "image_id": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+  "safety_config": "GMRobot/configs/ivj_v1d1b_functional_blockage.yaml",
+  "safety_config_sha256": "4f6fe11502bdbfc97ccbf179ad4a182ef096004e79a1ca3c2dbf06d28f9a9c12",
+  "env_cfg_sha256": "a52d025313b1183977986d7a6c7550ecb06e17d7835df156b3670d19cbd93841",
+  "scene_layout_hash": "be113b6045e87a3182aa1bef3760f47a6b2199c0b0ece627fd8f9547b8a76f7f",
+  "unit_tests": {"all": 33, "failed": 0},
+  "isaac_exit_code": 0,
+  "max_steps": 280,
+  "post_count": 0,
+  "plan_steps": [0, 100],
+  "rgb_frames": [
+    {
+      "sim_step": 0,
+      "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000000_env0.png",
+      "sha256": "39eb1853b8ad715dff368f75c867f62322c2ba95b4cbc8e5bf413ac9b95b8e8b",
+      "blocker_in_target_aabb": true,
+      "blocker_roi_pixel_area": 361,
+      "target_visible": true,
+      "blocker_fraction_inside_target_roi": 1.0,
+      "g_rule": 0
+    },
+    {
+      "sim_step": 100,
+      "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000100_env0.png",
+      "sha256": "3fdafcbb6cc3848309c4e2ed5a51b52f167fd34db1432c41840a0f960377fe11",
+      "blocker_in_target_aabb": true,
+      "blocker_roi_pixel_area": 361,
+      "target_visible": true,
+      "blocker_fraction_inside_target_roi": 1.0,
+      "g_rule": 0
+    }
+  ],
+  "geometry": {
+    "safe_dist_warn_m": 0.16,
+    "safe_dist_hard_stop_m": 0.13,
+    "ttc_threshold_s": 0.5,
+    "min_geometry_margin_m": 0.32792628900781584,
+    "margin_distribution": {
+      "min": 0.32792628900781584,
+      "p10": 0.3421222409421121,
+      "p50": 0.41971662773471136,
+      "p90": 0.7827700691414163,
+      "max": 0.8670313673401312
+    },
+    "gate_counts_episode": {"ALLOW": 254, "SLOW_DOWN": 24, "STOP": 2},
+    "gate_counts_capture_window_0_150": {"ALLOW": 125, "SLOW_DOWN": 24, "STOP": 2},
+    "replan_count": 0,
+    "primary_triggers": ["dynamic_ttc_warning", "dynamic_ttc"]
+  },
+  "post_capture_live_steps": 180,
+  "leakage_all_zero": true,
+  "control_hash_mismatch_count": 0,
+  "xid_before": 0,
+  "xid_after": 0,
+  "results_dir": "results/paper_demo/v1d1b_functional_blockage_capture_20260722",
+  "manifest": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/manifest/capture_manifest.json",
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d1b-functional-blockage-capture-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d1b-functional-blockage-capture-2026-07-22.json"
+  }
+}

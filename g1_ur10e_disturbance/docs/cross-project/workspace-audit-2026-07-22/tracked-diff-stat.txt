@@ -1,0 +1,11 @@
+ GMRobot/configs/perception_client.yaml             |   1 +
+ GMRobot/configs/vlm_client.yaml                    |   3 +
+ GMRobot/deploy/ai_server/vlm_service.py            | 119 +++++-----
+ GMRobot/scripts/gm_state_machine_agent.py          | 249 +++++++++++++++++++++
+ GMRobot/source/GMRobot/GMRobot/__init__.py         |  14 +-
+ .../source/GMRobot/GMRobot/perception/__init__.py  |  20 +-
+ .../source/GMRobot/GMRobot/perception/client.py    | 101 ++++++++-
+ .../tasks/manager_based/gmrobot/gmrobot_env_cfg.py |   5 +
+ GMRobot/source/GMRobot/GMRobot/vlm/__init__.py     |  47 +++-
+ GMRobot/source/GMRobot/GMRobot/vlm/client.py       | 149 ++++++++++--
+ 10 files changed, 628 insertions(+), 80 deletions(-)

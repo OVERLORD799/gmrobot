@@ -1,0 +1,42 @@
+{
+  "phase": "V1-B",
+  "date": "2026-07-21",
+  "semantic_supervisor_implemented": true,
+  "enforcement_mode": "shadow",
+  "enabled_default": false,
+  "offline_tested": true,
+  "unit_scripts_passed": 29,
+  "unit_scripts_failed": 0,
+  "new_supervisor_test_functions": 38,
+  "negative_replay_pass": true,
+  "negative_replay_accepted_count": 0,
+  "negative_replay_reasons": {
+    "risk_type_not_allowed": 1,
+    "low_confidence": 1
+  },
+  "synthetic_positive_pass": true,
+  "monotonic_fusion_pass": true,
+  "consistency_cooldown_pass": true,
+  "live_control_connected": false,
+  "intentional_control_effect": false,
+  "would_stop": false,
+  "would_replan": false,
+  "old_vlm_stage5_replan_deleted": false,
+  "old_vlm_stage5_replan_invoked_by_supervisor": false,
+  "real_post_count": 0,
+  "isaac_run": false,
+  "docker_build": false,
+  "credentials_read": false,
+  "human_tool_ppe_validated": false,
+  "paper_five_stage_complete": false,
+  "modules": [
+    "GMRobot/source/GMRobot/GMRobot/safety/semantic_supervisor.py",
+    "GMRobot/source/GMRobot/GMRobot/safety/semantic_supervisor_logger.py",
+    "GMRobot/configs/semantic_safety_supervisor.yaml",
+    "GMRobot/scripts/replay_semantic_supervisor_v1b.py"
+  ],
+  "replay_out": "results/paper_demo/v1b_semantic_supervisor_replay_20260721",
+  "v0c1_fail_preserved": true,
+  "v0c2_fail_preserved": true,
+  "v0c3_pass_preserved": true
+}

@@ -1,0 +1,41 @@
+{
+  "phase": "V0-C2.1",
+  "date": "2026-07-21",
+  "v0c2_fail_preserved": true,
+  "v0c2_verdict": "FAIL",
+  "v0c2_reason": "session_continuity_not_recorded",
+  "audit_note": {
+    "actual_pipeline": "2/2",
+    "track_id": "0→0",
+    "session_continuity_recorded": false,
+    "not_proven_remote_mismatch": true
+  },
+  "session_match_computed_before_redaction": true,
+  "raw_session_logged": false,
+  "session_alias_fields": [
+    "session_generation",
+    "session_ref",
+    "session_present",
+    "session_match",
+    "session_match_applicable",
+    "session_continuity_verified"
+  ],
+  "offline_tested": true,
+  "offline_tests_passed": 108,
+  "session_continuity_unit_tests": 14,
+  "v0c3_image_tag": "gmdisturb:five-stage-shadow-v0c3-20260721",
+  "v0c3_image_id": "sha256:cab6bf5cf637a1f16bd1ac4b14cd6611bb85c7c75ec71cacfddffc963b6ed452",
+  "v0c3_image_created": "2026-07-21T20:20:06.015548438+08:00",
+  "prior_images_unchanged": {
+    "defe95e7": true,
+    "b28c65a6": true,
+    "b32fbd1a": true,
+    "882da3ee": true
+  },
+  "real_post_count": 0,
+  "v0c3_shadow_not_run": true,
+  "import_smoke": true,
+  "config_resolve_smoke": true,
+  "isaac_one_step_smoke": true,
+  "paper_five_stage_complete": false
+}

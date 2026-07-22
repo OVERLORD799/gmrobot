@@ -1,0 +1,18 @@
+{
+  "phase": "V0-B4.1",
+  "date": "2026-07-21",
+  "formal_gateway_live_replay": true,
+  "negative_scene_only": true,
+  "stale_metric_bug_fixed": true,
+  "replay_validator_bug_fixed": true,
+  "isaac_shadow_validated": false,
+  "human_tool_ppe_validated": false,
+  "paper_five_stage_complete": false,
+  "raw_exit_verdict": "GROUND_FAIL",
+  "audited_verdict": "FORMAL_GATEWAY_REPLAY_PASS",
+  "no_repost": true,
+  "post_count": 6,
+  "stale_result_count_raw": 48,
+  "stale_result_count_semantic_expected": 1,
+  "audited_summary": "results/paper_demo/v0b4_legacy_gateway_replay_20260721/audited_summary.json"
+}

@@ -1,0 +1,74 @@
+{
+  "phase": "V1-C1R-P0",
+  "date": "2026-07-22",
+  "verdict": "FIX_COMPLETE_AWAITING_V1C1R_P1",
+  "root_cause": "semantic_bridge_toplevel_safety_import_incompatible_with_editable_install",
+  "formal_v1c1r_executed": false,
+  "post_count": 0,
+  "v1d_not_started": true,
+  "code_fix_round": true,
+  "changes": {
+    "semantic_bridge_imports": "GMRobot.safety.*",
+    "shadow_init_lazy_SemanticShadowBridge": true,
+    "gmrobot_init_optional_isaac_imports": true,
+    "new_test": "scripts/test_canonical_package_import_v1c0p1_unit.py",
+    "v1c0_unit_test_updated_to_canonical": true
+  },
+  "offline_tests": {
+    "scripts_passed": 33,
+    "test_defs_approx": 350,
+    "canonical_unit_tests_passed": 4,
+    "source_scan_toplevel_safety_imports": 0
+  },
+  "image": {
+    "tag": "gmdisturb:semantic-shadow-v1c0p1-20260722",
+    "id": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+    "created": "2026-07-22T15:40:00.553441175+08:00",
+    "covers_e516": false
+  },
+  "e516c78e_downgrade": {
+    "image_id": "sha256:e516c78ecc3c8e365763158f1b01ec6effba9aac1290ae0e1f4d1539c2ccf1da",
+    "unchanged": true,
+    "offline_semantic_isolation": "PASS",
+    "semantic_disabled_smoke": "PASS",
+    "live_semantic_import": "INVALID",
+    "must_not_claim_live_semantic_enabled_validated": true
+  },
+  "runtime_configs_unchanged": {
+    "five_stage_v1c1r_sha256": "df4e082800aab2bd0d900707be92eee00f7a6c1a60e20bb8c4f7782795de2253",
+    "semantic_v1c1r_sha256": "03f64250bd715b0327412fd7808bb82acf6198258d3ab49c9c3db68120773ac6",
+    "shutdown_drain_timeout_s": 60.0
+  },
+  "git": {
+    "revision": "46a76ad8bd2ad7ad1f0051239dfeaafb96782bc5",
+    "dirty_worktree": true
+  },
+  "image_import_smoke": {
+    "pass": true,
+    "module_files_under": "/opt/projects/GMRobot/source/GMRobot/GMRobot",
+    "toplevel_safety_dependency": false,
+    "marker": "V1C0P1_CANONICAL_IMPORT_OK"
+  },
+  "isaac_one_step_smoke": {
+    "pass": true,
+    "exit_code": 0,
+    "max_steps": 1,
+    "enable_five_stage_shadow": false,
+    "enable_semantic_supervisor_shadow": false,
+    "post_count": 0,
+    "device_lost": false,
+    "traceback": false,
+    "results_dir": "results/paper_demo/v1c0p1_isaac_smoke_20260722"
+  },
+  "xid": {
+    "before": 0,
+    "after": 0
+  },
+  "historical_evidence_untouched": true,
+  "v1c1r_fail_preserved": true,
+  "awaiting_approval": "V1-C1R-P1",
+  "docs": {
+    "md": "docs/cross-project/vlm-v1c1r-canonical-import-fix-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1c1r-canonical-import-fix-2026-07-22.json"
+  }
+}

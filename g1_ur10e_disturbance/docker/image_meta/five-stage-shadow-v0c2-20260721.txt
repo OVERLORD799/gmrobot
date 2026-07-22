@@ -1,0 +1,5 @@
+tag=gmdisturb:five-stage-shadow-v0c2-20260721
+image_id=sha256:882da3eef062fe11e7c6a7f2b4dab736c2f235d516910f169a920145f85fb140
+base_image=nvcr.io/nvidia/isaac-sim:5.1.0
+base_image_digest=nvcr.io/nvidia/isaac-sim@sha256:f3563cb2ba0c18af0b2fb321360dcb73a917b899f879e3213623d6bee484fa54
+built_at=2026-07-21T12:04:48Z

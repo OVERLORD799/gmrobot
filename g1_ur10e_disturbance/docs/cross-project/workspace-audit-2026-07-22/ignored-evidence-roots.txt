@@ -1,0 +1,71 @@
+=== git check-ignore -v sample roots ===
+-- g1_ur10e_disturbance/results
+(not ignored or missing)
+-- g1_ur10e_disturbance/results/paper_demo
+(not ignored or missing)
+-- GMRobot/results
+(not ignored or missing)
+-- .github_token
+.gitignore:4:*_token	.github_token
+-- /tmp
+(not ignored or missing)
+=== paper_demo top-level (indexed, not hashed) ===
+b0_b1_final_p010_20260721
+b0_b1_final_summary_p010.json
+b2_8part_20260720
+b2_8part_redeploy_20260720
+b2_b4_final_20260720
+b2_b4_final_summary.json
+b2_b4_final_summary_p010.json
+b2_b4_p010_20260721
+b4_iso_active_20260720
+b4_iso_shadow_20260720
+baseline_safe_r1_s43_080235
+baseline_safe_r1_s43_092230
+baseline_safe_r1_s43_110858
+baseline_safe_r2_s44_080253
+baseline_safe_r2_s44_112406
+baseline_safe_s42_080038
+baseline_safe_s42_080105
+baseline_safe_s42_085436
+baseline_safe_s42_090557
+baseline_safe_s42_102835
+baseline_safe_s42_105339
+batch_summary.json
+dynamic_lateral_sweep_proxy_1part_s42_081853
+dynamic_lateral_sweep_proxy_1part_s42_085028
+dynamic_lateral_sweep_proxy_1part_s42_091746
+pair_active_20260720
+pair_shadow_20260720
+static_occupancy_proxy_r1_s43_080331
+static_occupancy_proxy_r1_s43_115812
+static_occupancy_proxy_r2_s44_080350
+static_occupancy_proxy_r2_s44_121745
+static_occupancy_proxy_s42_080313
+static_occupancy_proxy_s42_113910
+v0b1_rgb_capture_20260721
+v0b2a_endpoint_preflight_20260721
+v0b2a_endpoint_preflight_retry1_20260721
+v0b2b_legacy_probe_20260721
+v0b2b_legacy_probe_dryrun_20260721
+v0b2b_track_step_continuation_20260721
+v0b4_legacy_gateway_replay_20260721
+v0c1_isaac_shadow_20260721
+v0c2_image_smoke_20260721
+v0c2_isaac_shadow_20260721
+v0c3_image_smoke_20260721
+v0c3_isaac_shadow_20260721
+v0c_image_smoke_20260721
+v1b_semantic_supervisor_replay_20260721
+v1c0_isaac_smoke_20260722
+v1c0p1_isaac_smoke_20260722
+v1c1_isaac_semantic_shadow_20260722
+v1c1r_gpu_stability_preflight_20260722
+v1c1r_isaac_semantic_shadow_20260722
+v1c1r_p1_isaac_semantic_shadow_20260722
+v1d1a_far_corridor_capture_20260722
+v1d1b_functional_blockage_capture_20260722
+v1d1b_vlm_semantic_screen_20260722
+v1d2b_task_context_vlm_replay_20260722
+v1e0_prompt_candidates_20260722.json
+v1e0_semantic_dataset_manifest_20260722.jsonl

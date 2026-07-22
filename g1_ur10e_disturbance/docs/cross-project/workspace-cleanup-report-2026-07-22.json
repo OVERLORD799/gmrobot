@@ -1,0 +1,141 @@
+{
+  "phase": "V1-W0.1",
+  "date": "2026-07-22",
+  "head": "46a76ad8bd2ad7ad1f0051239dfeaafb96782bc5",
+  "branch": "main",
+  "import_fixes": [
+    {
+      "file": "GMRobot/source/GMRobot/GMRobot/safety/semantic_supervisor.py",
+      "change": "single from .semantic_key_v2; removed safety fallback"
+    },
+    {
+      "file": "GMRobot/source/GMRobot/GMRobot/shadow/five_stage_worker.py",
+      "change": "GMRobot.vlm.* and GMRobot.safety.semantic_temporal_fusion only"
+    },
+    {
+      "file": "GMRobot/source/GMRobot/GMRobot/safety/semantic_temporal_fusion.py",
+      "change": "GMRobot.vlm.* only"
+    },
+    {
+      "file": "GMRobot/source/GMRobot/GMRobot/safety/semantic_key_v2.py",
+      "change": "GMRobot.vlm.temporal_evidence only"
+    },
+    {
+      "file": "GMRobot/scripts/test_v1d2a_temporal_fusion_unit.py",
+      "change": "canonical GMRobot.* imports + torch stub"
+    }
+  ],
+  "canonical_scan": {
+    "runtime_offenders": 0
+  },
+  "replan": {
+    "cwd": "/home/czz/GMrobot/GMRobot",
+    "exit": 0,
+    "prior_failure": "wrong_working_directory_not_missing_yaml"
+  },
+  "tests": {
+    "initial_run": {
+      "pass_files": 32,
+      "fail_files": 2
+    },
+    "final_run": {
+      "pass_files": 34,
+      "fail_files": 0,
+      "unit_files": 34
+    }
+  },
+  "commit_groups": [
+    {
+      "id": "commit1",
+      "title": "feat(vlm): add V0-A schemas, service contracts, and clients",
+      "path_count": 12,
+      "dependency": []
+    },
+    {
+      "id": "commit2",
+      "title": "feat(shadow): add five-stage worker/scheduler/logger/drain/isolation (no semantic_bridge)",
+      "path_count": 7,
+      "dependency": [
+        "commit1"
+      ]
+    },
+    {
+      "id": "commit3",
+      "title": "feat(safety): add semantic supervisor, semantic_bridge, and canonical agent wiring",
+      "path_count": 12,
+      "dependency": [
+        "commit1",
+        "commit2"
+      ]
+    },
+    {
+      "id": "commit4",
+      "title": "feat(vlm): add temporal v2 context/fusion/key (explicit opt-in)",
+      "path_count": 26,
+      "dependency": [
+        "commit1",
+        "commit2",
+        "commit3"
+      ]
+    },
+    {
+      "id": "commit5",
+      "title": "test(configs): add V0/V1 configs, fixtures, unit tests, and capture/replay tools",
+      "path_count": 53,
+      "dependency": [
+        "commit1",
+        "commit2",
+        "commit3",
+        "commit4"
+      ]
+    },
+    {
+      "id": "commit6",
+      "title": "docs: add cross-project VLM status, evidence index, image metadata, and W0 audit",
+      "path_count": 94,
+      "dependency": [
+        "commit1",
+        "commit2",
+        "commit3",
+        "commit4",
+        "commit5"
+      ]
+    }
+  ],
+  "commit_dependency_graph": "commit1->commit2->commit3->commit4->commit5->commit6; semantic_bridge in commit3",
+  "stage_unstage_path_identical": true,
+  "stage_path_count": 204,
+  "sensitive_scan": {
+    "security_review_required": false,
+    "github_token_tracked": false
+  },
+  "staged": 0,
+  "cached_diff_empty": true,
+  "counts": {
+    "modified_tracked": 10,
+    "untracked_entries": 149,
+    "porcelain_lines": 159
+  },
+  "e01_in_commit6": [
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.json",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.md"
+  ],
+  "git_actions_executed": {
+    "add": false,
+    "commit": false,
+    "push": false,
+    "stage_script": false
+  },
+  "c6_whitespace_waiver": {
+    "diff_check_exit": 2,
+    "allowed_markdown_hard_breaks": 61,
+    "unexpected_whitespace_errors": 0,
+    "eof_errors": 0,
+    "removed_nonsemantic_trailing_whitespace": 104,
+    "affected_markdown_files": 13,
+    "scripts_eof_fixed": 2,
+    "waiver_approved_by_user": true,
+    "allowlist_path": "g1_ur10e_disturbance/docs/cross-project/workspace-audit-2026-07-22/c6-markdown-hard-break-allowlist.txt"
+  },
+  "original_snapshot_note": "W0/W0.1 history retained; not rewritten"
+}

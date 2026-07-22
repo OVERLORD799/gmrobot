@@ -1,0 +1,72 @@
+{
+  "phase": "V1-W1",
+  "date": "2026-07-22",
+  "policy": "option_A_report_before_C6_then_freeze_in_C6",
+  "original_snapshot_head": "46a76ad8bd2ad7ad1f0051239dfeaafb96782bc5",
+  "C1_C2_unchanged": true,
+  "commits": {
+    "C1": {
+      "sha": "6550358ee0fe8d0dc44af1e58b862ce164b82407",
+      "title": "feat(vlm): add five-stage schemas service contracts and clients",
+      "paths": 12,
+      "tests": "vlm schema/service + perception service + gateway unit PASS",
+      "check": "exit 0",
+      "eof_incident": false
+    },
+    "C2": {
+      "sha": "b78c48af4023fc171d1ee5760ed6bc7354cb3bf4",
+      "title": "feat(shadow): add asynchronous five-stage shadow pipeline",
+      "paths": 7,
+      "tests": "worker/scheduler/drain/stale/logging/isolation/pipeline PASS",
+      "check": "exit 0",
+      "eof_incident": false
+    },
+    "C3": {
+      "sha": "a3aa11aa143051cafbf2a7011d0ddb08cc0404a5",
+      "title": "feat(safety): add semantic supervisor shadow isolation",
+      "paths": 12,
+      "tests": "supervisor/state/logger/replay/shadow/canonical/session PASS",
+      "check": "exit 0 after EOF fix",
+      "eof_incident": true,
+      "eof_note": "first cached --check failed on semantic_supervisor.py:746 new blank line at EOF; user approved minimal format fix; C1/C2 SHAs unchanged"
+    },
+    "C4": {
+      "sha": "00cd387a4d07920405db6d7e7afa5822e874bd83",
+      "title": "feat(vlm): add opt-in temporal semantic fusion v2",
+      "paths": 26,
+      "tests": "test_v1d2a_temporal_fusion 35 OK + canonical + supervisor regression PASS",
+      "check": "exit 0",
+      "eof_incident": false
+    },
+    "C5": {
+      "sha": "916d738be430e6f10e218c9bed1ee088374a8c00",
+      "title": "test(config): add V0 V1 configs fixtures and validation tools",
+      "paths": 53,
+      "tests": "py_compile PASS; replan PASS; 34/34 unit PASS",
+      "check": "exit 0",
+      "eof_incident": false
+    },
+    "C6": {
+      "sha": null,
+      "title": "docs(paper): archive five-stage validation and workspace evidence",
+      "paths": null,
+      "status": "pending"
+    }
+  },
+  "C3_eof_incident": {
+    "first_check": "fail new blank line at EOF semantic_supervisor.py:746",
+    "user_approved_minimal_format_fix": true,
+    "after_fix_check": "exit 0",
+    "C1_sha_unchanged": "6550358ee0fe8d0dc44af1e58b862ce164b82407",
+    "C2_sha_unchanged": "b78c48af4023fc171d1ee5760ed6bc7354cb3bf4"
+  },
+  "pre_C6_head": "916d738be430e6f10e218c9bed1ee088374a8c00",
+  "tests_at_C5": {
+    "unit_files": 34,
+    "pass_files": 34,
+    "fail_files": 0
+  },
+  "C6_status": "pending_inclusion_this_commit",
+  "push": false,
+  "e01_capture": false
+}

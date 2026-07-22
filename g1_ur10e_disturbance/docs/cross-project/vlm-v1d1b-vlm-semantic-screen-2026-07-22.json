@@ -1,0 +1,139 @@
+{
+  "phase": "V1-D1B-S",
+  "date": "2026-07-22",
+  "verdict": "SEMANTIC_SCREEN_FAIL",
+  "historical_geometry_verdict": "GEOMETRY_OVERLAP",
+  "historical_geometry_not_rewritten": true,
+  "fail_reasons": [
+    "5_risk_type_functional_or_dynamic",
+    "6_confidence_ge_0_85",
+    "8_semantic_key_identical"
+  ],
+  "gates": {
+    "1_post_exactly_2": true,
+    "2_http_success_both": true,
+    "3_parse_ok_both": true,
+    "4_synthetic_false_both": true,
+    "5_risk_type_functional_or_dynamic": false,
+    "6_confidence_ge_0_85": false,
+    "7_action_slow_down": true,
+    "8_semantic_key_identical": false,
+    "9_artifact_sha_vs_capture": true,
+    "10_retry_zero": true,
+    "11_no_credential_leak": true
+  },
+  "isaac_started": false,
+  "ground_track_called": false,
+  "formal_d1": false,
+  "active_control": false,
+  "retry_count": 0,
+  "post_count": 2,
+  "post_order": [
+    100,
+    200
+  ],
+  "prompt_changed": false,
+  "threshold_changed": false,
+  "third_post": false,
+  "vlm": {
+    "contract_mode": "legacy_v2",
+    "endpoint": "/analyze",
+    "prompt_version": "five_stage_safety_v1",
+    "schema_version": "five_stage_vlm_v1",
+    "model_id_response": "Qwen2.5-VL-7B-Instruct-4bit-nf4",
+    "health_http": 200,
+    "health_status": "ok"
+  },
+  "inputs": [
+    {
+      "sim_step": 100,
+      "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000100_env0.png",
+      "sha256": "3fdafcbb6cc3848309c4e2ed5a51b52f167fd34db1432c41840a0f960377fe11",
+      "manifest_listed": true,
+      "sha_matches_manifest": true
+    },
+    {
+      "sim_step": 200,
+      "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000200_env0.png",
+      "sha256": "40d0966ad933431a1ff01aa0d3e1a7f36720c40c63c6c54cbf221aac43ac337e",
+      "manifest_listed": false,
+      "sha_pinned_from_same_run_capture_scene": true
+    }
+  ],
+  "frames": [
+    {
+      "sim_step": 100,
+      "request_id": "v1d1b_s_20260722T092140Z_req1_step100_68aae711",
+      "frame_id": "v1d1b_s_20260722T092140Z_frm1_step100_dd8c0c6e",
+      "latency_ms_reported": 4946.480512619019,
+      "latency_ms_wall": 5253.78,
+      "parse_ok": true,
+      "synthetic": false,
+      "risk_type": "static",
+      "risk_confidence": 0.3,
+      "recommended_action": "slow_down",
+      "risk_entities": [
+        "robotic arm",
+        "orange sphere"
+      ],
+      "keywords": [
+        "robotic arm",
+        "orange sphere",
+        "green containers",
+        "black objects"
+      ],
+      "semantic_key": "static|slow_down|orange sphere|robotic arm|collision|left",
+      "geometry": {
+        "g_rule": 0,
+        "reason": "allow",
+        "ttc": "inf"
+      }
+    },
+    {
+      "sim_step": 200,
+      "request_id": "v1d1b_s_20260722T092140Z_req2_step200_e4d9f9aa",
+      "frame_id": "v1d1b_s_20260722T092140Z_frm2_step200_fbbbebd5",
+      "latency_ms_reported": 5480.173349380493,
+      "latency_ms_wall": 6145.95,
+      "parse_ok": true,
+      "synthetic": false,
+      "risk_type": "static",
+      "risk_confidence": 0.7,
+      "recommended_action": "slow_down",
+      "risk_entities": [
+        "robotic arm",
+        "container",
+        "small objects",
+        "spherical object"
+      ],
+      "keywords": [
+        "robotic arm",
+        "container",
+        "small objects",
+        "spherical object"
+      ],
+      "semantic_key": "static|slow_down|container|robotic arm|small objects|spherical object|collision|right",
+      "geometry": {
+        "g_rule": 0,
+        "reason": "allow",
+        "ttc": "inf"
+      }
+    }
+  ],
+  "semantic_keys_identical": false,
+  "supervisor_offline": {
+    "executed": false,
+    "reason": "SEMANTIC_SCREEN_FAIL"
+  },
+  "geometry_audit_supplement": {
+    "non_allow_only_steps_1_55": true,
+    "steps_56_279_all_allow": true,
+    "frame_100_200_allow_ttc_inf": true,
+    "early_ttc_source": "stationary_human_hand_vs_moving_ee",
+    "not_part_blocker_margin_penetration": true
+  },
+  "worth_fix_geometry_and_enter_formal_d1": false,
+  "worth_fix_geometry_reason": "VLM semantic screen failed (static + low confidence + inconsistent keys); geometry-only timing fix insufficient for formal D1",
+  "results_dir": "results/paper_demo/v1d1b_vlm_semantic_screen_20260722/",
+  "redaction_scan_hits": 0
+}

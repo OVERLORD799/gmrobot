@@ -1,0 +1,80 @@
+{
+  "phase": "V1-D2B",
+  "date": "2026-07-22",
+  "verdict": "D2B_TASK_CONTEXT_FAIL",
+  "fail_reasons": [
+    "4_native_risk_functional",
+    "5_native_conf_ge_0_85",
+    "8_semantic_key_v2_identical"
+  ],
+  "post_count": 2,
+  "retry_count": 0,
+  "isaac": false,
+  "docker": false,
+  "ground_track": false,
+  "temporal_evidence_used": false,
+  "temporal_validated": false,
+  "scheme_b_live_verified": false,
+  "active_control": false,
+  "d1b_history_rewritten": false,
+  "d1bs_history_rewritten": false,
+  "confidence_threshold_unchanged": 0.85,
+  "prompt_modified_ad_hoc": false,
+  "worthy_of_d2c": false,
+  "worthy_of_active": false,
+  "conclusion": "Local fusion engineering is sound, but current Qwen + prompt v2 cannot supply stable functional@>=0.85 control-grade semantic evidence. Do not build active scenes; enter dedicated prompt/model evaluation instead of lowering gates.",
+  "versions": {
+    "prompt_version": "five_stage_safety_v2_temporal",
+    "schema_version": "five_stage_vlm_v2",
+    "fusion_version": "five_stage_temporal_fusion_v1",
+    "semantic_key_version": "v2",
+    "model_id_response": "Qwen2.5-VL-7B-Instruct-4bit-nf4"
+  },
+  "inputs": [
+    {
+      "sim_step": 100,
+      "sha256": "3fdafcbb6cc3848309c4e2ed5a51b52f167fd34db1432c41840a0f960377fe11"
+    },
+    {
+      "sim_step": 200,
+      "sha256": "40d0966ad933431a1ff01aa0d3e1a7f36720c40c63c6c54cbf221aac43ac337e"
+    }
+  ],
+  "v1_baseline_source": "V1-D1B-S historical no_repost",
+  "v1_baseline": [
+    {"sim_step": 100, "risk_type": "static", "confidence": 0.3, "action": "slow_down"},
+    {"sim_step": 200, "risk_type": "static", "confidence": 0.7, "action": "slow_down"}
+  ],
+  "v2_results": [
+    {
+      "sim_step": 100,
+      "native_risk_type": "static",
+      "native_risk_confidence": 0.8,
+      "recommended_action": "slow_down",
+      "latency_ms_reported": 4849.52,
+      "task_phase": "approach",
+      "placement_target_occupied": "unknown",
+      "temporal_context_present": false,
+      "motion_evidence_source": "none"
+    },
+    {
+      "sim_step": 200,
+      "native_risk_type": "static",
+      "native_risk_confidence": 0.8,
+      "recommended_action": "slow_down",
+      "latency_ms_reported": 4585.28,
+      "task_phase": "transit",
+      "placement_target_occupied": "unknown",
+      "temporal_context_present": false,
+      "motion_evidence_source": "none"
+    }
+  ],
+  "supervisor_offline_executed": false,
+  "redaction_scan_hits": 0,
+  "results_dir": "results/paper_demo/v1d2b_task_context_vlm_replay_20260722/",
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d2b-task-context-replay-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d2b-task-context-replay-2026-07-22.json"
+  },
+  "git_diff_stat_tracked": "10 files changed, 628 insertions(+), 80 deletions(-)"
+}

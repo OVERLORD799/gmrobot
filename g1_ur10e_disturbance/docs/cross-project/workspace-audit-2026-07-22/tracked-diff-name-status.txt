@@ -1,0 +1,10 @@
+M	GMRobot/configs/perception_client.yaml
+M	GMRobot/configs/vlm_client.yaml
+M	GMRobot/deploy/ai_server/vlm_service.py
+M	GMRobot/scripts/gm_state_machine_agent.py
+M	GMRobot/source/GMRobot/GMRobot/__init__.py
+M	GMRobot/source/GMRobot/GMRobot/perception/__init__.py
+M	GMRobot/source/GMRobot/GMRobot/perception/client.py
+M	GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py
+M	GMRobot/source/GMRobot/GMRobot/vlm/__init__.py
+M	GMRobot/source/GMRobot/GMRobot/vlm/client.py

@@ -1,0 +1,11 @@
+git_root=/home/czz/GMrobot
+branch=main
+head=46a76ad8bd2ad7ad1f0051239dfeaafb96782bc5
+captured_at=2026-07-22T19:19:30+08:00
+note=post_V1-E0.1_design_stop_no_capture
+porcelain_lines=151
+staged_index_entries=0
+modified_worktree_tracked≈=10
+untracked=141
+deleted_entries=0
+dirty=True

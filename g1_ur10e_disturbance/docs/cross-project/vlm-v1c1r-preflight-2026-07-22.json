@@ -1,0 +1,104 @@
+{
+  "phase": "V1-C1R-P",
+  "date": "2026-07-22",
+  "verdict": "REMOTE_PERCEPTION_NOT_READY",
+  "v1_c1r_preflight_pass": false,
+  "formal_v1c1r_executed": false,
+  "post_count": 0,
+  "image_tag": "gmdisturb:semantic-shadow-v1c0-20260722",
+  "image_id": "sha256:e516c78ecc3c8e365763158f1b01ec6effba9aac1290ae0e1f4d1539c2ccf1da",
+  "image_rebuilt": false,
+  "boot_id": "c8323be1-3124-4017-9491-92a42b29082f",
+  "uptime_at_start_approx": "49m",
+  "nvidia_xid": {
+    "filter": "NVRM: Xid",
+    "before_isaac": 0,
+    "after_isaac": 0,
+    "final": 0,
+    "precheck_blocked_new_xid": false
+  },
+  "gpu_stability_preflight": {
+    "pass": true,
+    "results_dir": "results/paper_demo/v1c1r_gpu_stability_preflight_20260722",
+    "isaac_exit_code": 0,
+    "progress_120": true,
+    "scene_rgb_ready": true,
+    "error_device_lost": false,
+    "gpu_pagefault": false,
+    "traceback": false,
+    "gpu_process_exited_clean": true,
+    "memory_used_mib_before": 69,
+    "memory_used_mib_after": 70,
+    "compute_apps_after": []
+  },
+  "cli_used": {
+    "enable_cameras": true,
+    "enable_safety": true,
+    "max_steps": 120,
+    "num_envs": 1,
+    "headless": true,
+    "enable_five_stage_shadow": false,
+    "enable_semantic_supervisor_shadow": false,
+    "network_host": false
+  },
+  "diff_vs_formal_v1c1r": {
+    "reason": "max_submissions=0 means unlimited in scheduler; cannot zero-POST without code change",
+    "five_stage_shadow": "formal=on preflight=off",
+    "semantic_supervisor_shadow": "formal=on preflight=off",
+    "network_host": "formal=on preflight=off",
+    "safety_cameras_steps_image_scene": "matched"
+  },
+  "formal_configs_not_used_but_sha256": {
+    "five_stage_shadow_legacy_gateway_v1c1.yaml": "280ab4daad839090a49e7f1bc11e0d13f73b75679b6803ba981d74f9f4b0b073",
+    "semantic_safety_supervisor_shadow_v1c1.yaml": "ba473934c8f5a05a0a8e6b688daaba55cf6fe17d59103475427ea2e25e960a49"
+  },
+  "tunnel": {
+    "socket": "/tmp/gmrobot-v0b2-tunnel.sock",
+    "present": true,
+    "listen_18080": true,
+    "listen_18082": true
+  },
+  "vlm_health": {
+    "http": 200,
+    "status": "ok",
+    "ready": true
+  },
+  "perception_readiness": {
+    "ready": false,
+    "poll_interval_s": 30,
+    "max_wait_s": 600,
+    "polls": 21,
+    "final_http": 200,
+    "final_status": "warming",
+    "final_models_loaded": false,
+    "backend_available_field": null,
+    "timeline_file": "results/paper_demo/v1c1r_gpu_stability_preflight_20260722/perception_health_poll.jsonl",
+    "method": "GET_only",
+    "remote_restarted": false,
+    "post": false
+  },
+  "historical_evidence_untouched": {
+    "v1c1_not_run_doc": true,
+    "v1c1_fail_doc": true,
+    "xid_audit_doc": true,
+    "sha256_before_after_match": true
+  },
+  "constraints_honored": {
+    "no_formal_v1c1r": true,
+    "post_eq_0": true,
+    "no_image_rebuild": true,
+    "no_code_threshold_prompt_remote_change": true,
+    "no_credentials_read": true,
+    "no_tunnel_rebuild": true,
+    "no_perception_restart": true,
+    "no_v1d": true,
+    "no_overwrite_v1c1_history": true,
+    "no_retune_no_rerun_on_fail": true
+  },
+  "docs": {
+    "md": "docs/cross-project/vlm-v1c1r-preflight-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1c1r-preflight-2026-07-22.json"
+  },
+  "awaiting_user_approval_for_formal_v1c1r": true,
+  "paper_five_stage_complete": false
+}

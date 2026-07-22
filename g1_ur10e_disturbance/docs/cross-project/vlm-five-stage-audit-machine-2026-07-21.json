@@ -1,0 +1,374 @@
+{
+  "audit_date": "2026-07-21",
+  "physical_baseline_frozen": true,
+  "frozen_image_tag": "gmdisturb:b4-p010-20260721",
+  "frozen_image_sha": "defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+  "audit_mode": "read_only_feasibility",
+  "prohibitions_honored": [
+    "no_b0b1b2b4_mutation",
+    "no_docker_rebuild",
+    "no_isaac_sim",
+    "no_model_download_or_install",
+    "no_service_start",
+    "no_ssh_tunnel",
+    "no_post_inference",
+    "no_secret_values_printed"
+  ],
+  "endpoints": {
+    "vlm_yaml": {
+      "base_url": "http://127.0.0.1:18080",
+      "analyze": "/analyze",
+      "health": "/health",
+      "config_file": "GMRobot/configs/vlm_client.yaml"
+    },
+    "vlm_client_dataclass_default": {
+      "base_url": "http://120.209.70.195:8080",
+      "note": "differs from yaml; runtime uses from_yaml when configured",
+      "file": "GMRobot/source/GMRobot/GMRobot/vlm/client.py:20"
+    },
+    "perception_yaml": {
+      "base_url": "http://127.0.0.1:18082",
+      "ground": "/ground",
+      "track": "/track",
+      "health": "/health",
+      "config_file": "GMRobot/configs/perception_client.yaml"
+    },
+    "localhost_listen_18080_18082_8080": "NONE",
+    "vlm_health_127_0_0_1_18080": "UNAVAILABLE — endpoint not listening; inference not tested",
+    "perception_health_127_0_0_1_18082": "UNAVAILABLE — endpoint not listening; inference not tested",
+    "env_flags": {
+      "VLM_HOST": "ABSENT",
+      "VLM_PORT": "ABSENT",
+      "VLM_SSH_HOST": "ABSENT",
+      "VLM_SSH_KEY": "ABSENT",
+      "VLM_SSH_PASSWORD": "ABSENT"
+    },
+    "github_token_file": "PRESENT",
+    "github_token_vlm_host_password_last_two_lines": "DECLARED_BY_USER_NOT_VERIFIED",
+    "default_yaml_vlm_ssh_host": "PRESENT",
+    "default_yaml_vlm_ssh_password": "ABSENT_OR_EMPTY",
+    "default_yaml_vlm_ssh_key": "ABSENT_OR_EMPTY",
+    "default_yaml_vlm_port": 8080
+  },
+  "canonical_stack_recommendation": "GMRobot VLMClient + vlm_service(/analyze) + PerceptionClient + full perception server(/ground,/track) + SafetyLogger + gm_state_machine_agent shadow wiring. Do NOT conflate with g1_ur10e_disturbance G1VLMClient navigation/testing advisor.",
+  "non_canonical_stacks": [
+    {
+      "name": "G1VLMClient",
+      "path": "g1_ur10e_disturbance/g1_vlm_client.py",
+      "role": "navigation/adversarial testing advisor",
+      "disposition": "retain_for_gmdisturb_nav_tests_do_not_use_as_five_stage_paper_stack"
+    }
+  ],
+  "stages": {
+    "camera_rgb_capture": {
+      "status": "WIRED",
+      "notes": "Configured and read in code; no paper_demo RGB artifacts; not LIVE-VALIDATED",
+      "evidence": [
+        "g1_ur10e_disturbance/dual_env_cfg.py:385-621",
+        "g1_ur10e_disturbance/scripts/run_phase3.py:1390-1451",
+        "GMRobot/scripts/gm_state_machine_agent.py:509-531"
+      ]
+    },
+    "vlm_scene_summary": {
+      "status": "PRESENT",
+      "notes": "Target schema in plan doc only; service does not emit scene_summary",
+      "evidence": [
+        "g1_ur10e_disturbance/docs/cross-project/paper-demo-implementation-plan-2026-07-18.md:497+",
+        "GMRobot/deploy/ai_server/vlm_service.py:107-116"
+      ]
+    },
+    "vlm_keywords": {
+      "status": "PRESENT",
+      "notes": "Logger column exists; server does not return keywords",
+      "evidence": [
+        "GMRobot/source/GMRobot/GMRobot/safety/logger.py:28,254-274",
+        "GMRobot/deploy/ai_server/vlm_service.py:107-116"
+      ]
+    },
+    "keywords_to_grounding_dino": {
+      "status": "WIRED",
+      "notes": "Agent passes vlm_keywords to text_prompt; effective prompt usually empty/default because server omits keywords",
+      "evidence": [
+        "GMRobot/scripts/gm_state_machine_agent.py:2002-2010"
+      ]
+    },
+    "grounding_dino_boxes": {
+      "status": "IMPLEMENTED",
+      "notes": "Client ground() implemented; no complete deployable /ground server in repo",
+      "evidence": [
+        "GMRobot/source/GMRobot/GMRobot/perception/client.py:93-112",
+        "GMRobot/deploy/perception_track_server_snippet.py"
+      ]
+    },
+    "sam2_mask": {
+      "status": "IMPLEMENTED",
+      "notes": "Client run_sam2 + snippet predictor path; not LIVE-VALIDATED",
+      "evidence": [
+        "GMRobot/configs/perception_client.yaml:8",
+        "GMRobot/deploy/perception_track_server_snippet.py:88-100"
+      ]
+    },
+    "sam2_temporal_tracking": {
+      "status": "IMPLEMENTED",
+      "notes": "track_init/step/frame + snippet /track; no lost/reacquired state in logger",
+      "evidence": [
+        "GMRobot/source/GMRobot/GMRobot/perception/client.py:114-204",
+        "GMRobot/deploy/perception_track_server_snippet.py:103-214"
+      ]
+    },
+    "consequence_and_horizon": {
+      "status": "PRESENT",
+      "notes": "Only in plan schema; not in client/server/logger — treat as missing implementation",
+      "implemented": false,
+      "evidence": [
+        "g1_ur10e_disturbance/docs/cross-project/paper-demo-implementation-plan-2026-07-18.md:502-503"
+      ]
+    },
+    "structured_safety_suggestion": {
+      "status": "IMPLEMENTED",
+      "notes": "Fields exist but HARDCODED after real inference — not real structured reasoning",
+      "evidence": [
+        "GMRobot/deploy/ai_server/vlm_service.py:107-116"
+      ]
+    },
+    "shadow_logging": {
+      "status": "TESTED",
+      "notes": "Offline logger unit tests pass; no live episode evidence",
+      "evidence": [
+        "GMRobot/source/GMRobot/GMRobot/safety/logger.py:133-278",
+        "GMRobot/scripts/test_safety_logger_vlm_unit.py",
+        "GMRobot/scripts/test_safety_logger_perception_unit.py"
+      ]
+    },
+    "timeout_failure_fallback": {
+      "status": "IMPLEMENTED",
+      "notes": "Client returns ok=False; logger maps error; server stub/hardcode still returns ok=True with static",
+      "evidence": [
+        "GMRobot/source/GMRobot/GMRobot/vlm/client.py:92-95",
+        "GMRobot/source/GMRobot/GMRobot/safety/logger.py:222-234",
+        "GMRobot/deploy/ai_server/vlm_service.py:74-83,107-116"
+      ]
+    },
+    "request_frame_track_id_linkage": {
+      "status": "PRESENT",
+      "notes": "Weak: meta.step only; no end-to-end request_id/frame_id; track session_id not logged as columns",
+      "implemented": false,
+      "evidence": [
+        "GMRobot/scripts/gm_state_machine_agent.py:447,531",
+        "GMRobot/source/GMRobot/GMRobot/safety/logger.py:34-45"
+      ]
+    }
+  },
+  "schema_gap": {
+    "target_fields": [
+      "scene_summary",
+      "keywords",
+      "risk_type",
+      "risk_confidence",
+      "affected_entities",
+      "predicted_consequence",
+      "prediction_horizon_s",
+      "explanation",
+      "suggested_action",
+      "spatial_hint"
+    ],
+    "client_supports": ["image_b64", "prompt", "meta", "model_id", "ok", "error"],
+    "server_emits": [
+      "ok",
+      "model_id",
+      "vlm_risk_type(hardcoded)",
+      "vlm_severity(hardcoded)",
+      "vlm_suggested_action(hardcoded)",
+      "vlm_explanation",
+      "vlm_stage",
+      "vlm_latency_ms"
+    ],
+    "logger_columns": [
+      "vlm_risk_class",
+      "vlm_confidence",
+      "vlm_suggested_action",
+      "vlm_model_id",
+      "rgb_frame_path",
+      "vlm_explanation",
+      "vlm_keywords",
+      "vlm_risk_type",
+      "vlm_risk_confidence",
+      "vlm_parse_ok",
+      "perception_*"
+    ],
+    "missing_critical": [
+      "scene_summary",
+      "keywords_from_server",
+      "predicted_consequence",
+      "prediction_horizon_s",
+      "affected_entities",
+      "spatial_hint",
+      "prompt_version",
+      "schema_version",
+      "explicit_parse_error_not_silent_static"
+    ]
+  },
+  "tests": [
+    {
+      "command": "python3 -m py_compile GMRobot/source/GMRobot/GMRobot/vlm/client.py GMRobot/source/GMRobot/GMRobot/perception/client.py GMRobot/source/GMRobot/GMRobot/safety/logger.py GMRobot/source/GMRobot/GMRobot/safety/vlm_grasp_supervisor.py GMRobot/deploy/ai_server/vlm_service.py GMRobot/deploy/perception_track_server_snippet.py g1_ur10e_disturbance/g1_vlm_client.py",
+      "exit_code": 0,
+      "cwd": "/home/czz/GMrobot"
+    },
+    {
+      "command": "python scripts/test_safety_logger_vlm_unit.py",
+      "exit_code": 0,
+      "cwd": "/home/czz/GMrobot/GMRobot"
+    },
+    {
+      "command": "python scripts/test_safety_logger_perception_unit.py",
+      "exit_code": 0,
+      "cwd": "/home/czz/GMrobot/GMRobot"
+    },
+    {
+      "command": "PYTHONPATH=GMRobot/source/GMRobot python3 -c 'from GMRobot.safety.logger import vlm_log_fields_from_result'",
+      "exit_code": 1,
+      "cwd": "/home/czz/GMrobot",
+      "note": "Package import pulls isaaclab_tasks; offline logger tests still pass via direct script path"
+    },
+    {
+      "command": "ss -ltnp | rg '18080|18082|8080'",
+      "exit_code": 0,
+      "result": "NO_LISTEN_MATCH"
+    },
+    {
+      "command": "curl --max-time 2 -sS http://127.0.0.1:18080/health",
+      "exit_code": 7,
+      "result": "UNAVAILABLE"
+    },
+    {
+      "command": "curl --max-time 2 -sS http://127.0.0.1:18082/health",
+      "exit_code": 7,
+      "result": "UNAVAILABLE"
+    }
+  ],
+  "p0_blockers": [
+    {
+      "id": "P0-1",
+      "title": "vlm_service hardcodes risk after real inference",
+      "evidence": "GMRobot/deploy/ai_server/vlm_service.py:107-116",
+      "risk": "Fake structured reasoning invalidates paper claims",
+      "min_fix": "Parse model JSON; emit parse_error on failure; never silent static/medium/slow_down",
+      "tests_needed": ["schema_roundtrip_unit", "parse_failure_explicit_unit"],
+      "needs_user_resources": ["vlm_endpoint"]
+    },
+    {
+      "id": "P0-2",
+      "title": "No complete deployable perception /ground server in repo",
+      "evidence": "GMRobot/deploy/perception_track_server_snippet.py; GMRobot/deploy/ai_server/ lacks ground app",
+      "risk": "Cannot run GDINO→SAM2 chain for paper shadow",
+      "min_fix": "Provide full server or confirmed remote deployment path",
+      "tests_needed": ["client_contract_against_recorded_json"],
+      "needs_user_resources": ["perception_endpoint", "model_weights"]
+    },
+    {
+      "id": "P0-3",
+      "title": "keywords not produced so GDINO prompt chain is broken",
+      "evidence": "vlm_service.py:107-116; gm_state_machine_agent.py:2002-2010",
+      "risk": "Stage2→3 not auditable",
+      "min_fix": "Server emits keywords; request_id links VLM→ground",
+      "tests_needed": ["keywords_to_text_prompt_unit"],
+      "needs_user_resources": ["vlm_endpoint"]
+    },
+    {
+      "id": "P0-4",
+      "title": "Synchronous HTTP may block 50Hz loop",
+      "evidence": "vlm/client.py:67-89; perception/client.py:272-288; gm_state_machine_agent.py:499-532",
+      "risk": "Control jitter / stall",
+      "min_fix": "Async worker/queue; control loop reads cache only",
+      "tests_needed": ["queue_backpressure_timeout_unit"],
+      "needs_user_resources": []
+    },
+    {
+      "id": "P0-5",
+      "title": "VLM path can trigger live replan (not pure shadow)",
+      "evidence": "gm_state_machine_agent.py:1402-1462",
+      "risk": "Contaminates frozen geometric safety path",
+      "min_fix": "Shadow mode must not write gate/action/clock/replan; leakage=0 gate",
+      "tests_needed": ["control_leakage_zero_unit"],
+      "needs_user_resources": []
+    },
+    {
+      "id": "P0-6",
+      "title": "Missing request/frame/track ID linkage",
+      "evidence": "logger.py lacks request_id/frame_id/track_state columns",
+      "risk": "Cannot audit five-stage chain",
+      "min_fix": "Propagate and log IDs end-to-end",
+      "tests_needed": ["id_consistency_unit"],
+      "needs_user_resources": []
+    },
+    {
+      "id": "P0-7",
+      "title": "No RGB artifacts for offline V0 replay",
+      "evidence": "find results/paper_demo *.png/*.jpg count=0",
+      "risk": "Cannot start V0 without capture",
+      "min_fix": "Next round: capture few frames only; no long sim",
+      "tests_needed": ["artifact_manifest_check"],
+      "needs_user_resources": ["permission_to_capture_few_rgb_frames"]
+    },
+    {
+      "id": "P0-8",
+      "title": "Local endpoints unavailable",
+      "evidence": "curl 18080/18082 connection refused",
+      "risk": "No LIVE-VALIDATED path this host",
+      "min_fix": "User provides reachable endpoints after approval",
+      "tests_needed": ["health_smoke_after_approval"],
+      "needs_user_resources": ["vlm_endpoint", "perception_endpoint", "credentials"]
+    }
+  ],
+  "p1_gaps": [
+    {
+      "id": "P1-1",
+      "title": "No latency distribution / queue metrics",
+      "evidence": "single latency_ms fields only"
+    },
+    {
+      "id": "P1-2",
+      "title": "Missing prompt_version/schema_version",
+      "evidence": "only model_id partially present"
+    },
+    {
+      "id": "P1-3",
+      "title": "No track lost/reacquired state logging",
+      "evidence": "perception client resets session; logger has no track_state"
+    },
+    {
+      "id": "P1-4",
+      "title": "Tool/PPE pairing not implemented",
+      "evidence": "plan-only"
+    },
+    {
+      "id": "P1-5",
+      "title": "Camera obs key mismatch GMDisturb vs GMRobot agent",
+      "evidence": "ur10e_camera.scene_rgb vs camera.scene_rgb"
+    },
+    {
+      "id": "P1-6",
+      "title": "VLMClient dataclass default URL drifts from yaml",
+      "evidence": "vlm/client.py:20 vs configs/vlm_client.yaml"
+    }
+  ],
+  "p0_count": 8,
+  "p1_count": 6,
+  "shadow_experiment_ready": false,
+  "five_stage_claimed_complete": false,
+  "next_slice_design_only": {
+    "V0": "offline/replay schema+IDs+keywords→boxes+SAM2 latency; no control",
+    "V1": "Isaac shadow async; leakage=0; L1 frozen geometric safety independent"
+  },
+  "requires_user_resources": [
+    "reachable_vlm_http_endpoint_or_approved_tunnel",
+    "reachable_perception_http_endpoint_with_ground_and_track",
+    "credentials_declared_in_github_token_last_lines_not_read_this_round",
+    "confirmation_remote_model_weights_installed",
+    "permission_to_capture_few_rgb_frames_for_V0"
+  ],
+  "report_files": [
+    "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-readonly-audit-2026-07-21.md",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-audit-machine-2026-07-21.json"
+  ]
+}

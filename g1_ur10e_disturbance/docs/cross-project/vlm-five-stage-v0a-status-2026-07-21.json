@@ -1,0 +1,42 @@
+{
+  "date": "2026-07-21",
+  "phase": "V0-A",
+  "physical_baseline_frozen": true,
+  "frozen_image_sha": "defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+  "five_stage_live_validated": false,
+  "five_stage_claimed_complete": false,
+  "shadow_experiment_ready_offline_infra": true,
+  "shadow_experiment_ready_with_real_endpoint": false,
+  "p0_status": {
+    "P0-1": "done",
+    "P0-2": "done",
+    "P0-3": "done",
+    "P0-4": "done",
+    "P0-5": "done",
+    "P0-6": "done",
+    "P0-7": "open",
+    "P0-8": "open"
+  },
+  "tests": {
+    "new_test_functions": 25,
+    "new_test_files": 6,
+    "legacy_logger_tests_pass": true,
+    "all_offline_exit_code": 0,
+    "submit_max_ms_observed": 0.017
+  },
+  "operations": {
+    "network": false,
+    "model_download": false,
+    "docker": false,
+    "isaac": false,
+    "credentials_read": false,
+    "real_post_inference": false
+  },
+  "canonical_stack": "GMRobot VLMClient + vlm_service schema + PerceptionClient + FiveStageShadowWorker + FiveStageShadowLogger",
+  "non_canonical": "g1_vlm_client navigation advisor untouched",
+  "docs": [
+    "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-v0a-implementation-2026-07-21.md",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-readonly-audit-2026-07-21.md"
+  ],
+  "next": "V0-B real RGB + endpoint validation after approval"
+}

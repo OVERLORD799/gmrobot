@@ -1,0 +1,226 @@
+################################################################################
+# V1-W0 INITIAL RUN (2026-07-22, wrong CWD=/home/czz/GMrobot for some tests)
+# unit_files=34 pass_files=32 fail_files=2
+# FAIL 1: test_canonical_package_import — bare from safety.* fallbacks
+# FAIL 2: test_replan_unit — FileNotFoundError ivj_intrusion_positive.yaml (WRONG CWD, file exists)
+# CORRECTION: canonical imports fixed; replan must run from GMRobot/; temporal test uses GMRobot.* + torch stub
+################################################################################
+
+=== V1-W0.1 FINAL RUN 2026-07-22T19:31:40+08:00 cwd=/home/czz/GMrobot/GMRobot ===
+compile_exit=0
+OK test_canonical_package_imports
+OK test_gm_state_machine_agent_semantic_import_is_canonical
+OK test_source_tree_no_toplevel_safety_imports
+OK test_sys_path_canonical_only
+PASS 4
+canonical_exit=0
+Replan trigger using dist_ee_human (0.100 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Grasp rewind exhausted after 2 attempts at task_step=201; proceeding without re-grasp
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+All replan unit tests passed.
+replan_exit=0
+--- RUN scripts/test_canonical_package_import_v1c0p1_unit.py ---
+OK test_canonical_package_imports
+OK test_gm_state_machine_agent_semantic_import_is_canonical
+OK test_source_tree_no_toplevel_safety_imports
+OK test_sys_path_canonical_only
+PASS 4
+--- RUN scripts/test_envelope_unit.py ---
+test_envelope_unit: OK
+--- RUN scripts/test_five_stage_legacy_gateway_pipeline_unit.py ---
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.043s
+
+OK
+--- RUN scripts/test_five_stage_pipeline_halt_unit.py ---
+......
+----------------------------------------------------------------------
+Ran 6 tests in 15.356s
+
+OK
+--- RUN scripts/test_five_stage_shadow_isolation_unit.py ---
+All five-stage shadow isolation unit tests passed.
+--- RUN scripts/test_five_stage_shadow_logging_unit.py ---
+All five-stage shadow logging unit tests passed.
+--- RUN scripts/test_five_stage_shadow_scheduler_unit.py ---
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.792s
+
+OK
+--- RUN scripts/test_five_stage_shadow_worker_unit.py ---
+All five-stage shadow worker unit tests passed. submit_ms=0.012
+--- RUN scripts/test_five_stage_shutdown_drain_unit.py ---
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 9.584s
+
+OK
+--- RUN scripts/test_five_stage_stale_unique_count_unit.py ---
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.080s
+
+OK
+--- RUN scripts/test_gt_fusion_envelope_unit.py ---
+test_gt_fusion_envelope_unit: OK
+--- RUN scripts/test_perception_legacy_gateway_unit.py ---
+.............
+----------------------------------------------------------------------
+Ran 13 tests in 0.001s
+
+OK
+--- RUN scripts/test_perception_service_contract_unit.py ---
+All perception service contract unit tests passed.
+--- RUN scripts/test_replan_unit.py ---
+Replan trigger using dist_ee_human (0.100 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.150 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Grasp rewind exhausted after 2 attempts at task_step=201; proceeding without re-grasp
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+Replan trigger using dist_ee_human (0.173 m) as fallback — dist_min_for_gating is missing from gate metadata.  Thresholds may be mismatched.
+All replan unit tests passed.
+--- RUN scripts/test_rule_engine_unit.py ---
+test_rule_engine_unit: OK
+--- RUN scripts/test_safety_logger_perception_unit.py ---
+All perception logger unit tests passed.
+--- RUN scripts/test_safety_logger_replan_unit.py ---
+All replan logger unit tests passed.
+--- RUN scripts/test_safety_logger_vlm_unit.py ---
+All VLM logger unit tests passed.
+--- RUN scripts/test_semantic_supervisor_logger_unit.py ---
+OK test_log_has_no_sensitive_fields
+OK test_logger_round_trip
+OK test_no_replan_fields_true
+PASS
+--- RUN scripts/test_semantic_supervisor_replay_unit.py ---
+OK test_old_vlm_stage5_replan_not_invoked_by_supervisor
+OK test_replay_script_exit_zero
+OK test_synthetic_dynamic_two_accepted
+OK test_v0c3_dynamic_low_conf_also_blocked
+OK test_v0c3_negative_accepted_zero
+OK test_v0c3_static_slow_down_rejected
+PASS
+--- RUN scripts/test_semantic_supervisor_shadow_v1c0_unit.py ---
+OK test_accepted_does_not_change_effective_gate
+OK test_config_file_defaults
+OK test_control_hash_off_on_match
+OK test_decision_time_geometry_gate_used
+OK test_default_disabled_validation_noop
+OK test_five_stage_leakage_still_zero
+OK test_geometry_slow_not_downgraded_by_allow
+OK test_geometry_stop_not_downgraded
+OK test_logger_schema_round_trip
+OK test_mutex_with_live_vlm_replan
+OK test_non_shadow_enforcement_rejected
+OK test_repeat_poll_same_result_no_duplicate_log
+OK test_request_id_consumed_once
+OK test_requires_five_stage_shadow
+OK test_requires_safety
+OK test_semantic_leakage_all_zero
+OK test_shutdown_drain_advisory_complete_via_callback
+OK test_source_and_decision_steps_recorded
+OK test_stale_rejected
+OK test_synthetic_dynamic_shadow_accept_would_slow
+OK test_v0c3_negative_not_accepted
+PASS 21
+--- RUN scripts/test_semantic_supervisor_state_unit.py ---
+OK test_cooldown_blocks_repeat_advisory
+OK test_episode_reset_clears_state
+OK test_multi_episode_isolation
+OK test_requested_gate_only_slow_or_empty
+OK test_thread_safe_under_lock
+PASS
+--- RUN scripts/test_semantic_supervisor_unit.py ---
+OK test_action_not_allowed
+OK test_allow_to_shadow_slow
+OK test_consistency_then_accept
+OK test_default_config_file_disabled_shadow
+OK test_disabled_reject
+OK test_duplicate_request
+OK test_geometry_slow_not_downgraded_by_empty
+OK test_geometry_stop_not_downgraded
+OK test_horizon_bounds
+OK test_int_gate_mapping
+OK test_key_change_resets_consistency
+OK test_low_confidence
+OK test_missing_consequence_entities
+OK test_missing_ids
+OK test_non_shadow_mode_reject
+OK test_result_too_old
+OK test_risk_type_not_allowed_static
+OK test_same_request_not_double_counted_for_consistency
+OK test_schema_invalid
+OK test_stale
+OK test_unknown_gate_fails
+OK test_vlm_error
+OK test_window_timeout_resets
+OK test_would_stop_replan_effect_always_false_on_accept
+PASS 24
+--- RUN scripts/test_session_continuity_unit.py ---
+/home/czz/GMrobot/GMRobot/scripts/test_session_continuity_unit.py:298: ResourceWarning: unclosed file <_io.TextIOWrapper name='/tmp/tmpxltff9oe/five_stage_shadow_20260722_193210/five_stage_shadow_steps.csv' mode='r' encoding='UTF-8'>
+  rows = list(csv.DictReader(csv_path.open()))
+ResourceWarning: Enable tracemalloc to get the object allocation traceback
+..............
+----------------------------------------------------------------------
+Ran 14 tests in 0.034s
+
+OK
+--- RUN scripts/test_shadow_config_resolve_unit.py ---
+.....
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+OK
+--- RUN scripts/test_v0b2b_probe_limiter_unit.py ---
+............
+----------------------------------------------------------------------
+Ran 12 tests in 0.003s
+
+OK
+--- RUN scripts/test_v0b2b_track_step_continuation_unit.py ---
+..........
+----------------------------------------------------------------------
+Ran 10 tests in 0.002s
+
+OK
+continuation_verdict=TRACK_STEP_HTTP_FAIL posts=1 session_match=False
+continuation_verdict=LEGACY_GATEWAY_FEASIBLE_COMPOSITE posts=1 session_match=True
+--- RUN scripts/test_v0b4_replay_validator_unit.py ---
+......
+----------------------------------------------------------------------
+Ran 6 tests in 0.000s
+
+OK
+--- RUN scripts/test_v1d1a_far_corridor_capture_unit.py ---
+V1D1A_CAPTURE_UNIT_OK
+--- RUN scripts/test_v1d1b_functional_blockage_capture_unit.py ---
+V1D1B_CAPTURE_UNIT_OK
+--- RUN scripts/test_v1d2a_temporal_fusion_unit.py ---
+...................................
+----------------------------------------------------------------------
+Ran 35 tests in 0.065s
+
+OK
+--- RUN scripts/test_vlm_legacy_gateway_unit.py ---
+........
+----------------------------------------------------------------------
+Ran 8 tests in 0.001s
+
+OK
+--- RUN scripts/test_vlm_schema_unit.py ---
+All VLM schema unit tests passed.
+--- RUN scripts/test_vlm_service_contract_unit.py ---
+All VLM service contract unit tests passed.
+unit_files=34 pass_files=34 fail_files=0
+elapsed_sec=30.876
+=== W0.1 FINAL END ===
+canonical_runtime_scan_offenders 0

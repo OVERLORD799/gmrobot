@@ -1,0 +1,90 @@
+{
+  "bare_safety_imports": [
+    {
+      "check": "canonical_import",
+      "path": "GMRobot/source/GMRobot/GMRobot/safety/semantic_supervisor.py",
+      "line": 543,
+      "msg": "bare safety import"
+    },
+    {
+      "check": "canonical_import",
+      "path": "GMRobot/source/GMRobot/GMRobot/shadow/five_stage_worker.py",
+      "line": 455,
+      "msg": "bare safety import"
+    }
+  ],
+  "temporal_and_defaults": [
+    {
+      "check": "v1_default",
+      "path": "GMRobot/source/GMRobot/GMRobot/vlm/versions.py",
+      "ok": true,
+      "note": "versions module present"
+    },
+    {
+      "check": "temporal_v2_explicit",
+      "path": "GMRobot/configs/five_stage_shadow_temporal_v2.yaml",
+      "has_enabled_false": true,
+      "snippet_check_only": true
+    },
+    {
+      "check": "temporal_v2_explicit",
+      "path": "GMRobot/configs/semantic_safety_supervisor_temporal_v2.yaml",
+      "has_enabled_false": true,
+      "snippet_check_only": true
+    },
+    {
+      "check": "temporal_v2_explicit",
+      "path": "GMRobot/configs/vlm_client_legacy_gateway_temporal_v2.yaml",
+      "has_enabled_false": false,
+      "snippet_check_only": true
+    },
+    {
+      "check": "default_shadow_not_v2",
+      "path": "GMRobot/configs/five_stage_shadow.yaml",
+      "mentions_temporal_v2": false,
+      "enabled_true_temporal": false
+    }
+  ],
+  "control_boundary": [
+    {
+      "check": "control_boundary",
+      "path": "GMRobot/source/GMRobot/GMRobot/safety/semantic_supervisor.py",
+      "has_intentional_false_default": true,
+      "mentions_shadow": true,
+      "size": 29262
+    },
+    {
+      "check": "control_boundary",
+      "path": "GMRobot/source/GMRobot/GMRobot/shadow/control_isolation.py",
+      "has_intentional_false_default": false,
+      "mentions_shadow": true,
+      "size": 4210
+    },
+    {
+      "check": "supervisor_config_mode",
+      "path": "GMRobot/configs/semantic_safety_supervisor.yaml",
+      "mode": "shadow",
+      "active": null,
+      "intentional_control_effect": null
+    },
+    {
+      "check": "supervisor_config_mode",
+      "path": "GMRobot/configs/semantic_safety_supervisor_shadow_v1c1r_p1.yaml",
+      "mode": "shadow",
+      "active": null,
+      "intentional_control_effect": null
+    }
+  ],
+  "missing_yaml_refs": [],
+  "cred_like_yaml": [],
+  "bad_doc_claims": [],
+  "freeze_phrases_found_in_vlm_v1_docs": {
+    "DATASET_INSUFFICIENT": true,
+    "GEOMETRY_OVERLAP": true,
+    "SEMANTIC_SCREEN_FAIL": true,
+    "D2B_TASK_CONTEXT_FAIL": true
+  },
+  "bare_safety_imports_assessment": "FALLBACK_IMPORT_PATHS; primary paths use relative/GMRobot; still fails canonical unit gate; SECURITY_REVIEW not required; CODE_CONSISTENCY_FIX_RECOMMENDED",
+  "control_boundary_assessment": "supervisor configs mode=shadow; intentional_control_effect defaults false in worker fusion_fields; active not enabled",
+  "doc_claims_assessment": "no forbidden complete claims detected; freeze phrases present"
+}

@@ -1,0 +1,80 @@
+{
+  "phase": "V1-W1",
+  "date": "2026-07-22",
+  "blocker": "DATASET_INSUFFICIENT",
+  "original_snapshot": {
+    "head": "46a76ad8bd2ad7ad1f0051239dfeaafb96782bc5",
+    "note": "post_V1-E0.1_design_stop_pre_W0_commits",
+    "tests_initial_W0": {
+      "pass_files": 32,
+      "fail_files": 2
+    },
+    "tests_final_W0_1": {
+      "pass_files": 34,
+      "fail_files": 0
+    }
+  },
+  "post_fix_snapshot": {
+    "canonical_import_fixed": true,
+    "replan_root_cause": "wrong_working_directory_not_missing_yaml",
+    "EOF_format_fix_C3": true
+  },
+  "pre_C6_commit_state": {
+    "head": "916d738be430e6f10e218c9bed1ee088374a8c00",
+    "staged": 0,
+    "C1_to_C5": {
+      "C1": {
+        "sha": "6550358ee0fe8d0dc44af1e58b862ce164b82407",
+        "title": "feat(vlm): add five-stage schemas service contracts and clients",
+        "paths": 12
+      },
+      "C2": {
+        "sha": "b78c48af4023fc171d1ee5760ed6bc7354cb3bf4",
+        "title": "feat(shadow): add asynchronous five-stage shadow pipeline",
+        "paths": 7
+      },
+      "C3": {
+        "sha": "a3aa11aa143051cafbf2a7011d0ddb08cc0404a5",
+        "title": "feat(safety): add semantic supervisor shadow isolation",
+        "paths": 12
+      },
+      "C4": {
+        "sha": "00cd387a4d07920405db6d7e7afa5822e874bd83",
+        "title": "feat(vlm): add opt-in temporal semantic fusion v2",
+        "paths": 26
+      },
+      "C5": {
+        "sha": "916d738be430e6f10e218c9bed1ee088374a8c00",
+        "title": "test(config): add V0 V1 configs fixtures and validation tools",
+        "paths": 53
+      }
+    },
+    "remaining_untracked_count": 79,
+    "remaining_modified_tracked_count": 0,
+    "C6_pending": true
+  },
+  "completed": [
+    "B0/B1/B2/B4 physical safety baselines (frozen)",
+    "Real five-stage shadow",
+    "Legacy gateway",
+    "Session continuity",
+    "Semantic supervisor shadow",
+    "Control isolation",
+    "Temporal fusion offline (opt-in v2)",
+    "W0.1 canonical import + 34/34 offline units",
+    "V1-W1 C1–C5 local commits"
+  ],
+  "incomplete": [
+    "glove/PPE",
+    "Control-grade positive dataset",
+    "V1-E1 live eval",
+    "Real accepted semantic positive",
+    "Active ALLOW→SLOW_DOWN",
+    "Multi-seed active",
+    "E0.1 capture not executed",
+    "push not performed"
+  ],
+  "e01_status": "DESIGN_READY_AWAITING_CAPTURE_APPROVAL",
+  "active_vlm_control": "not_ready",
+  "push": false
+}

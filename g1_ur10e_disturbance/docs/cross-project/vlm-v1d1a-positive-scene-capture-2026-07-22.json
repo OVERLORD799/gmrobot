@@ -1,0 +1,87 @@
+{
+  "phase": "V1-D1A",
+  "date": "2026-07-22",
+  "verdict": "FAIL",
+  "reason": "geometry_not_allow_throughout",
+  "ready_for_2post_semantic_filter": false,
+  "no_vlm_post": true,
+  "no_full_d1": true,
+  "no_active_control": true,
+  "no_image_rebuild": true,
+  "no_retune_rerun": true,
+  "visual_semantic_risk": "low",
+  "image_tag": "gmdisturb:semantic-shadow-v1c0p1-20260722",
+  "image_id": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+  "safety_config": "GMRobot/configs/ivj_v1d1_far_corridor_motion.yaml",
+  "safety_config_sha256": "a807b531fd28bfee1965e1e4ce502c549c9c7faf3d4248b0e4eaf671597a9fe1",
+  "trajectory_pose_hash": "1f246437642bccbd6468128c67f32798d8a97d2f952b0c55499f9b964a22c209",
+  "seed": null,
+  "unit_tests": {"all_unit_scripts": 32, "failed": 0, "v1d1a_unit": "PASS"},
+  "smoke": {
+    "canonical_import": "PASS",
+    "one_step_exit": 0,
+    "post_count": 0,
+    "xid": 0
+  },
+  "isaac_exit_code": 0,
+  "max_steps": 280,
+  "progress_280": true,
+  "post_count": 0,
+  "plan_steps": [0, 100],
+  "rgb_frames": [
+    {
+      "sim_step": 0,
+      "path": "results/paper_demo/v1d1a_far_corridor_capture_20260722/scene/frame_000000_env0.png",
+      "sha256": "65ec01ad87e6a30b1282c11364810a65e21b08335ecd1c543ac6615a60e90862",
+      "visible": true,
+      "pixel_area": 79,
+      "centroid_uv": [402.8481012658228, 216.39240506329114],
+      "dist_ee_proxy_m": 0.8003645149209989,
+      "g_rule": 0
+    },
+    {
+      "sim_step": 100,
+      "path": "results/paper_demo/v1d1a_far_corridor_capture_20260722/scene/frame_000100_env0.png",
+      "sha256": "57480cfbab0849dd7231c1cc185f6e10f7e3123f6efc631218a4946d12c29a88",
+      "visible": true,
+      "pixel_area": 390,
+      "centroid_uv": [321.1871794871795, 227.13846153846154],
+      "dist_ee_proxy_m": 0.42087956867562165,
+      "g_rule": 0
+    }
+  ],
+  "pixel_displacement_px": 82.36494324350166,
+  "rgb_hashes_unique": true,
+  "proxy_trajectory": {
+    "start_pos": [0.4, -0.55, 0.5],
+    "end_pos": [0.4, 0.55, 0.5],
+    "duration_steps": 200,
+    "radius_m": 0.05,
+    "speed_m_s_approx": 0.275
+  },
+  "geometry": {
+    "safe_dist_warn_m": 0.16,
+    "safe_dist_hard_stop_m": 0.13,
+    "ttc_threshold_s": 0.5,
+    "ttc_warn_threshold_s": 1.5,
+    "min_geometry_margin_m": -0.02836761337638194,
+    "gate_counts": {"ALLOW": 184, "SLOW_DOWN": 67, "STOP": 29},
+    "replan_count": 0,
+    "primary_non_allow_triggers": ["static_warning", "dynamic_ttc_warning", "dynamic_ttc"]
+  },
+  "leakage": {
+    "five_stage_all_zero": true,
+    "semantic_all_zero": true,
+    "note": "capture-only; network workers not initialized"
+  },
+  "xid_before": 0,
+  "xid_after": 0,
+  "results_dir": "results/paper_demo/v1d1a_far_corridor_capture_20260722",
+  "manifest": "results/paper_demo/v1d1a_far_corridor_capture_20260722/manifest/capture_manifest.json",
+  "v1c1r_p1_untouched": true,
+  "frozen_b0_b4_untouched": true,
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d1a-positive-scene-capture-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d1a-positive-scene-capture-2026-07-22.json"
+  }
+}

@@ -1,0 +1,85 @@
+{
+  "phase": "V1-D2A",
+  "date": "2026-07-22",
+  "verdict": "OFFLINE_IMPLEMENTATION_COMPLETE",
+  "post_count": 0,
+  "network": false,
+  "isaac": false,
+  "docker": false,
+  "remote_changed": false,
+  "active_control": false,
+  "b0_b4_modified": false,
+  "d1a_d1b_history_rewritten": false,
+  "min_risk_confidence": 0.85,
+  "confidence_lowered": false,
+  "synthetic_as_paper_evidence": false,
+  "v1_default_preserved": true,
+  "silent_v1_v2_switch_forbidden": true,
+  "versions": {
+    "prompt_version": "five_stage_safety_v2_temporal",
+    "schema_version": "five_stage_vlm_v2",
+    "fusion_version": "five_stage_temporal_fusion_v1",
+    "semantic_key_version": "semantic_key_v2",
+    "remote_contract": "legacy_v2"
+  },
+  "configs": {
+    "five_stage": "GMRobot/configs/five_stage_shadow_temporal_v2.yaml",
+    "supervisor": "GMRobot/configs/semantic_safety_supervisor_temporal_v2.yaml",
+    "vlm_client": "GMRobot/configs/vlm_client_legacy_gateway_temporal_v2.yaml",
+    "enabled_default": false,
+    "enforcement_mode": "shadow"
+  },
+  "modules": [
+    "GMRobot/source/GMRobot/GMRobot/vlm/versions.py",
+    "GMRobot/source/GMRobot/GMRobot/vlm/task_context.py",
+    "GMRobot/source/GMRobot/GMRobot/vlm/temporal_evidence.py",
+    "GMRobot/source/GMRobot/GMRobot/vlm/prompt_v2.py",
+    "GMRobot/source/GMRobot/GMRobot/safety/semantic_temporal_fusion.py",
+    "GMRobot/source/GMRobot/GMRobot/safety/semantic_key_v2.py"
+  ],
+  "tests": {
+    "new_v1d2a": 35,
+    "all_unit": 140,
+    "all_unit_ok": true
+  },
+  "historical_negatives_accepted": {
+    "V0-C3": 0,
+    "V1-C1R-P1": 0,
+    "V1-D1B-S": 0
+  },
+  "temporal_evidence_thresholds": {
+    "max_evidence_age_s": 2.0,
+    "min_track_score": 0.5,
+    "min_speed_px_s": 10.0,
+    "independent_of_semantic_confidence": true
+  },
+  "fusion_sources": ["vlm_native", "temporal_fusion", "task_context_fusion"],
+  "motion_evidence_sources": ["sam2_track", "none"],
+  "d2b_plan": {
+    "max_vlm_posts": 4,
+    "isaac": false,
+    "inputs": [
+      {
+        "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000100_env0.png",
+        "sha256": "3fdafcbb6cc3848309c4e2ed5a51b52f167fd34db1432c41840a0f960377fe11"
+      },
+      {
+        "path": "results/paper_demo/v1d1b_functional_blockage_capture_20260722/scene/frame_000200_env0.png",
+        "sha256": "40d0966ad933431a1ff01aa0d3e1a7f36720c40c63c6c54cbf221aac43ac337e"
+      }
+    ],
+    "note": "If D2B still lacks high-confidence positives, conclude model/prompt unfit for control feedback — do not lower gates."
+  },
+  "not_yet_validated": [
+    "live_remote_v2_prompt_quality",
+    "isaac_live_loop_accepted_ge_1",
+    "online_task_context_provider_wiring",
+    "d1b_geometry_timing_fix"
+  ],
+  "entered_d2b": false,
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d2a-temporal-fusion-implementation-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d2a-temporal-fusion-implementation-2026-07-22.json"
+  },
+  "git_diff_stat_tracked": "10 files changed, 628 insertions(+), 80 deletions(-)"
+}

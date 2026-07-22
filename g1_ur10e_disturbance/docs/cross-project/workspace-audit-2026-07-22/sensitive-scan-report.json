@@ -1,0 +1,93 @@
+{
+  "security_review_required": false,
+  "github_token_tracked": false,
+  "github_token_ignored": true,
+  "finding_count": 12,
+  "findings": [
+    {
+      "path": ".github_token",
+      "line": null,
+      "rule": "github_token_present_untracked",
+      "risk": "REAL_SECRET_LOCAL",
+      "detail": "ignored_ok_not_tracked"
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-readonly-audit-2026-07-21.md",
+      "line": 22,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-readonly-audit-2026-07-21.md",
+      "line": 34,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-readonly-audit-2026-07-21.md",
+      "line": 231,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-five-stage-v0a-implementation-2026-07-21.md",
+      "line": 94,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v0b1-rgb-capture-result-2026-07-21.md",
+      "line": 100,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v0b2a-endpoint-preflight-2026-07-21.md",
+      "line": 96,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v0b2a-endpoint-preflight-retry1-2026-07-21.md",
+      "line": 121,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v0b2b-legacy-capability-probe-2026-07-21.md",
+      "line": 18,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1c1r-perception-warming-audit-2026-07-22.md",
+      "line": 17,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/workspace-audit-2026-07-22/ignored-evidence-roots.txt",
+      "line": 8,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/workspace-audit-2026-07-22/ignored-evidence-roots.txt",
+      "line": 9,
+      "rule": "github_token_filename",
+      "risk": "DOCUMENTATION_PATH_REFERENCE",
+      "match_echoed": false
+    }
+  ],
+  "note": "Match plaintext omitted; .github_token local untracked+ignored; no REAL_SECRET in proposed commit set"
+}

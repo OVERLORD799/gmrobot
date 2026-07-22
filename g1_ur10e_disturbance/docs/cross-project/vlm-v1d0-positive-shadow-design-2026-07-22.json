@@ -1,0 +1,152 @@
+{
+  "phase": "V1-D0",
+  "date": "2026-07-22",
+  "verdict": "CONDITIONAL_GO",
+  "read_only": true,
+  "no_code_change": true,
+  "no_isaac_run": true,
+  "no_post": true,
+  "no_active_control": true,
+  "v1d1_not_executed": true,
+  "frozen_evidence": {
+    "v1c1r_p1_verdict": "PASS",
+    "image_id": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+    "accepted_count": 0,
+    "rejection_reasons": {"risk_type_not_allowed": 2},
+    "advisory_geometry_gate": "SLOW_DOWN",
+    "advisory_geometry_gate_reason": "shutdown_drain",
+    "cold_ground_latency_ms": 13118.060333999892,
+    "warm_ground_latency_ms": 472.6907799995388,
+    "results_dir": "results/paper_demo/v1c1r_p1_isaac_semantic_shadow_20260722"
+  },
+  "evidence_gaps": {
+    "raw_rgb_in_p1": false,
+    "rgb_prior_path": "results/paper_demo/v0b1_rgb_capture_20260721/scene/"
+  },
+  "root_cause": {
+    "risk_classification": "Both VLM frames labeled risk_type=static with confidence 0.3/0.2; supervisor reject_static_risk_in_v1 + allowed_risk_types={dynamic,functional}.",
+    "semantic_key": {
+      "logged": ["", ""],
+      "hypothetical_if_past_risk_gate": [
+        "static|slow_down|device|robotic arm|collision|left",
+        "static|slow_down|container|robotic arm|collision|above"
+      ],
+      "keys_equal": false
+    },
+    "live_window": "max_steps=120 finishes in ~8.66s wall while cold/queued pipelines need ~20-25s; both results completed only during shutdown_drain.",
+    "geometry_at_advisory": "Default Layer-1 often g_rule=2 late in episode; drain flush recorded SLOW_DOWN/shutdown_drain."
+  },
+  "timing_model": {
+    "wall_ms_per_step_p1": 72.19,
+    "warm_pipeline_latency_ms": 5502.4,
+    "cold_frame0_e2e_ms": 19560.825484000816,
+    "frame1_queue_wait_ms": 15951.2701750009,
+    "interval_steps": 50,
+    "queue_size": 1,
+    "second_result_live_step_if_extend_cold": 347,
+    "second_result_live_step_if_warm": 152,
+    "min_max_steps_warm_plus_50": 202,
+    "recommended_max_steps": 280,
+    "consistency_window_s_sim": 10.0,
+    "semantic_max_result_age_s": 2.0,
+    "age_ok_if_same_step_flush": true
+  },
+  "candidates": [
+    {
+      "id": "A",
+      "name": "far_corridor_hand_lateral_motion",
+      "recommended": true,
+      "assets": ["human_hand_sphere", "ur10e", "box_A", "box_B"],
+      "new_usd": false,
+      "new_yaml_only": true,
+      "expected_risk_type": "dynamic",
+      "geometry_allow_strategy": "keep EE-hand distance >0.25m and TTC>=1.5 throughout advisory window",
+      "avoid": ["held_critical", "B2_ttc_near_sweep", "static_block_B1"],
+      "repro_risk": "VLM may still emit static/low confidence or unstable semantic_key",
+      "est_post": 6,
+      "est_max_steps": 280
+    },
+    {
+      "id": "B",
+      "name": "functional_container_mouth_occlusion_far",
+      "recommended": false,
+      "assets": ["human_hand_sphere", "box_B"],
+      "new_usd": false,
+      "expected_risk_type": "functional",
+      "repro_risk": "Often classified static; may approach static SLOW geometry",
+      "est_post": 6
+    },
+    {
+      "id": "C",
+      "name": "path_crossing_trend_during_carry",
+      "recommended": false,
+      "assets": ["human_hand_sphere"],
+      "new_usd": false,
+      "expected_risk_type": "dynamic",
+      "repro_risk": "High confusion with Layer-1 TTC / paper B2; ALLOW window fragile",
+      "est_post": 6
+    }
+  ],
+  "recommended_scenario": "A",
+  "live_window_design": {
+    "max_steps": 280,
+    "submit_steps": [0, 50],
+    "alt_submit_steps_reduce_queue": [0, 100],
+    "alt_inference_hz": 0.5,
+    "max_submissions": 2,
+    "shutdown_drain_timeout_s": 60.0,
+    "independent_warmup_ground_before_formal": true,
+    "warmup_counts_toward_formal_post_budget": false,
+    "formal_post_budget": 6,
+    "expected_capture_completion_decision": {
+      "frame0_submit": 0,
+      "frame0_complete_decision_est": 76,
+      "frame1_submit": 50,
+      "frame1_complete_decision_est": 152,
+      "post_advisory_live_steps_required": 50,
+      "stop": 280
+    },
+    "geometry_allow_hold_window": "decision steps for both advisories and +/-10 steps; prefer entire early episode ALLOW",
+    "task_phase": "early_transport_or_approach_with_far_hand_motion",
+    "seed": null,
+    "seed_note": "gm_state_machine_agent has no --seed; pin image/config SHA + trajectory YAML",
+    "results_dir": "results/paper_demo/v1d1_isaac_semantic_positive_shadow_20260722",
+    "five_stage_config": "configs/five_stage_shadow_legacy_gateway_v1d1.yaml",
+    "semantic_config": "configs/semantic_safety_supervisor_shadow_v1d1.yaml",
+    "safety_config": "configs/ivj/ivj_v1d1_far_corridor_motion.yaml"
+  },
+  "v1d1_gates_draft": {
+    "accepted_ge_1": true,
+    "synthetic_false": true,
+    "two_consistent_semantic_keys": true,
+    "decision_geometry_allow": true,
+    "geometry_reason_geometry_l1_not_shutdown_drain": true,
+    "evaluated_semantic_gate_slow_down": true,
+    "effective_control_gate_allow": true,
+    "advisory_processed_during_live_loop": true,
+    "post_advisory_live_steps_ge_50": true,
+    "control_hash_mismatch_0": true,
+    "semantic_leakage_all_0": true,
+    "five_stage_leakage_all_0": true,
+    "post_le_6": true,
+    "no_xid_traceback": true,
+    "task_unchanged_by_shadow": true,
+    "no_overwrite_v1c1r_p1": true,
+    "no_touch_frozen_b0_b4": true
+  },
+  "constraints_honored": {
+    "no_glove_ppe_assets": true,
+    "no_lower_confidence_threshold": true,
+    "no_widen_allowed_risk_types": true,
+    "no_forge_vlm_output": true,
+    "no_synthetic_as_paper_evidence": true,
+    "no_held_critical_or_b2_ttc_dependency": true,
+    "no_direct_joint_torque_control": true
+  },
+  "implementation_readiness": "CONDITIONAL_GO",
+  "primary_residual_risk": "Spontaneous VLM dynamic/functional@>=0.85 with stable semantic_key across two frames",
+  "docs": {
+    "md": "docs/cross-project/vlm-v1d0-positive-shadow-design-2026-07-22.md",
+    "json": "docs/cross-project/vlm-v1d0-positive-shadow-design-2026-07-22.json"
+  }
+}

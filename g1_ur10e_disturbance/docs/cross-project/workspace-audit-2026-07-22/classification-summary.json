@@ -1,0 +1,26 @@
+{
+  "total_files": 199,
+  "by_category": {
+    "configs": 22,
+    "deployment_image_meta": 8,
+    "tests_fixtures": 57,
+    "runtime_core": 29,
+    "sensitive_or_generated": 10,
+    "historical_docs": 54,
+    "current_docs": 19
+  },
+  "include_true": 189,
+  "include_false": 10,
+  "by_commit_group": {
+    "commit5": 80,
+    "commit1": 12,
+    "commit3": 4,
+    "commit4": 6,
+    "commit2": 8,
+    "commit6": 79
+  },
+  "e01_paths": [
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.json",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.md"
+  ]
+}
