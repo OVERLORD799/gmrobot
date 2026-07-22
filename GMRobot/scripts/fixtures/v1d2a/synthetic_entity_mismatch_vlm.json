@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.9,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "container"
+  ],
+  "keywords": [
+    "container"
+  ],
+  "predicted_consequence": "potential collision",
+  "prediction_horizon_s": 1.5,
+  "explanation": "container",
+  "spatial_hint": "left"
+}

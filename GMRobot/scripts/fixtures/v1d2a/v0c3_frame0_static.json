@@ -1,0 +1,22 @@
+{
+  "synthetic": false,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.3,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "device"
+  ],
+  "keywords": [
+    "robotic arm",
+    "device"
+  ],
+  "predicted_consequence": "potential collision or damage to the device",
+  "prediction_horizon_s": 1.5,
+  "explanation": "The robotic arm is close to the device.",
+  "spatial_hint": "left",
+  "scene_summary": "arm near device",
+  "prompt_version": "five_stage_safety_v1",
+  "schema_version": "five_stage_vlm_v1"
+}

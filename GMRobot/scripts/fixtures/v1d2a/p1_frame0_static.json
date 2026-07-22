@@ -1,0 +1,19 @@
+{
+  "synthetic": false,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.3,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "device"
+  ],
+  "keywords": [
+    "robotic arm",
+    "device"
+  ],
+  "predicted_consequence": "potential collision or damage to the device",
+  "prediction_horizon_s": 1.5,
+  "explanation": "close to device",
+  "spatial_hint": "left"
+}

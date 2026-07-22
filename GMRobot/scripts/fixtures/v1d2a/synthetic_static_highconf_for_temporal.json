@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.9,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "human hand"
+  ],
+  "keywords": [
+    "human hand",
+    "robotic arm"
+  ],
+  "predicted_consequence": "potential collision with human hand",
+  "prediction_horizon_s": 1.5,
+  "explanation": "hand nearby",
+  "spatial_hint": "left"
+}

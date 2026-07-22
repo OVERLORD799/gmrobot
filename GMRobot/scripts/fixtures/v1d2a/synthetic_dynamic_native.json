@@ -1,0 +1,17 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "risk_type": "dynamic",
+  "risk_confidence": 0.91,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "human hand"
+  ],
+  "keywords": [
+    "human hand"
+  ],
+  "predicted_consequence": "potential collision",
+  "prediction_horizon_s": 1.5,
+  "explanation": "moving hand",
+  "spatial_hint": "left"
+}

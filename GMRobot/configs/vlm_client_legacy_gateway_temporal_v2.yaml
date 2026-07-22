@@ -1,0 +1,11 @@
+# Explicit V2 temporal VLM client (legacy gateway; remote contract unchanged).
+# Must be selected by config — never silent-switched from health.
+backend: remote_http
+base_url: "http://127.0.0.1:18080"
+endpoint: "/analyze"
+health_endpoint: "/health"
+model_id: "Qwen2.5-VL-7B-Instruct"
+timeout_s: 180.0
+prompt_version: "five_stage_safety_v2_temporal"
+schema_version: "five_stage_vlm_v2"
+contract_mode: legacy_v2

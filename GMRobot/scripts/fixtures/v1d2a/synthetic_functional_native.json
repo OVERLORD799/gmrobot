@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "risk_type": "functional",
+  "risk_confidence": 0.88,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "industrial part",
+    "container"
+  ],
+  "keywords": [
+    "container",
+    "industrial part"
+  ],
+  "predicted_consequence": "placement blocked by occupied target",
+  "prediction_horizon_s": 1.5,
+  "explanation": "target occupied",
+  "spatial_hint": "none"
+}

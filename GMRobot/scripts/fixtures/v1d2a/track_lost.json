@@ -1,0 +1,16 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "track_state": "lost",
+  "session_continuity_verified": false,
+  "tracks": [
+    {
+      "track_id": 0,
+      "label": "human hand",
+      "sam2_score": 0.9,
+      "speed_px_s": 40.0,
+      "direction_deg": 90.0,
+      "track_state": "lost"
+    }
+  ]
+}

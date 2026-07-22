@@ -1,0 +1,19 @@
+{
+  "synthetic": false,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.2,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "container"
+  ],
+  "keywords": [
+    "robotic arm",
+    "container"
+  ],
+  "predicted_consequence": "Potential collision between the robotic arm and the container",
+  "prediction_horizon_s": 1.5,
+  "explanation": "above container",
+  "spatial_hint": "above"
+}

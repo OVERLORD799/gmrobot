@@ -1,0 +1,26 @@
+# V1-D2A temporal fusion five-stage shadow config (explicit opt-in).
+# Default remains disabled. Does NOT replace v1 configs.
+# Remote endpoints unchanged. No credentials.
+enabled: false
+enforcement_mode: shadow
+contract_mode: legacy_v2
+temporal_fusion_enabled: true
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 2
+stop_submissions_on_pipeline_error: true
+shutdown_drain_timeout_s: 60.0
+max_result_age_s: 10.0
+log_dir: "results/paper_demo/v1d2a_temporal_fusion_offline_20260722"
+vlm_config: "configs/vlm_client_legacy_gateway_temporal_v2.yaml"
+perception_config: "configs/perception_client_legacy_gateway.yaml"
+prompt_version: "five_stage_safety_v2_temporal"
+schema_version: "five_stage_vlm_v2"
+fusion_version: "five_stage_temporal_fusion_v1"
+# Independent motion thresholds — NOT semantic confidence (0.85 untouched).
+temporal_evidence:
+  max_evidence_age_s: 2.0
+  min_track_score: 0.5
+  min_speed_px_s: 10.0
+  require_session_continuity_when_applicable: true
+  allow_initialized_without_continuity: true

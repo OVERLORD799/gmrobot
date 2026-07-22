@@ -1,0 +1,19 @@
+{
+  "synthetic": false,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.3,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "orange sphere"
+  ],
+  "keywords": [
+    "robotic arm",
+    "orange sphere"
+  ],
+  "predicted_consequence": "potential collision between the robotic arm and the orange sphere",
+  "prediction_horizon_s": 1.5,
+  "explanation": "close to orange sphere",
+  "spatial_hint": "left"
+}

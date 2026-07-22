@@ -1,0 +1,19 @@
+{
+  "synthetic": true,
+  "ok": true,
+  "track_state": "tracking",
+  "session_continuity_verified": true,
+  "session_ref": "session_1",
+  "session_generation": 1,
+  "tracks": [
+    {
+      "track_id": 0,
+      "label": "human hand",
+      "sam2_score": 0.92,
+      "speed_px_s": 2.0,
+      "direction_deg": 0.0,
+      "track_state": "tracking",
+      "re_detected": false
+    }
+  ]
+}

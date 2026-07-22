@@ -1,0 +1,21 @@
+{
+  "synthetic": false,
+  "ok": true,
+  "risk_type": "static",
+  "risk_confidence": 0.7,
+  "suggested_action": "slow_down",
+  "affected_entities": [
+    "robotic arm",
+    "container",
+    "spherical object"
+  ],
+  "keywords": [
+    "robotic arm",
+    "container",
+    "spherical object"
+  ],
+  "predicted_consequence": "Potential collision between the robotic arm and the spherical object or the container.",
+  "prediction_horizon_s": 1.5,
+  "explanation": "close to sphere and container",
+  "spatial_hint": "right"
+}

@@ -1,0 +1,13 @@
+{
+  "synthetic": true,
+  "task_name": "pick_place",
+  "task_phase": "place",
+  "task_goal_type": "place_into_container",
+  "source_container": "container_a",
+  "target_container": "container_b",
+  "held_object_class": "industrial_part",
+  "transport_active": "true",
+  "placement_target_occupied": "true",
+  "context_source": "scene_config",
+  "context_sim_step": 100
+}
