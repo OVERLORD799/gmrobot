@@ -26,6 +26,8 @@ run_docker() {
     -v "${HOST_GM}/source/GMRobot/GMRobot/shadow/target_full_override.py:/opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py:ro" \
     -v "${HOST_GM}/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py:/opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py:ro" \
     -v "${HOST_GM}/source/GMRobot/GMRobot/assets/container_full_visual.usd:/opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd:ro" \
+	    -v "${HOST_GM}/source/GMRobot/GMRobot/assets/container_fixed.usd:/opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd:ro" \
+	    -v "${HOST_GM}/source/GMRobot/GMRobot/assets/part/part_fixed.usd:/opt/projects/GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd:ro" \
     -v "${HOME}/.cache/gmdisturb-docker/kit:/isaac-sim/kit/cache" \
     -v "${HOME}/.cache/gmdisturb-docker/ov:/root/.cache/ov" \
     -v "${HOME}/.cache/gmdisturb-docker/pip:/root/.cache/pip" \

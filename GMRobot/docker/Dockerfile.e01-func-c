@@ -7,6 +7,8 @@ COPY source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py /opt/
 COPY configs/ivj_v1e01_target_container_full.yaml /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml
 COPY scripts/test_e01_func_c_capture_unit.py /opt/projects/GMRobot/scripts/test_e01_func_c_capture_unit.py
 COPY scripts/analyze_e01_func_c_capture.py /opt/projects/GMRobot/scripts/analyze_e01_func_c_capture.py
+COPY scripts/normalize_container_usd.py /opt/projects/GMRobot/scripts/normalize_container_usd.py
+COPY scripts/normalize_part_usd.py /opt/projects/GMRobot/scripts/normalize_part_usd.py
 
 LABEL gmdisturb.e01_func_c="20260722" \
       gmdisturb.base_tag="gmdisturb:e01-dyn-a-20260722"

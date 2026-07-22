@@ -1,0 +1,83 @@
+{
+  "doc": "m1-usd-init-fix-milestone-2026-07-23",
+  "verdict": "M1_GATES_PASS",
+  "date": "2026-07-23",
+  "container_fix": {
+    "script": "GMRobot/scripts/normalize_container_usd.py",
+    "input": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+      "sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9"
+    },
+    "output": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd",
+      "sha256": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+      "defaultPrim": "/Root",
+      "rigid_body_count": 1,
+      "rigid_body_paths": ["/Root/Container"],
+      "kinematic": true,
+      "meshes": 1,
+      "collision_apis": 2
+    },
+    "change": "Removed RigidBodyAPI from /Root/Container/Ref; kept single active rigid body at /Root/Container; set kinematic=True"
+  },
+  "part_fix": {
+    "script": "GMRobot/scripts/normalize_part_usd.py",
+    "input": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/part/part_5000.usd",
+      "sha256": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6"
+    },
+    "output": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd",
+      "sha256": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
+      "defaultPrim": "/Root",
+      "rigid_body_count": 1,
+      "rigid_body_paths": ["/Root"],
+      "mass_api_count": 1,
+      "mass_api_paths": ["/Root"],
+      "meshes": 1,
+      "collision_apis": 1
+    },
+    "change": "Removed RigidBodyAPI from /Root/container_part_fixed_5000; applied RigidBodyAPI + MassAPI(mass=0.2) to /Root"
+  },
+  "gating": {
+    "opt_in_only": true,
+    "env_var": "GMROBOT_V1E01_TARGET_FULL=1",
+    "default_unchanged": true,
+    "b0_b4_frozen": true,
+    "d1a_d1b_frozen": true
+  },
+  "structural_gates": {
+    "container_fixed_single_rigid": "PASS",
+    "part_fixed_single_rigid_at_root": "PASS",
+    "part_fixed_mass_api_present": "PASS",
+    "no_nested_rigid_bodies": "PASS",
+    "frozen_originals_unchanged": "PASS"
+  },
+  "smoke_test": {
+    "image_tag": "gmdisturb:e01-func-c-m1-fix-20260723",
+    "image_sha256": "d8bef5e28f319e93903f5185a313c68f10a817eb5a08f17aa2f3672dd51e6b58",
+    "base_image": "gmdisturb:e01-dyn-a-20260722",
+    "exit_code": 0,
+    "max_steps": 1,
+    "nested_rigid_body_warnings": 0,
+    "box_b_modify_rigid_warnings": 1,
+    "box_b_modify_collision_warnings": 1,
+    "box_b_warnings_expected": true,
+    "frame0": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/smoke_scene/frame_000000_env0.png",
+      "sha256": "c28596ba5f1caa87deb6899bc08509bc8b413a976afd0b16b6d93a8b5f740649",
+      "bytes": 186050
+    },
+    "original_faulty_frame0": {
+      "sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
+      "bytes": 187432
+    }
+  },
+  "offline_tests": {
+    "verdict": "PASS",
+    "test_file": "GMRobot/scripts/test_e01_func_c_capture_unit.py"
+  },
+  "formal_capture_required": true,
+  "func_c_recovery_not_claimed": true,
+  "stop_boundary": "M1 complete; fresh capture needed for Func-C recovery"
+}

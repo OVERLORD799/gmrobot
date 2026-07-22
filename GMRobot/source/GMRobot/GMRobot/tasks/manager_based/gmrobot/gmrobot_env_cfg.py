@@ -37,12 +37,16 @@ _ASSETS_DIR = os.path.abspath(os.path.join(_CURRENT_DIR, "../../../assets"))
 
 CONTAINER_USD = os.path.join(_ASSETS_DIR, "container.usd")
 CONTAINER_FULL_USD = os.path.join(_ASSETS_DIR, "container_full.usd")
+CONTAINER_FIXED_USD = os.path.join(_ASSETS_DIR, "container_fixed.usd")
 DIVIDER_USD = os.path.join(_ASSETS_DIR, "container/GM_Container_Slim_Divider_Sim.usd")
 PART_USD = os.path.join(_ASSETS_DIR, "part/part_5000.usd")
+PART_FIXED_USD = os.path.join(_ASSETS_DIR, "part/part_fixed.usd")
 
 from ....shadow.target_full_override import (  # noqa: E402
     resolve_box_scale,
     resolve_box_usd_name,
+    resolve_part_usd_name,
+    target_full_enabled,
 )
 
 
@@ -167,7 +171,8 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
         box_scale = resolve_box_scale(container_name, default_scale=CONTAINER_SCALE)
         # container_full_visual.usd is the spawn payload (relative paths, no physics).
         # Semantic source remains container_full.usd (see target_full_override).
-        if usd_name == "container_full_visual.usd":
+        # container_fixed.usd is the normalized box_A asset (Func-C mode: single kinematic rigid body).
+        if usd_name in ("container_full_visual.usd",):
             spawn_cfg = sim_utils.UsdFileCfg(
                 usd_path=usd_path,
                 scale=box_scale,
@@ -176,6 +181,16 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
                     kinematic_enabled=True,
                 ),
                 collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
+            )
+        elif usd_name == "container_fixed.usd":
+            # Normalized box_A: single RigidBodyAPI, kinematic (static box).
+            spawn_cfg = sim_utils.UsdFileCfg(
+                usd_path=usd_path,
+                scale=box_scale,
+                rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                    rigid_body_enabled=True,
+                    kinematic_enabled=True,
+                ),
             )
         else:
             spawn_cfg = sim_utils.UsdFileCfg(
@@ -203,6 +218,11 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
 def build_part_assets() -> dict[str, RigidObjectCfg]:
     assets: dict[str, RigidObjectCfg] = {}
 
+    # In Func-C mode, use part_fixed.usd (root-prim RigidBodyAPI + MassAPI)
+    # to avoid nested rigid bodies from spawn mass_props applying to parent prim.
+    _part_usd_name = resolve_part_usd_name()
+    _part_usd_path = os.path.join(_ASSETS_DIR, _part_usd_name)
+
     for idx, location in enumerate(PART_LOCATIONS, start=1):
         container_id, slot_id_str = location.split("@")
         slot_id = int(slot_id_str) - 1
@@ -221,7 +241,7 @@ def build_part_assets() -> dict[str, RigidObjectCfg]:
                 rot=part_rot,
             ),
             spawn=sim_utils.UsdFileCfg(
-                usd_path=PART_USD,
+                usd_path=_part_usd_path,
                 scale=(1.0, 1.0, 1.0),
                 rigid_props=RigidBodyPropertiesCfg(
                     solver_position_iteration_count=32,

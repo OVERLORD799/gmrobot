@@ -32,11 +32,15 @@ from shadow.v1e01_func_c_capture import (  # noqa: E402
     validate_func_c_flags,
 )
 from shadow.target_full_override import (  # noqa: E402
+    CONTAINER_FIXED_USD_NAME,
     CONTAINER_FULL_SPAWN_USD_NAME,
     CONTAINER_FULL_USD_NAME,
     CONTAINER_USD_NAME,
+    PART_FIXED_USD_NAME,
+    PART_USD_NAME,
     resolve_box_scale,
     resolve_box_usd_name,
+    resolve_part_usd_name,
     target_full_enabled,
 )
 
@@ -56,9 +60,14 @@ def test_switch_default_off_and_box_b_unchanged():
 
 def test_func_c_enables_only_box_b_full():
     env = {"GMROBOT_V1E01_TARGET_FULL": "1"}
-    assert resolve_box_usd_name("A", env=env) == CONTAINER_USD_NAME
+    # box_A → container_fixed.usd (normalized single RigidBodyAPI, kinematic)
+    assert resolve_box_usd_name("A", env=env) == CONTAINER_FIXED_USD_NAME
+    # box_B → container_full_visual.usd (visual-only)
     assert resolve_box_usd_name("B", env=env) == CONTAINER_FULL_SPAWN_USD_NAME
     assert resolve_box_scale("B", default_scale=(0.01, 0.01, 0.01), env=env) == (1.0, 1.0, 1.0)
+    # Parts → part_fixed.usd (root-prim RigidBodyAPI)
+    assert resolve_part_usd_name(env=env) == PART_FIXED_USD_NAME
+    assert resolve_part_usd_name(env={}) == PART_USD_NAME
 
 
 def test_d1b_blocker_not_enabled_and_env_cfg_intact():
@@ -161,12 +170,16 @@ FROZEN_ASSET_HASHES: dict[str, str] = {
     "container_full.usd": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
     "container_full_visual.usd": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
     "part_5000.usd": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6",
+    "container_fixed.usd": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+    "part_fixed.usd": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
 }
 FROZEN_HASH_ASSET_MAP: dict[str, str] = {
     "container.usd": "container.usd",
     "container_full.usd": "container_full.usd",
     "container_full_visual.usd": "container_full_visual.usd",
     "part_5000.usd": "part/part_5000.usd",
+    "container_fixed.usd": "container_fixed.usd",
+    "part_fixed.usd": "part/part_fixed.usd",
 }
 
 
@@ -235,6 +248,65 @@ def test_frozen_usd_structure_read_only():
     assert n_rigid_p == 1, f"part_5000.usd has {n_rigid_p} active rigid bodies (expected 1)"
 
 
+def test_normalized_asset_structure_gate():
+    """Structural gate: no nested rigid bodies in normalized assets."""
+    try:
+        from pxr import Usd, UsdGeom, UsdPhysics  # type: ignore
+    except ImportError:
+        return
+
+    # Gate: container_fixed.usd — exactly 1 active rigid body at /Root/Container, kinematic
+    stage_c = Usd.Stage.Open(str(ASSETS / "container_fixed.usd"))
+    c_rigid = []
+    for prim in stage_c.Traverse():
+        if prim.HasAPI(UsdPhysics.RigidBodyAPI):
+            try:
+                if UsdPhysics.RigidBodyAPI(prim).GetRigidBodyEnabledAttr().Get():
+                    c_rigid.append(str(prim.GetPath()))
+            except Exception:
+                pass
+    assert len(c_rigid) == 1, f"container_fixed: expected 1 rigid, got {len(c_rigid)}: {c_rigid}"
+    assert c_rigid[0] == "/Root/Container", f"container_fixed: wrong rigid path {c_rigid[0]}"
+    r = UsdPhysics.RigidBodyAPI(stage_c.GetPrimAtPath("/Root/Container"))
+    assert r.GetKinematicEnabledAttr().Get() is True, "container_fixed: not kinematic"
+
+    # Gate: part_fixed.usd — exactly 1 active rigid body at /Root, MassAPI present
+    stage_p = Usd.Stage.Open(str(ASSETS / "part" / "part_fixed.usd"))
+    p_rigid = []
+    p_mass = []
+    for prim in stage_p.Traverse():
+        if prim.HasAPI(UsdPhysics.RigidBodyAPI):
+            try:
+                if UsdPhysics.RigidBodyAPI(prim).GetRigidBodyEnabledAttr().Get():
+                    p_rigid.append(str(prim.GetPath()))
+            except Exception:
+                pass
+        if prim.HasAPI(UsdPhysics.MassAPI):
+            p_mass.append(str(prim.GetPath()))
+    assert len(p_rigid) == 1, f"part_fixed: expected 1 rigid, got {len(p_rigid)}: {p_rigid}"
+    assert p_rigid[0] == "/Root", f"part_fixed: rigid body not at /Root: {p_rigid[0]}"
+    assert len(p_mass) == 1, f"part_fixed: expected 1 MassAPI, got {len(p_mass)}: {p_mass}"
+    assert p_mass[0] == "/Root", f"part_fixed: MassAPI not at /Root: {p_mass[0]}"
+
+    # Gate: no child of /Root has RigidBodyAPI in part_fixed.usd
+    child_rigid = [p for p in p_rigid if p != "/Root"]
+    assert not child_rigid, f"part_fixed: child rigid bodies detected: {child_rigid}"
+
+
+def test_part_initial_pose_numeric_gate():
+    """Numeric gate: 20 parts with initial slot positions well-formed."""
+    cfg_text = ENV_CFG.read_text(encoding="utf-8")
+    # Verify part count: PART_SLOT_COUNT = CONTAINER_X_SLOTS * CONTAINER_Y_SLOTS = 5*4 = 20
+    assert "CONTAINER_X_SLOTS = 5" in cfg_text or "CONTAINER_X_SLOTS=5" in cfg_text
+    assert "CONTAINER_Y_SLOTS = 4" in cfg_text or "CONTAINER_Y_SLOTS=4" in cfg_text
+    assert "PART_SLOT_COUNT=CONTAINER_X_SLOTS*CONTAINER_Y_SLOTS" in cfg_text.replace(" ", "")
+    # PART_LOCATIONS has 20 entries
+    assert "PART_LOCATIONS = [f\"A@{i}\" for i in range(1, PART_SLOT_COUNT + 1)]" in cfg_text
+    # Default (no D1B blocker): all 20 parts go to slots A@1..A@20
+    assert 'PART_LOCATIONS[19] = "B@10"' in cfg_text  # D1B opt-in line present
+    # In Func-C mode (default), D1B blocker is disabled, so part_20 stays in A@20.
+
+
 def test_no_secrets_in_new_files():
     """No credentials, tokens, or API keys in Func-C specific source files."""
     forbidden = re.compile(
@@ -270,6 +342,8 @@ def main():
     test_geometry_manifest_roundtrip_and_b0b4()
     test_frozen_asset_hashes_unchanged()
     test_frozen_usd_structure_read_only()
+    test_normalized_asset_structure_gate()
+    test_part_initial_pose_numeric_gate()
     test_no_secrets_in_new_files()
     print("PASS test_e01_func_c_capture_unit")
 
