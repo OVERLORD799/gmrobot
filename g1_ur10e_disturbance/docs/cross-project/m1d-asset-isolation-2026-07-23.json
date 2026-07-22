@@ -1,0 +1,85 @@
+{
+  "diagnostic": "M1D",
+  "date": "2026-07-23",
+  "branch": "main",
+  "base_commit": "794227e",
+  "commit_role": "isolation-confirmed correction to 794227e static analysis",
+  "docker_image": "gmdisturb:e01-func-c-m1-fix-20260723",
+  "docker_image_sha256": "d8bef5e28f31",
+  "camera_pos": [0.35, 0.0, 2.5],
+  "camera_rot": [0.7071, 0.0, 0.7071, 0.0],
+  "camera_hfov_deg": 60.4,
+  "camera_resolution": [480, 640],
+  "seed": 51,
+  "max_steps": 1,
+  "toggles": {
+    "B_HIDDEN": {"env": "GMROBOT_M1D_B_HIDDEN", "effect": "skip ContainerB spawn"},
+    "PARTS_HIDDEN": {"env": "GMROBOT_M1D_PARTS_HIDDEN", "effect": "skip Part_1..20 spawn"}
+  },
+  "toggles_reverted": true,
+  "toggle_revert_rationale": "Diagnostic switches must not enter production. Toggles served their purpose — isolating the visual culprit to ContainerB in a single successful B_HIDDEN trial.",
+  "experiment_results": {
+    "b_hidden": {
+      "status": "SUCCESS",
+      "exit_code": 0,
+      "png_path": "results/paper_demo/m1d_asset_isolation_20260723/b_hidden/scene/frame_000000_env0.png",
+      "sha256": "a65e2575",
+      "visual_result": "White fan pattern COMPLETELY disappeared. ContainerA and all 20 parts render normally.",
+      "culprit_confirmed": true
+    },
+    "parts_hidden": {
+      "status": "FAILED_INVALID",
+      "exit_code": "non-zero",
+      "png_produced": false,
+      "failure_reason": "ObservationManager still references part_1_pos. build_part_observations() early-return of {} causes mismatch — observation group expects 20 part terms but none are registered.",
+      "impact_on_attribution": "NONE — this invalid trial does not weaken the B_HIDDEN conclusion. B_HIDDEN alone is sufficient to isolate the culprit to ContainerB."
+    }
+  },
+  "image_sha256": {
+    "original": "c28596",
+    "original_path": "results/paper_demo/v1e01_func_c_capture_20260722/smoke_scene/frame_000000_env0.png",
+    "b_hidden": "a65e2575",
+    "parts_hidden": null
+  },
+  "prim_visibility": {
+    "b_hidden_case": {
+      "container_b_present": false,
+      "container_a_present": true,
+      "parts_present": true,
+      "part_obs_count": 20
+    },
+    "parts_hidden_case": {
+      "note": "Container failed before entity enumeration could be captured."
+    }
+  },
+  "container_positions": {
+    "A": [0.75, -0.25, 0.0],
+    "B": [0.75, 0.25, 0.0]
+  },
+  "verdict": "M1D_ROOT_CAUSE_IDENTIFIED",
+  "culprit": "ContainerB (container_full_visual.usd)",
+  "culprit_detail": "container_full_visual.usd has unit/scale inconsistency: metersPerUnit=1 with cm-scale geometry. This mismatch causes the renderer to produce the white fan artifact.",
+  "verdict_confidence": "HIGH",
+  "verdict_basis": "isolation_render",
+  "evidence_summary": "B_HIDDEN (hide ContainerB) causes the white fan pattern to COMPLETELY vanish — a binary, qualitative result. ContainerA and all 20 parts render normally. 794227e static analysis already identified container_full_visual.usd unit/scale inconsistency; this isolation render confirms it.",
+  "exonerated": {
+    "parts": "part_fixed.usd / part_5000.usd — all 20 parts render correctly in B_HIDDEN case",
+    "container_a": "container_fixed.usd — renders normally in B_HIDDEN case",
+    "camera_lighting_layout": "identical setup produces clean image when ContainerB is removed"
+  },
+  "not_root_cause": ["container_fixed.usd", "part_fixed.usd"],
+  "static_analysis_commit": "794227e",
+  "static_analysis_finding": "container_full_visual.usd unit/scale inconsistency (metersPerUnit=1 with cm-scale geometry)",
+  "minimum_next_fix": "Fix scale/unit inconsistency in container_full_visual.usd: apply uniform scale (likely 0.01 for cm→m) to root prim, or re-author geometry at meter scale. Verify against B_HIDDEN reference image.",
+  "fix_applied_this_commit": false,
+  "output_images": [
+    "results/paper_demo/v1e01_func_c_capture_20260722/smoke_scene/frame_000000_env0.png",
+    "results/paper_demo/m1d_asset_isolation_20260723/b_hidden/scene/frame_000000_env0.png"
+  ],
+  "parts_hidden_output": "none — container failed before any PNG was written",
+  "not_vlm_positive": true,
+  "no_formal_capture": true,
+  "no_safety_threshold_change": true,
+  "no_new_docker_image": true,
+  "m1c_m1_history": "UNCHANGED — this commit only corrects M1D documentation"
+}
