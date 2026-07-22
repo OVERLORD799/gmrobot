@@ -96,3 +96,4 @@ g1_ur10e_disturbance/results_smoke_*/
 g1_ur10e_disturbance/results_paper_demo_r040/
 # full episode dumps under results/ remain ignored via **/results/
 # machine summaries are force-added when needed
+GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd

@@ -1,0 +1,53 @@
+# V1-E01-Func-C: target box_B = container_full.usd (capture-only).
+# Semantic evidence: filled target container asset (NOT D1B part_5000@B@10, NOT red ball).
+# Requires process env: GMROBOT_V1E01_TARGET_FULL=1
+# Must NOT set D1B functional-block env (part@B@10).
+#
+# Labels remain provisional; not VLM-positive / not reviewer-approved.
+base: ivj/_base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.30
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+log_enabled: true
+log_dir: /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/safety_logs
+
+human_enabled: true
+human_hand_radius: 0.05
+human_torso_radius: 0.0
+
+# Far-field parked kinematic hand — NOT semantic evidence.
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.25, -0.75, 0.60]
+  end_pos: [0.25, -0.75, 0.60]
+  start_step: 0
+  duration_steps: 1
+  hold_steps: 400
+  hold_far: true
+
+envelope:
+  gating_enabled: false
+
+# Capture profile (documentation; enforced by runner + offline tests)
+e01_func_c:
+  scene_group: e01_func_c
+  expected_risk_type: functional
+  label_status: provisional
+  reviewer_approved: false
+  seed: 51
+  max_steps: 300
+  capture_steps: [100, 200]
+  geometry_window: [100, 200]
+  camera_pos: [0.35, 0.0, 2.5]
+  box_A_usd: container.usd
+  box_B_usd: container_full.usd
+  d1b_blocker: false
+  virtual_hand_motion: false
+  vlm: false
+  perception: false
+  five_stage: false
+  post_count_expected: 0

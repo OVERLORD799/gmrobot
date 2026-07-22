@@ -1,0 +1,24 @@
+# E01-Func-C capture profile (documentation + runner defaults).
+# Runtime safety YAML: GMRobot/configs/ivj_v1e01_target_container_full.yaml
+# Runtime env: GMROBOT_V1E01_TARGET_FULL=1 (default off)
+scene_group: e01_func_c
+expected_risk_type: functional
+label_status: provisional
+reviewer_approved: false
+seed: 51
+max_steps: 300
+capture_steps: [100, 200]
+geometry_window: [100, 200]
+camera_pos: [0.35, 0.0, 2.5]
+box_A_usd: container.usd
+box_B_usd: container_full.usd
+d1b_blocker: false
+virtual_hand_motion: false
+save_camera: true
+vlm: false
+perception: false
+five_stage: false
+post_count_expected: 0
+image_tag: gmdisturb:e01-func-c-20260722
+results_dir: results/paper_demo/v1e01_func_c_capture_20260722
+safety_config: /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml

@@ -69,3 +69,4 @@ tests/
 
 # Docker history
 .isaac-lab-docker-history
+source/GMRobot/GMRobot/assets/container_full_visual.usd

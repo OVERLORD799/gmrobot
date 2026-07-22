@@ -1,0 +1,12 @@
+# Thin rebuild for E01-Func-C runtime deltas. Does not overwrite historical tags.
+FROM gmdisturb:e01-dyn-a-20260722
+
+COPY source/GMRobot/GMRobot/shadow/target_full_override.py /opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py
+COPY source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py /opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py
+COPY source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py /opt/projects/GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py
+COPY configs/ivj_v1e01_target_container_full.yaml /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml
+COPY scripts/test_e01_func_c_capture_unit.py /opt/projects/GMRobot/scripts/test_e01_func_c_capture_unit.py
+COPY scripts/analyze_e01_func_c_capture.py /opt/projects/GMRobot/scripts/analyze_e01_func_c_capture.py
+
+LABEL gmdisturb.e01_func_c="20260722" \
+      gmdisturb.base_tag="gmdisturb:e01-dyn-a-20260722"

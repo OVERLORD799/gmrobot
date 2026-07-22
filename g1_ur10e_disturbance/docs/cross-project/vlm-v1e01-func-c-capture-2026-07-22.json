@@ -1,0 +1,154 @@
+{
+  "doc": "vlm-v1e01-func-c-capture-2026-07-22",
+  "verdict": "VISUAL_SCENE_INTEGRITY_FAIL",
+  "verdict_downgraded_from": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL",
+  "verdict_downgraded_date": "2026-07-23",
+  "verdict_downgrade_reason": "frame0 white fan-out: box A 20 Parts scattered; nested RigidBodyAPI in container.usd; modify_mass_properties failed for Part_1..20",
+  "scene_group": "e01_func_c",
+  "expected_risk_type": "functional",
+  "label_status": "provisional",
+  "reviewer_approved": false,
+  "not_vlm_positive": true,
+  "not_accepted": true,
+  "ready_for_human_label_review": false,
+  "ready_for_vlm_screen": false,
+  "dataset_eligible": false,
+  "paper_claim": "视觉上已满或不可用于继续放置的目标容器候选场景。",
+  "head": "2d3c870642ecc25eb4d3665bccea798c0339d8a5",
+  "worktree_dirty": true,
+  "push_authorized": true,
+  "commit_authorized": true,
+  "formal_capture_count": 1,
+  "results_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722",
+  "image": {
+    "tag": "gmdisturb:e01-func-c-20260722",
+    "id": "sha256:c2e526961d44119d2ac6ec30079cf58dfd4adab6b8c755fe617765434b31839b",
+    "created": "2026-07-22T20:39:49.930522322+08:00"
+  },
+  "config_sha256": {
+    "e01_func_c_capture.yaml": "c4924b16843ed2b262e670fe551cf34e64abbf6c20d8d0f00587d1750b1163a3",
+    "ivj_v1e01_target_container_full.yaml": "b30f728b32deb528621ef6e552f2306133eba123f946681b0d1aca5a8731fee8"
+  },
+  "asset_sha256": {
+    "container.usd": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "container_full.usd": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+    "container_full_visual.usd": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
+    "part_5000.usd": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6"
+  },
+  "asset_precheck": {
+    "verdict": "ASSET_DISTINCTION_OK",
+    "evidence": "full has 31 meshes / 27458778 points vs empty 1 / 891318; 30 Part_* meshes (filled content)"
+  },
+  "scene_integrity_failure": {
+    "detected": true,
+    "frame": 0,
+    "description": "white fan-shaped scatter around box A: ~20 Part prims not seated in slot A at init",
+    "root_cause_container_usd": "nested RigidBodyAPI: /Root/Container AND /Root/Container/Ref both active rigid bodies",
+    "root_cause_part_mass": "modify_mass_properties failed for Part_1..20 (spawn prim path mismatch)",
+    "isaac_log_warning": "nested RigidBodyAPI produces unpredictable results",
+    "box_b_visual_ok": true,
+    "box_a_init_broken": true,
+    "frame0_image_sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
+    "normal_frame0_image_sha256": "d2c30b8733343251d3020dab697421da969ac2af70b7cc2221aae41d533a1056",
+    "normal_frame0_path": "results/paper_demo/v0b1_rgb_capture_20260721/scene/frame_000000_env0.png"
+  },
+  "runtime": {
+    "exit_code": 0,
+    "max_steps": 300,
+    "steps_recorded": 300,
+    "seed_recorded": 51,
+    "camera_pos": [0.35, 0.0, 2.5],
+    "capture_steps": [100, 200],
+    "geometry_window": [100, 200],
+    "d1b_blocker_enabled": false,
+    "virtual_hand_motion": false,
+    "hand_pos": [0.25, -0.75, 0.6],
+    "post_count": 0,
+    "traceback_count": 0,
+    "spawn_usd": "container_full_visual.usd",
+    "semantic_usd": "container_full.usd"
+  },
+  "rgb": {
+    "step_0": {
+      "path": "results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000000_env0.png",
+      "sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
+      "note": "WHITE FAN-OUT: box A parts scattered"
+    },
+    "step_100": {
+      "path": "results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000100_env0.png",
+      "sha256": "0b9583938044ad2aaddd684b3b024933c7d11a8b11aa41e2428912fd4050964b",
+      "target_roi_px2": 2970,
+      "filled_content_px": 323
+    },
+    "step_200": {
+      "path": "results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000200_env0.png",
+      "sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c",
+      "target_roi_px2": 2970,
+      "filled_content_px": 309
+    },
+    "roi_source_target": "projected_box_b_aabb",
+    "roi_source_filled": "projected_filled_parts_aabb",
+    "target_bbox_xyxy": [266, 203, 364, 232],
+    "filled_bbox_xyxy": [279, 207, 351, 228]
+  },
+  "geometry_window_summary": {
+    "ok": true,
+    "n_steps": 101,
+    "allow": 101,
+    "stop": 0,
+    "slow": 0,
+    "replan": 0,
+    "held_critical": 0,
+    "static_warning": 0,
+    "dynamic_ttc_reason": 0,
+    "dist_min": 0.38628674881334,
+    "dist_mean": 0.4129114632606049,
+    "margin_to_warn": 0.22628674881334002,
+    "margin_to_hard": 0.25628674881334,
+    "ttc_finite_min": 2.6579714105577676,
+    "thresholds": {
+      "safe_dist_warn": 0.16,
+      "safe_dist_hard_stop": 0.13,
+      "ttc_threshold": 0.5,
+      "ttc_warn_threshold": 1.5
+    }
+  },
+  "episode_gate_summary": {
+    "ALLOW": 274,
+    "SLOW_DOWN": 24,
+    "STOP": 2,
+    "note": "non-ALLOW only outside window (early dynamic_ttc*); window 100-200 all ALLOW"
+  },
+  "task_phase": {
+    "outcome": "timeout@298/7521",
+    "task_time_step_last": 297,
+    "task_time_step_max": 7420
+  },
+  "tests": {
+    "test_e01_func_c_capture_unit": "PASS",
+    "smoke_exit": 0,
+    "capture_exit": 0
+  },
+  "changed_files": [
+    ".gitignore",
+    "GMRobot/.gitignore",
+    "GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py",
+    "GMRobot/configs/ivj_v1e01_target_container_full.yaml",
+    "GMRobot/docker/Dockerfile.e01-func-c",
+    "GMRobot/scripts/analyze_e01_func_c_capture.py",
+    "GMRobot/scripts/test_e01_func_c_capture_unit.py",
+    "GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py",
+    "GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py",
+    "g1_ur10e_disturbance/configs/e01_func_c_capture.yaml",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-capture-2026-07-22.md",
+    "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-capture-2026-07-22.json",
+    "g1_ur10e_disturbance/scripts/run_e01_func_c_capture.sh"
+  ],
+  "stop_boundary": {
+    "no_vlm": true,
+    "no_sam2": true,
+    "no_dyn_b": true,
+    "no_formal_capture": true,
+    "blocked_by_init_fix": true
+  }
+}

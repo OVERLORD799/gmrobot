@@ -36,8 +36,14 @@ _CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))
 _ASSETS_DIR = os.path.abspath(os.path.join(_CURRENT_DIR, "../../../assets"))
 
 CONTAINER_USD = os.path.join(_ASSETS_DIR, "container.usd")
+CONTAINER_FULL_USD = os.path.join(_ASSETS_DIR, "container_full.usd")
 DIVIDER_USD = os.path.join(_ASSETS_DIR, "container/GM_Container_Slim_Divider_Sim.usd")
 PART_USD = os.path.join(_ASSETS_DIR, "part/part_5000.usd")
+
+from ....shadow.target_full_override import (  # noqa: E402
+    resolve_box_scale,
+    resolve_box_usd_name,
+)
 
 
 # --------------------------------------------------------------------------------------
@@ -156,20 +162,40 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
             local_rot=GRID_ROT,
         )
 
+        usd_name = resolve_box_usd_name(container_name)
+        usd_path = os.path.join(_ASSETS_DIR, usd_name)
+        box_scale = resolve_box_scale(container_name, default_scale=CONTAINER_SCALE)
+        # container_full_visual.usd is the spawn payload (relative paths, no physics).
+        # Semantic source remains container_full.usd (see target_full_override).
+        if usd_name == "container_full_visual.usd":
+            spawn_cfg = sim_utils.UsdFileCfg(
+                usd_path=usd_path,
+                scale=box_scale,
+                rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                    rigid_body_enabled=False,
+                    kinematic_enabled=True,
+                ),
+                collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
+            )
+        else:
+            spawn_cfg = sim_utils.UsdFileCfg(
+                usd_path=usd_path,
+                scale=box_scale,
+            )
+
         assets[f"box_{container_name}"] = AssetBaseCfg(
             prim_path=f"{{ENV_REGEX_NS}}/Container{container_name}",
             init_state=AssetBaseCfg.InitialStateCfg(pos=box_pos, rot=box_rot),
-            spawn=sim_utils.UsdFileCfg(
-                usd_path=CONTAINER_USD,
-                scale=CONTAINER_SCALE,
-            ),
+            spawn=spawn_cfg,
         )
 
-        assets[f"grid_{container_name}"] = AssetBaseCfg(
-            prim_path=f"{{ENV_REGEX_NS}}/Grid{container_name}",
-            init_state=AssetBaseCfg.InitialStateCfg(pos=grid_pos, rot=grid_rot),
-            spawn=sim_utils.UsdFileCfg(usd_path=DIVIDER_USD),
-        )
+        # Full target already includes filled content; skip extra grid_B.
+        if not (container_name == "B" and usd_name == "container_full_visual.usd"):
+            assets[f"grid_{container_name}"] = AssetBaseCfg(
+                prim_path=f"{{ENV_REGEX_NS}}/Grid{container_name}",
+                init_state=AssetBaseCfg.InitialStateCfg(pos=grid_pos, rot=grid_rot),
+                spawn=sim_utils.UsdFileCfg(usd_path=DIVIDER_USD),
+            )
 
     return assets
 

@@ -1,0 +1,128 @@
+# F01-USD Read-Only Asset Structure Audit (2026-07-23)
+
+## Purpose
+Read-only structural audit of four USD assets used in E01-Func-C scene.
+Confirms asset structure, identifies nested-RigidBodyAPI issue, establishes
+frozen hash baseline. Original assets **not modified**.
+
+## Asset Inventory
+
+### 1. `container.usd` (empty target container)
+| Property | Value |
+|---|---|
+| Path | `GMRobot/source/GMRobot/GMRobot/assets/container.usd` |
+| SHA256 | `ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9` |
+| Size (bytes) | (PXR-opened) |
+| defaultPrim | `/Root` |
+| metersPerUnit | `0.01` |
+| Total prims | 8 |
+| Meshes | 1 |
+| RigidBodyAPI | **2** (⚠️ nested at `/Root/Container` + `/Root/Container/Ref`) |
+| RigidBody enabled | 2 (both active) |
+| Collision | 2 |
+| xformOp:resetXformStack | 0 |
+
+**⚠️ Nested RigidBodyAPI Issue**:
+```
+/Root/Container        RigidBodyAPI enabled=True  CollisionAPI enabled=True
+/Root/Container/Ref    RigidBodyAPI enabled=True
+```
+Isaac PhysX logs: "nested RigidBodyAPI produces unpredictable results".
+This is the **root cause** of box A initialization scatter.
+
+### 2. `container_full.usd` (filled target container, semantic source)
+| Property | Value |
+|---|---|
+| Path | `GMRobot/source/GMRobot/GMRobot/assets/container_full.usd` |
+| SHA256 | `ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0` |
+| defaultPrim | `/World` |
+| metersPerUnit | `1.0` |
+| Total prims | 322 |
+| Meshes | 31 (incl. 30 Part_* + 1 container shell) |
+| RigidBodyAPI | **41** (Container + Ref nested + Dividers + all Parts) |
+| RigidBody enabled | 41 |
+| Collision | 41 |
+| xformOp:resetXformStack | 0 |
+| Part_* mesh count | 30 (Part_00 through Part_29) |
+
+Nested pattern confirmed: `/World/Container` + `/World/Container/Ref` both RigidBodyAPI.
+Each Part_* also has RigidBodyAPI on the `Ref` child (e.g. `/World/Parts/Part_00/Ref`).
+
+### 3. `container_full_visual.usd` (visual-only spawn payload)
+| Property | Value |
+|---|---|
+| Path | `GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd` |
+| SHA256 | `60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885` |
+| defaultPrim | `/FullContainer` |
+| metersPerUnit | `1.0` |
+| Total prims | 64 |
+| Meshes | 31 |
+| RigidBodyAPI | **0** ✅ |
+| Collision | **0** ✅ |
+| xformOp:resetXformStack | 0 |
+
+**Clean asset**: relative defaultPrim, no `/World`, no physics API. Renders correctly as kinematic visual.
+Spawned with `rigid_body_enabled=False, kinematic_enabled=True`.
+
+### 4. `part_5000.usd` (single part, D1B functional-blockage reference)
+| Property | Value |
+|---|---|
+| Path | `GMRobot/source/GMRobot/GMRobot/assets/part/part_5000.usd` |
+| SHA256 | `71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6` |
+| defaultPrim | `/Root` |
+| metersPerUnit | `0.01` |
+| Total prims | 7 |
+| Meshes | 1 |
+| RigidBodyAPI | 1 (`/Root/container_part_fixed_5000`) |
+| RigidBody enabled | 1 |
+| Collision | 1 |
+| xformOp:resetXformStack | 0 |
+
+Spawned as individual part (not in this capture scope). Current spawn's `modify_mass_properties`
+calls for Part_1..20 fail because prim paths do not match the physical prim.
+
+## Image Evidence
+
+### Abnormal (Func-C v1e01, frame 0)
+| Property | Value |
+|---|---|
+| Path | `g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000000_env0.png` |
+| SHA256 | `6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6` |
+| Size | 187,432 bytes |
+| Observation | White fan-shaped scatter around box A |
+
+### Normal (V0B1 baseline, frame 0)
+| Property | Value |
+|---|---|
+| Path | `g1_ur10e_disturbance/results/paper_demo/v0b1_rgb_capture_20260721/scene/frame_000000_env0.png` |
+| SHA256 | `d2c30b8733343251d3020dab697421da969ac2af70b7cc2221aae41d533a1056` |
+| Size | 173,956 bytes |
+| Observation | Clean scene, no scatter |
+
+## V0B1 frame0 (normal) vs V1E01 frame0 (abnormal)
+| Metric | V0B1 (normal) | V1E01 (abnormal) |
+|---|---|---|
+| SHA256 | `d2c30b87...` | `6e203cc4...` |
+| Size | 173,956 B | 187,432 B |
+| Δ bytes | — | +13,476 B (scatter artifacts) |
+
+## Conclusions
+
+1. **Root cause**: `container.usd` has nested active RigidBodyAPI at `/Root/Container` and `/Root/Container/Ref`.
+   Box A spawns with this asset and the nested physics causes unpredictable initial state for the 20 Parts
+   placed in slot A.
+2. **Box B fine**: `container_full_visual.usd` is a clean visual-only asset (0 rigid, 0 collision).
+3. **Part mass properties**: `modify_mass_properties` fails for Part_1..20 because the current spawn
+   prim path does not resolve to the correct RigidBody prim (Part_* `Ref` children).
+4. **Fix direction**: Normalize `container.usd` to single RigidBodyAPI (e.g., keep only `/Root/Container`
+   rigid, remove from `/Root/Container/Ref`). Fix part spawn to target correct prim paths.
+5. **No original assets modified**: This is a read-only audit. Derivatives must be generated by
+   reproducible scripts.
+
+## Frozen Hashes (regression baseline)
+```
+container.usd          ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9
+container_full.usd     ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0
+container_full_visual.usd  60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885
+part_5000.usd          71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6
+```

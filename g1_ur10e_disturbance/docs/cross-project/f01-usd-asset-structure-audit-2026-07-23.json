@@ -1,0 +1,92 @@
+{
+  "doc": "f01-usd-asset-structure-audit-2026-07-23",
+  "audit_date": "2026-07-23",
+  "audit_type": "read_only",
+  "no_assets_modified": true,
+  "assets": {
+    "container.usd": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+      "sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+      "defaultPrim": "/Root",
+      "metersPerUnit": 0.01,
+      "prims": 8,
+      "meshes": 1,
+      "rigid_body_api": 2,
+      "rigid_enabled": 2,
+      "collision": 2,
+      "xform_reset_stack": 0,
+      "nested_rigid_body_detected": true,
+      "rigid_body_paths": ["/Root/Container", "/Root/Container/Ref"],
+      "verdict": "BROKEN_NESTED_RIGID"
+    },
+    "container_full.usd": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container_full.usd",
+      "sha256": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+      "defaultPrim": "/World",
+      "metersPerUnit": 1.0,
+      "prims": 322,
+      "meshes": 31,
+      "rigid_body_api": 41,
+      "rigid_enabled": 41,
+      "collision": 41,
+      "xform_reset_stack": 0,
+      "nested_rigid_body_detected": true,
+      "part_mesh_count": 30,
+      "part_numbers": [0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28,29],
+      "verdict": "BROKEN_NESTED_RIGID"
+    },
+    "container_full_visual.usd": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd",
+      "sha256": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
+      "defaultPrim": "/FullContainer",
+      "metersPerUnit": 1.0,
+      "prims": 64,
+      "meshes": 31,
+      "rigid_body_api": 0,
+      "rigid_enabled": 0,
+      "collision": 0,
+      "xform_reset_stack": 0,
+      "nested_rigid_body_detected": false,
+      "verdict": "CLEAN_VISUAL_ONLY"
+    },
+    "part_5000.usd": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/part/part_5000.usd",
+      "sha256": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6",
+      "defaultPrim": "/Root",
+      "metersPerUnit": 0.01,
+      "prims": 7,
+      "meshes": 1,
+      "rigid_body_api": 1,
+      "rigid_enabled": 1,
+      "collision": 1,
+      "xform_reset_stack": 0,
+      "nested_rigid_body_detected": false,
+      "rigid_body_paths": ["/Root/container_part_fixed_5000"],
+      "verdict": "CLEAN_SINGLE_RIGID"
+    }
+  },
+  "images": {
+    "v1e01_faulty_frame0": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000000_env0.png",
+      "sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
+      "bytes": 187432,
+      "observation": "white fan-shaped scatter around box A"
+    },
+    "v0b1_normal_frame0": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v0b1_rgb_capture_20260721/scene/frame_000000_env0.png",
+      "sha256": "d2c30b8733343251d3020dab697421da969ac2af70b7cc2221aae41d533a1056",
+      "bytes": 173956,
+      "observation": "clean scene, no scatter"
+    }
+  },
+  "root_cause": {
+    "summary": "container.usd has nested active RigidBodyAPI at /Root/Container AND /Root/Container/Ref",
+    "isaac_warning": "nested RigidBodyAPI produces unpredictable results",
+    "effect": "box A (uses container.usd) initialization produces scattered parts in frame0",
+    "box_b_unaffected": true,
+    "part_modify_mass_failure": "Part_1..20 modify_mass_properties calls fail due to prim path mismatch"
+  },
+  "fix_direction": "Normalize container.usd to single RigidBodyAPI; fix part spawn prim paths; generate derivatives via script",
+  "frozen_hashes_verified": true,
+  "frozen_hashes_timestamp": "2026-07-23T00:00:00+08:00"
+}
