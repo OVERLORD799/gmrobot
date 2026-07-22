@@ -1,0 +1,113 @@
+{
+  "doc": "m1d-root-cause-diagnosis-2026-07-23",
+  "type": "root_cause_diagnosis",
+  "date": "2026-07-23",
+  "verdict": "M1D_ROOT_CAUSE_IDENTIFIED",
+  "diagnosis_method": "static_analysis",
+  "smoke_tests_run": 0,
+  "smoke_tests_max": 2,
+
+  "culprit": {
+    "asset": "GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd",
+    "prim": "/FullContainer/Container/mesh",
+    "sha256": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
+    "role": "box_B (visual-only full container, Func-C mode)",
+    "root_cause": "scale_inconsistency",
+    "scale_bug_location": "target_full_override.py:35 CONTAINER_FULL_SCALE = (1.0, 1.0, 1.0)"
+  },
+
+  "scale_evidence": {
+    "container_usd_box_a": {
+      "meters_per_unit": 0.01,
+      "mesh_x_span_units": 380,
+      "env_scale": 0.01,
+      "internal_ref_scale": 0.1,
+      "effective_world_span_m": 0.38,
+      "status": "correct"
+    },
+    "container_full_visual_box_b": {
+      "meters_per_unit": 1.0,
+      "mesh_x_span_units": 38,
+      "env_scale": 1.0,
+      "internal_scale": "none",
+      "effective_world_span_m": 38.0,
+      "status": "100x_too_large"
+    },
+    "filled_content_items": {
+      "count": 30,
+      "grid_x_span": 0.275,
+      "grid_y_span": 0.44,
+      "individual_mesh_x_span": 0.172,
+      "status": "correct_scale"
+    }
+  },
+
+  "camera_containment": {
+    "camera_world_pos": [0.35, 0.0, 2.5],
+    "camera_orientation_quat": [0.7071, 0.0, 0.7071, 0.0],
+    "camera_forward": "world_+X",
+    "camera_up": "world_+Y",
+    "camera_right": "world_+Z",
+    "box_b_world_center": [0.765, 0.25, 0.10],
+    "container_world_x_range": [-18.3, 19.7],
+    "container_world_z_range": [-30.4, 30.6],
+    "camera_x_in_container_range": true,
+    "camera_z_in_container_range": true,
+    "conclusion": "Camera is INSIDE the massive container mesh"
+  },
+
+  "filled_content_transform_analysis": {
+    "transform_type": "xformOp:transform (4x4 matrix)",
+    "rotation_uniform": true,
+    "rotation_quat": [0.5, -0.5, -0.5, -0.5],
+    "rotation_angle_deg": 120,
+    "rotation_axis": [-0.577, -0.577, -0.577],
+    "grid_layout": "6x5 (columns in X, rows in Y)",
+    "all_same_rotation": true,
+    "transform_preservation": "consistent_internally"
+  },
+
+  "part_expected_poses": {
+    "parts_1_19": "container_A slots A@1..A@19",
+    "part_20": "container_B slot B@10",
+    "part_20_world_pos": [0.75, 0.215, 0.17],
+    "container_a_world_pos": [0.75, -0.25, 0.0],
+    "container_b_world_pos": [0.75, 0.25, 0.0],
+    "slot_grid": "5_cols_x_4_rows",
+    "part_z_height": 0.17,
+    "part_rotation_quat": [0.7071068, 0.0, -0.7071068, 0.0],
+    "runtime_telemetry_available": false,
+    "note": "Init numerical gate not implemented; no runtime pose/velocity data"
+  },
+
+  "container_full_visual_generation": {
+    "generation_script_found": false,
+    "likely_generation_error": "cm-scale Container mesh in meter-scale USD (metersPerUnit=1.0)",
+    "container_vs_filled_content_ratio": 86
+  },
+
+  "fix_recommendation": {
+    "option_a_minimal": {
+      "file": "target_full_override.py",
+      "line": 35,
+      "change": "CONTAINER_FULL_SCALE = (0.01, 0.01, 0.01)",
+      "risk": "FilledContent items may become too small (1.7mm each)"
+    },
+    "option_b_preferred": {
+      "action": "Regenerate container_full_visual.usd with correct meter-scale vertices",
+      "keep": "CONTAINER_FULL_SCALE = (1.0, 1.0, 1.0) or set to 0.01 consistently"
+    },
+    "option_c_targeted": {
+      "action": "Add xformOp:scale=(0.01,0.01,0.01) on /FullContainer/Container in USD",
+      "benefit": "Fixes only Container mesh, preserves FilledContent sizes"
+    },
+    "recommended_path": "Option A for smoke confirmation, Option B for production fix"
+  },
+
+  "m1_fix_relevance": {
+    "container_fixed_normalization": "NOT related to white fan",
+    "part_fixed_normalization": "NOT related to white fan",
+    "container_full_visual_scale": "THIS IS the root cause",
+    "m1_structural_fix_still_valid": true
+  }
+}
