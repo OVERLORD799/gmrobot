@@ -1,0 +1,38 @@
+{
+  "tag": "M1E",
+  "date": "2026-07-23",
+  "verdict": "STRUCTURAL_PASS_VISUAL_UNVERIFIED",
+  "image": "gmdisturb:e01-func-c-m1e-20260723",
+  "image_sha": "sha256:3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+  "base_image": "gmdisturb:e01-func-c-m1-fix-20260723",
+  "source_sha256": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+  "structural_fingerprint": "bb90e8cbf865dd9b",
+  "gate_passed": true,
+  "gates": {
+    "mesh_count": 31,
+    "rigid_body_api": 0,
+    "collision_api": 0,
+    "mass_api": 0,
+    "physics_scene": 0,
+    "container_x_span_m": 0.38,
+    "filled_item_span_m": 0.1662,
+    "grid_x_span_m": 0.275,
+    "grid_y_span_m": 0.44,
+    "default_prim": "/FullContainer",
+    "has_world": false,
+    "part_n_pattern": false
+  },
+  "display_color": {
+    "container": [0.2, 0.6, 0.28],
+    "filled": [0.7, 0.45, 0.22]
+  },
+  "smoke": {
+    "scene_loaded": true,
+    "mesh_count": 31,
+    "default_prim": "/FullContainer",
+    "screenshot_produced": false,
+    "screenshot_reason": "Isaac Sim 5.1 headless kit API mismatch: capture_next_frame and omni.kit.viewport_legacy unavailable"
+  },
+  "commit": "pending_commit",
+  "verdict_note": "STRUCTURAL_PASS_VISUAL_UNVERIFIED equals M1E FAIL. Func-C official capture and dataset collection are PROHIBITED until visual verification passes. The single smoke has been consumed; no PNG evidence exists."
+}

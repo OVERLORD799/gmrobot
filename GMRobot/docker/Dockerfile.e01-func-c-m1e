@@ -1,0 +1,39 @@
+# M1E: deterministic container_full_visual.usd generation fix.
+# Based on gmdisturb:e01-func-c-m1-fix-20260723 (M1 structural fix).
+# Does NOT overwrite historical tags.
+FROM gmdisturb:e01-func-c-m1-fix-20260723
+
+# Copy M1E generator script (deterministic: container_full.usd → container_full_visual.usd)
+COPY GMRobot/scripts/generate_container_full_visual_usd.py /opt/projects/GMRobot/scripts/generate_container_full_visual_usd.py
+COPY GMRobot/scripts/test_generate_container_full_visual_usd_unit.py /opt/projects/GMRobot/scripts/test_generate_container_full_visual_usd_unit.py
+
+# Install numpy for the isaac-sim Python (needed by generator)
+RUN /isaac-sim/kit/python/bin/python3 -m pip install numpy --quiet --no-cache-dir
+
+# Lightweight import verification — find omni.usd.libs and verify pxr is importable.
+# We use a find+head pattern that is stable across omni.usd.libs version changes.
+RUN set -eux; \
+    USD_LIBS=$(find /isaac-sim/extscache -maxdepth 1 -name "omni.usd.libs-*" -type d | head -1); \
+    echo "USD_LIBS=$USD_LIBS"; \
+    test -n "$USD_LIBS" || { echo "FATAL: omni.usd.libs not found"; exit 1; }; \
+    test -d "$USD_LIBS/bin" || { echo "FATAL: USD_LIBS/bin not found"; exit 1; }; \
+    export PYTHONPATH="$USD_LIBS:${PYTHONPATH:-}"; \
+    export LD_LIBRARY_PATH="$USD_LIBS/bin:${LD_LIBRARY_PATH:-}"; \
+    /isaac-sim/kit/python/bin/python3 -c "from pxr import Usd, UsdGeom, Sdf, Vt, Gf; print('pxr import OK')"
+
+# Generate the visual USD at build time from the tracked source asset.
+# This replaces any stale or gitignored visual USD that may have been carried forward.
+RUN set -eux; \
+    USD_LIBS=$(find /isaac-sim/extscache -maxdepth 1 -name "omni.usd.libs-*" -type d | head -1); \
+    export PYTHONPATH="$USD_LIBS:${PYTHONPATH:-}"; \
+    export LD_LIBRARY_PATH="$USD_LIBS/bin:${LD_LIBRARY_PATH:-}"; \
+    /isaac-sim/kit/python/bin/python3 \
+        /opt/projects/GMRobot/scripts/generate_container_full_visual_usd.py \
+        --source /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_full.usd \
+        --output /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd \
+        --freeze-hash \
+        --quiet \
+    && echo "M1E: container_full_visual.usd regenerated successfully"
+
+LABEL gmdisturb.e01_func_c_m1e="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1-fix-20260723"
