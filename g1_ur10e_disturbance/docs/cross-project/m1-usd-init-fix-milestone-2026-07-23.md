@@ -1,8 +1,14 @@
 # M1-USD-Init Fix Milestone (2026-07-23)
 
-## Verdict: **M1_GATES_PASS**
+## Verdict: **M1_STRUCTURAL_FIX_PASS_VISUAL_GATE_FAIL**
 
-All structural gates and smoke test passed. Func-C capture path is opt-in, frozen defaults unchanged.
+### Corrected 2026-07-23 (M1C)
+
+**Human review** of `smoke_scene/frame_000000_env0.png` (SHA256 `c28596ba`) found the white fan-shaped scatter artifact **still present** — visually identical to the pre-fix anomalous frame. The structural normalization (nested RigidBodyAPI removal) succeeded, but the visual gate (frame0 pixel-level verification) **failed**. See `m1c-correction-2026-07-23.md` for full correction record.
+
+### Original M1 summary (now superseded)
+
+Structural gates passed; smoke test ran without Isaac warnings. However, the white fan artifact persists, proving the root cause was NOT solely the nested RigidBodyAPI issue. Func-C capture path is opt-in, frozen defaults unchanged.
 
 ---
 
@@ -59,6 +65,8 @@ All structural gates and smoke test passed. Func-C capture path is opt-in, froze
 | Frame0 SHA256 | `c28596ba5f1caa87deb6899bc08509bc8b413a976afd0b16b6d93a8b5f740649` |
 | Frame0 size | 186,050 bytes |
 | Original faulty frame0 | 187,432 bytes (white fan scatter) |
+| **Human review (M1C)** | **WHITE FAN STILL PRESENT** — frame0 visually identical to pre-fix anomaly |
+| Frame0 path (on disk) | `g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/smoke_scene/frame_000000_env0.png` |
 
 ---
 
@@ -95,16 +103,31 @@ All tests pass (`PASS test_e01_func_c_capture_unit`):
 
 ## 6. Stop Boundary
 
-- ✅ M1 complete: all structural gates + smoke passed
-- ⛔ NOT a Func-C positive sample recovery — that requires a fresh formal capture (separate milestone)
+- ✅ M1 structural fix: nested RigidBodyAPI warnings eliminated, asset structure normalized
+- ❌ M1 visual gate FAILED: white fan artifact persists in smoke frame0 (human review 2026-07-23)
+- ⛔ NOT a Func-C positive sample recovery — that requires root cause fix + fresh formal capture (separate milestone)
 - ⛔ No formal Func-C capture executed in M1
 - ⛔ Docker image `gmdisturb:e01-func-c-m1-fix-20260723` built but NOT a frozen release
+- ⛔ Init numerical gate NOT implemented (20 parts actual pose/velocity, box drift values not recorded)
+
+---
+
+## 6b. M1C Correction Record (2026-07-23)
+
+Human review of `smoke_scene/frame_000000_env0.png` confirmed the white fan-shaped scatter artifact is visually identical to the pre-fix anomaly. The M1 structural fix (commit `9ac4f0a`) successfully removed nested RigidBodyAPI warnings and normalized container/part USD structure, but did NOT resolve the visual artifact. Root cause is therefore NOT solely the nested RigidBodyAPI issue.
+
+**What M1 proved**: Structural normalization works; Isaac warnings gone.
+**What M1 did NOT prove**: White fan artifact is fixed; Func-C is ready for dataset.
+
+See `m1c-correction-2026-07-23.md` for full correction details and next steps.
 
 ---
 
 ## 7. Remaining Blockers for Func-C Recovery
 
-1. Fresh formal capture required with `GMROBOT_V1E01_TARGET_FULL=1` and the M1-fixed assets
-2. Frame0 visual verification (human review)
-3. Full episode gate audit
-4. VLM readiness decision
+1. ~~Fresh formal capture with M1-fixed assets~~ — M1 smoke showed this is insufficient alone
+2. **Root cause diagnosis (M1D)**: Precise attribution of white fan artifact to specific prim(s)
+3. Frame0 visual verification (human review) — FAILED M1 smoke
+4. Full episode gate audit
+5. Init numerical gate: record 20 parts actual pose/velocity, box drift values
+6. VLM readiness decision

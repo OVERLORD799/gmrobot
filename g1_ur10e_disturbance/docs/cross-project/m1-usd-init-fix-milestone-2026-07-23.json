@@ -1,6 +1,10 @@
 {
   "doc": "m1-usd-init-fix-milestone-2026-07-23",
-  "verdict": "M1_GATES_PASS",
+  "verdict": "M1_STRUCTURAL_FIX_PASS_VISUAL_GATE_FAIL",
+  "verdict_corrected": true,
+  "verdict_correction_date": "2026-07-23",
+  "verdict_correction_reason": "Human review of smoke frame0 found white fan artifact still present — visually identical to pre-fix anomaly. Structural normalization succeeded but visual gate failed.",
+  "verdict_correction_doc": "m1c-correction-2026-07-23.md",
   "date": "2026-07-23",
   "container_fix": {
     "script": "GMRobot/scripts/normalize_container_usd.py",
@@ -71,6 +75,12 @@
     "original_faulty_frame0": {
       "sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
       "bytes": 187432
+    },
+    "human_review_2026_07_23": {
+      "white_fan_still_present": true,
+      "visual_identical_to_pre_fix": true,
+      "visual_gate": "FAIL",
+      "reviewer_note": "White fan-shaped scatter artifact persists in frame0. Structural normalization did NOT resolve the visual anomaly."
     }
   },
   "offline_tests": {
@@ -79,5 +89,9 @@
   },
   "formal_capture_required": true,
   "func_c_recovery_not_claimed": true,
-  "stop_boundary": "M1 complete; fresh capture needed for Func-C recovery"
+  "stop_boundary": "M1 structural fix complete (nested RigidBodyAPI warnings gone); visual gate FAILED (white fan persists). Root cause diagnosis (M1D) required before Func-C recovery.",
+  "init_numerical_gate": {
+    "implemented": false,
+    "note": "20 parts actual pose/velocity, box drift values NOT recorded"
+  }
 }

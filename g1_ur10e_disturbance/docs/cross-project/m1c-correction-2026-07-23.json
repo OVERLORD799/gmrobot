@@ -1,0 +1,73 @@
+{
+  "doc": "m1c-correction-2026-07-23",
+  "type": "correction",
+  "corrects": "m1-usd-init-fix-milestone-2026-07-23",
+  "date": "2026-07-23",
+  "verdict": "M1_STRUCTURAL_FIX_PASS_VISUAL_GATE_FAIL",
+  "original_verdict": "M1_GATES_PASS",
+  "original_verdict_overridden": true,
+  "correction_trigger": "human_review",
+  "reviewer": "OVERLORD799",
+
+  "what_m1_proved": {
+    "nested_rigid_body_warnings_gone": true,
+    "asset_structure_normalized": true,
+    "frozen_originals_unchanged": true,
+    "white_fan_artifact_resolved": false,
+    "func_c_ready_for_dataset": false
+  },
+
+  "smoke_frame_evidence": {
+    "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/smoke_scene/frame_000000_env0.png",
+    "sha256": "c28596ba5f1caa87deb6899bc08509bc8b413a976afd0b16b6d93a8b5f740649",
+    "bytes": 186050,
+    "commit_at_smoke": "9ac4f0a",
+    "docker_image": "gmdisturb:e01-func-c-m1-fix-20260723",
+    "docker_image_sha256": "d8bef5e28f319e93903f5185a313c68f10a817eb5a08f17aa2f3672dd51e6b58",
+    "smoke_exit_code": 0,
+    "nested_rigid_body_warnings": 0,
+    "white_fan_still_present": true,
+    "visual_identical_to_pre_fix": true,
+    "pre_fix_frame0_sha256": "6e203cc482f1fcb12309ac0586a7665e1749fba3a8c20bea1953fc4ae0a33ba6",
+    "pre_fix_frame0_bytes": 187432
+  },
+
+  "root_cause_hypothesis_updated": {
+    "nested_rigid_body_ruled_out": true,
+    "current_suspects": [
+      "container_full_visual.usd FilledContent mesh world-space transforms",
+      "Part_1..20 spawn transforms relative to container slots",
+      "Camera/projection interaction with box_B visual meshes"
+    ],
+    "requires_m1d": true
+  },
+
+  "m1_gaps": {
+    "init_numerical_gate_implemented": false,
+    "parts_pose_velocity_recorded": false,
+    "box_drift_values_recorded": false,
+    "container_full_visual_audited": false,
+    "filled_content_transform_verified": false,
+    "isolation_rendering_done": false,
+    "aabb_pose_telemetry_done": false,
+    "formal_func_c_capture_done": false
+  },
+
+  "next_milestone": "M1D",
+  "m1d_objective": "Precise attribution of white fan artifact to specific prim(s) via auditable diagnostic methods",
+  "m1d_constraints": [
+    "Max 2 short diagnostic smoke runs",
+    "No formal capture",
+    "No safety threshold changes",
+    "No B0-B4 rerun",
+    "No original USD overwrite",
+    "No force push"
+  ],
+
+  "correction_integrity": {
+    "original_milestone_preserved": true,
+    "new_artifact_not_overwrite": true,
+    "commit_9ac4f0a_not_rewritten": true,
+    "prior_docs_intact": true
+  }
+}
