@@ -1,0 +1,25 @@
+# E01-Dyn-A capture profile (documentation + runner defaults).
+# Does not modify frozen B0–B4 paper_scenarios/*.yaml.
+scene: E01-Dyn-A
+scenario: arm_wave
+motion_source: scripted_g1_locomotion_arm_wave
+seed: 42
+num_envs: 1
+headless: true
+enable_cameras: true
+max_steps: 500
+capture_steps: [210, 280]
+geometry_window: [210, 280]
+progress_interval: 1
+virtual_hand: false
+vlm: false
+perception: false
+five_stage: false
+replan: false
+post_count_expected: 0
+camera:
+  override: true
+  pos: [0.2, 0.0, 3.2]
+  rot: [0.7071, 0.0, 0.7071, 0.0]
+image_tag: gmdisturb:e01-dyn-a-20260722
+results_dir: results/paper_demo/v1e01_dyn_a_capture_20260722

@@ -1,0 +1,13 @@
+# Thin rebuild: copy only E01-Dyn-A runtime deltas onto the V1-C0P1 baseline.
+# Does NOT overwrite gmdisturb:semantic-shadow-v1c0p1-20260722 / defe95e / f81e59ce.
+FROM gmdisturb:semantic-shadow-v1c0p1-20260722
+
+COPY scene_camera_override.py /opt/projects/g1_ur10e_disturbance/scene_camera_override.py
+COPY e01_dyn_a_capture.py /opt/projects/g1_ur10e_disturbance/e01_dyn_a_capture.py
+COPY dual_env_cfg.py /opt/projects/g1_ur10e_disturbance/dual_env_cfg.py
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/test_e01_dyn_a_capture_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_a_capture_unit.py
+COPY configs/e01_dyn_a_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_a_capture.yaml
+
+LABEL gmdisturb.e01_dyn_a="20260722" \
+      gmdisturb.base_tag="gmdisturb:semantic-shadow-v1c0p1-20260722"

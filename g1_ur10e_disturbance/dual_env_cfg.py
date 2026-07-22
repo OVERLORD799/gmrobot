@@ -46,6 +46,10 @@ _PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
 if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
+from scene_camera_override import resolve_scene_camera_pose
+
+_SCENE_CAMERA_POS, _SCENE_CAMERA_ROT = resolve_scene_camera_pose()
+
 from mdp.tactile_obs import (
     tactile_force_multi_net,
     velocity_commands_deploy,
@@ -382,6 +386,11 @@ class DualRobotSceneCfg(InteractiveSceneCfg):
     locals().update(build_part_assets())
 
     # === Scene Camera (overhead) ===
+    # Default pose (1.0, 0.0, 3.0). Opt-in override via env (see scene_camera_override.py):
+    #   GMDISTURB_SCENE_CAMERA_OVERRIDE=1
+    #   GMDISTURB_SCENE_CAMERA_POS=...
+    #   GMDISTURB_SCENE_CAMERA_ROT=...
+    # When override is off, POS/ROT env vars are ignored and Dual defaults are unchanged.
     scene_camera: TiledCameraCfg = TiledCameraCfg(
         prim_path="{ENV_REGEX_NS}/SceneCamera",
         update_period=0.1,
@@ -395,8 +404,8 @@ class DualRobotSceneCfg(InteractiveSceneCfg):
             clipping_range=(0.1, 1.0e5),
         ),
         offset=TiledCameraCfg.OffsetCfg(
-            pos=(1.0, 0.0, 3.0),
-            rot=(0.7071, 0.0, 0.7071, 0.0),
+            pos=_SCENE_CAMERA_POS,
+            rot=_SCENE_CAMERA_ROT,
             convention="world",
         ),
     )

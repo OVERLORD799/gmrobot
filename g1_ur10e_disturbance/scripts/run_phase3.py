@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+import json
 import os
 import sys
 
@@ -207,6 +208,43 @@ parser.add_argument(
     "--dynamic-sweep",
     action="store_true",
     help="Enable B2 world-coordinate lateral sweep proxy (from YAML dynamic_sweep).",
+)
+parser.add_argument(
+    "--save_camera",
+    action="store_true",
+    help="Save scene RGB PNGs (capture-only; no VLM).",
+)
+parser.add_argument(
+    "--camera_output_dir",
+    type=str,
+    default="",
+    help="Directory for --save_camera PNGs (default: <output_csv>_camera/).",
+)
+parser.add_argument(
+    "--camera_save_steps",
+    type=str,
+    default="",
+    help="Comma-separated 0-based steps to dump scene RGB (e.g. 210,280). "
+         "Empty = save every progress_interval when --save_camera.",
+)
+parser.add_argument(
+    "--camera_pose_json",
+    type=str,
+    default="",
+    help="Optional path to write resolved scene camera pose JSON.",
+)
+parser.add_argument(
+    "--body_pose_jsonl",
+    type=str,
+    default="",
+    help="Optional JSONL path for G1/UR10e body poses at camera save steps.",
+)
+parser.add_argument(
+    "--motion_source_label",
+    type=str,
+    default="",
+    help="Honest motion-source label written to capture sidecars "
+         "(e.g. scripted_g1_locomotion_arm_wave). Does not change safety attribution.",
 )
 parser.add_argument(
     "--enforcement-mode",
@@ -639,6 +677,62 @@ def main():
         f"(sidecar={_seed_path})"
     )
     print(f"[phase3] {_seed_record['physx_note']}")
+
+    # ── Optional scene-camera capture sidecars (0-POST; no VLM) ──────────
+    _cam_out = ""
+    _cam_steps: set[int] = set()
+    _body_pose_fh = None
+    if args_cli.save_camera:
+        _cam_out = args_cli.camera_output_dir or (
+            args_cli.output_csv.replace(".csv", "_camera")
+        )
+        os.makedirs(_cam_out, exist_ok=True)
+        if args_cli.camera_save_steps.strip():
+            _cam_steps = {
+                int(x.strip())
+                for x in args_cli.camera_save_steps.split(",")
+                if x.strip() != ""
+            }
+        print(
+            f"[phase3] save_camera=ON dir={_cam_out} "
+            f"steps={sorted(_cam_steps) if _cam_steps else f'every progress_interval={args_cli.progress_interval}'}"
+        )
+    from scene_camera_override import (
+        resolve_scene_camera_pose,
+        scene_camera_override_enabled,
+    )
+    _cam_pos, _cam_rot = resolve_scene_camera_pose()
+    _cam_pose_record = {
+        "override_enabled": scene_camera_override_enabled(),
+        "pos": list(_cam_pos),
+        "rot": list(_cam_rot),
+        "motion_source_label": args_cli.motion_source_label or "",
+        "scenario": args_cli.scenario or "wander",
+        "seed": int(_episode_seed),
+        "virtual_hand": args_cli.virtual_hand is not None,
+        "vlm": bool(args_cli.vlm),
+        "save_camera": bool(args_cli.save_camera),
+    }
+    _pose_json = args_cli.camera_pose_json or (
+        args_cli.output_csv.replace(".csv", "_camera_pose.json")
+        if args_cli.save_camera
+        else ""
+    )
+    if _pose_json:
+        _pose_dir = os.path.dirname(_pose_json)
+        if _pose_dir:
+            os.makedirs(_pose_dir, exist_ok=True)
+        with open(_pose_json, "w", encoding="utf-8") as _pf:
+            json.dump(_cam_pose_record, _pf, indent=2)
+            _pf.write("\n")
+        print(f"[phase3] camera pose sidecar: {_pose_json}")
+    if args_cli.body_pose_jsonl:
+        _bp_dir = os.path.dirname(args_cli.body_pose_jsonl)
+        if _bp_dir:
+            os.makedirs(_bp_dir, exist_ok=True)
+        _body_pose_fh = open(args_cli.body_pose_jsonl, "w", encoding="utf-8")
+    elif args_cli.save_camera:
+        _body_pose_fh = open(os.path.join(_cam_out, "body_poses.jsonl"), "w", encoding="utf-8")
 
     # ── Workspace + bias defaults (scenario/protocol may override) ──────
     _ws_x = cfg.disturbance.workspace_x
@@ -2623,6 +2717,56 @@ def main():
         # ── 9. Step simulation ────────────────────────────────────────
         obs, reward, terminated, truncated, info = env.step(action)
 
+        # ── 9a. Optional scene RGB + body-pose capture (0-POST) ────────
+        _do_cam = False
+        if args_cli.save_camera:
+            if _cam_steps:
+                _do_cam = step in _cam_steps
+            else:
+                _do_cam = (step % ival == 0)
+        if _do_cam:
+            scene_rgb = obs.get("ur10e_camera", {}).get("scene_rgb")
+            if scene_rgb is not None:
+                from PIL import Image as _PILImage
+
+                _arr = scene_rgb[0].detach().cpu().numpy()
+                if _arr.dtype != np.uint8:
+                    _arr = np.clip(_arr, 0, 255).astype(np.uint8)
+                if _arr.shape[-1] > 3:
+                    _arr = _arr[..., :3]
+                _frame_path = os.path.join(_cam_out, f"frame_{step:06d}_env0.png")
+                _PILImage.fromarray(_arr).save(_frame_path)
+                print(f"  [camera] saved {_frame_path}")
+            if _body_pose_fh is not None:
+                from safety_adapter import TRACKED_BODIES as _TRACKED
+
+                _bodies = {}
+                for _bn in _TRACKED:
+                    try:
+                        _bi = g1.find_bodies(_bn)[0][0]
+                        _bp = g1.data.body_link_pos_w[0, _bi].cpu().numpy()
+                        _bodies[_bn] = [float(v) for v in _bp]
+                    except Exception:
+                        continue
+                _root_now = g1.data.root_pos_w[0].cpu().numpy()
+                _ee_now = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
+                _rec = {
+                    "step": int(step),
+                    "phase": str(disturb.scenario_name),
+                    "g1_root": [float(v) for v in _root_now],
+                    "ur10e_ee": [float(v) for v in _ee_now],
+                    "g1_bodies": _bodies,
+                    "camera_pos": list(_cam_pos),
+                    "motion_source_label": args_cli.motion_source_label or "",
+                    "gate": gate_decision.name if gate_decision is not None else "NONE",
+                }
+                # Prefer live closest-body dist from adapter when available.
+                if adapter is not None:
+                    _rec["dist_min_g1_body"] = float(adapter.closest_body_distance)
+                    _rec["closest_g1_body"] = str(adapter.closest_body_name or "")
+                _body_pose_fh.write(json.dumps(_rec) + "\n")
+                _body_pose_fh.flush()
+
         # ── 9. Metrics ─────────────────────────────────────────────────
         g1_ur10e_dist = float(np.linalg.norm(g1_root[:2] - ur10e_ee[:2]))
         adapter_surface_dist = adapter.closest_body_distance if adapter is not None else float("inf")
@@ -2888,6 +3032,8 @@ def main():
 
     _track_fh.close()
     _event_fh.close()
+    if _body_pose_fh is not None:
+        _body_pose_fh.close()
     if _dynamic_audit_fh is not None:
         _dynamic_audit_fh.close()
     if _trajectory_fh is not None:
