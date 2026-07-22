@@ -15,6 +15,11 @@ import numpy as np
 from PIL import Image
 
 
+CONTRACT_MODE_CANONICAL = "canonical_v0a"
+CONTRACT_MODE_LEGACY = "legacy_v2"
+_VALID_CONTRACT_MODES = frozenset({CONTRACT_MODE_CANONICAL, CONTRACT_MODE_LEGACY})
+
+
 @dataclass
 class PerceptionClientConfig:
     backend: str = "remote_http"
@@ -24,11 +29,15 @@ class PerceptionClientConfig:
     health_endpoint: str = "/health"
     text_prompt: str = "gloved hand . robot gripper"
     box_threshold: float = 0.2
+    text_threshold: float = 0.25
+    max_detections: int = 10
     run_sam2: bool = True
     timeout_s: float = 30.0
     track_target_label: str = "hand"
     track_re_detect_every_n: int = 100
     track_dt_s: float = 0.02
+    # Explicit protocol mode — never auto-switch from health.
+    contract_mode: str = CONTRACT_MODE_CANONICAL
 
 
 @dataclass
@@ -52,6 +61,35 @@ class PerceptionClient:
 
     def __init__(self, config: PerceptionClientConfig | None = None):
         self.config = config or PerceptionClientConfig()
+        mode = str(self.config.contract_mode or CONTRACT_MODE_CANONICAL).strip()
+        if mode not in _VALID_CONTRACT_MODES:
+            raise ValueError(
+                f"contract_mode must be one of {sorted(_VALID_CONTRACT_MODES)}, got {mode!r}"
+            )
+        self.config.contract_mode = mode
+        self._legacy_gateway = None
+        if mode == CONTRACT_MODE_LEGACY:
+            from .legacy_gateway import LegacyPerceptionGateway
+
+            self._legacy_gateway = LegacyPerceptionGateway(
+                http_post=self._legacy_http_post,
+                box_threshold=self.config.box_threshold,
+                text_threshold=self.config.text_threshold,
+                max_detections=self.config.max_detections,
+                run_sam2=self.config.run_sam2,
+            )
+
+    def _legacy_http_post(self, endpoint: str, body: dict[str, Any]) -> dict[str, Any]:
+        return self._request_json("POST", endpoint, body=body)
+
+    def legacy_track_callback(self, rgb: np.ndarray, **kwargs: Any) -> dict[str, Any]:
+        """Worker-facing stateful track callback (legacy contract_mode only)."""
+        if self._legacy_gateway is None:
+            raise RuntimeError("legacy_track_callback requires contract_mode=legacy_v2")
+        return self._legacy_gateway.track(
+            image_b64=self._frame_to_b64(rgb),
+            **kwargs,
+        )
 
     @classmethod
     def from_yaml(cls, path: str) -> PerceptionClient:
@@ -95,19 +133,76 @@ class PerceptionClient:
         rgb: np.ndarray,
         *,
         text_prompt: str | None = None,
+        keywords: list[str] | None = None,
         box_threshold: float | None = None,
         run_sam2: bool | None = None,
         meta: dict[str, Any] | None = None,
+        request_id: str | None = None,
+        frame_id: str | None = None,
+        allow_default_prompt: bool = False,
     ) -> dict[str, Any]:
-        """POST /ground with base64 PNG and text prompt."""
+        """POST /ground with base64 PNG, keywords, and text prompt.
+
+        Five-stage shadow must pass ``keywords`` from VLM. When keywords are
+        empty and ``allow_default_prompt`` is False, returns an explicit skip
+        without using unrelated default categories.
+        """
+        from .schema import keywords_to_text_prompt, normalize_keywords
+
+        kw = normalize_keywords(keywords)
+        meta_out = dict(meta or {})
+        if request_id:
+            meta_out.setdefault("request_id", request_id)
+        if frame_id:
+            meta_out.setdefault("frame_id", frame_id)
+
+        if not kw and not allow_default_prompt and text_prompt is None:
+            return {
+                "ok": True,
+                "request_id": str(request_id or meta_out.get("request_id") or ""),
+                "frame_id": str(frame_id or meta_out.get("frame_id") or ""),
+                "detections": [],
+                "keyword_detection_map": {},
+                "perception_status": "skipped_no_keywords",
+                "latency_ms": 0.0,
+            }
+
+        if self._legacy_gateway is not None:
+            parent = str(meta_out.get("parent_request_id") or request_id or "")
+            return self._legacy_gateway.ground(
+                image_b64=self._frame_to_b64(rgb),
+                keywords=kw,
+                request_id=str(request_id or meta_out.get("request_id") or ""),
+                frame_id=str(frame_id or meta_out.get("frame_id") or ""),
+                parent_request_id=parent,
+                run_sam2=run_sam2,
+                meta=meta_out,
+                allow_default_prompt=allow_default_prompt,
+            )
+
+        if text_prompt is not None:
+            prompt = text_prompt
+        elif kw:
+            prompt = keywords_to_text_prompt(kw)
+        elif allow_default_prompt:
+            prompt = self.config.text_prompt
+        else:
+            prompt = ""
+
         payload: dict[str, Any] = {
-            "text_prompt": text_prompt if text_prompt is not None else self.config.text_prompt,
+            "text_prompt": prompt,
+            "keywords": kw,
             "image_b64": self._frame_to_b64(rgb),
             "box_threshold": (
                 box_threshold if box_threshold is not None else self.config.box_threshold
             ),
+            "confidence_threshold": (
+                box_threshold if box_threshold is not None else self.config.box_threshold
+            ),
             "run_sam2": run_sam2 if run_sam2 is not None else self.config.run_sam2,
-            "meta": meta or {},
+            "meta": meta_out,
+            "request_id": request_id or meta_out.get("request_id"),
+            "frame_id": frame_id or meta_out.get("frame_id"),
         }
         return self._request_json("POST", self.config.endpoint, body=payload)
 
