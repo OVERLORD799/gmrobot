@@ -1,0 +1,111 @@
+{
+  "phase": "V1-E01-Dyn-A",
+  "date": "2026-07-22",
+  "scene": "E01-Dyn-A",
+  "verdict": "GEOMETRY_WINDOW_FAIL",
+  "ready_for_sam2": false,
+  "sam2_preconditions_met": false,
+  "sam2_block_reason": "centroid_displacement_px≈4.54 < 40; dynamic positive gate already failed",
+  "results_dir_gitignored": true,
+  "results_dir_committed": false,
+  "ready_for_vlm_screen": false,
+  "no_retune_rerun": true,
+  "no_sam2": true,
+  "no_vlm_post": true,
+  "no_func_c": true,
+  "no_dyn_b": true,
+  "no_push": true,
+  "head": "1c5c9f809c760e8ea46aebcf3aa1da189529ff30",
+  "branch": "main",
+  "worktree_dirty": true,
+  "local_commits_unpushed": 6,
+  "image_tag": "gmdisturb:e01-dyn-a-20260722",
+  "image_id": "sha256:c609dae18a611e9b703b5d87b3e24ed55cfa3c660d907fbc3c55823e2134b534",
+  "image_created": "2026-07-22T20:15:34+08:00",
+  "base_image_preserved": {
+    "semantic_shadow_v1c0p1": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+    "b4_p010": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+  },
+  "config": "g1_ur10e_disturbance/configs/e01_dyn_a_capture.yaml",
+  "config_sha256": "c8fc9515f654cad9cb1a2da9ea2df041bde99a7be05764906a305d62e1c59e47",
+  "camera_code_added": true,
+  "camera_override_default_off": true,
+  "camera_pose": {
+    "pos": [0.2, 0.0, 3.2],
+    "rot": [0.7071, 0.0, 0.7071, 0.0]
+  },
+  "scenario": "arm_wave",
+  "motion_source": "scripted_g1_locomotion_arm_wave",
+  "seed": 42,
+  "max_steps": 500,
+  "capture_steps": [210, 280],
+  "phases_at_capture": {"210": "stand", "280": "stand"},
+  "virtual_hand": false,
+  "unit_tests": {"test_e01_dyn_a_capture_unit": "PASS"},
+  "smoke": {
+    "canonical_import": "PASS",
+    "one_step_exit": 0,
+    "scene_rgb_ready": true,
+    "post_count": 0,
+    "traceback": 0
+  },
+  "isaac_exit_code": 0,
+  "post_count": 0,
+  "rgb_frames": [
+    {
+      "sim_step": 210,
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_a_capture_20260722/scene/frame_000210_env0.png",
+      "sha256": "0d63919e62acc547696b95f28c404bf0158f6f1484ae5778439a5d5a2e6aa783",
+      "roi_area_px2": 4573.695966022107,
+      "centroid_uv": [273.5743535859858, 339.55348866578225],
+      "roi_source": "projected_g1_body_points",
+      "gate": "ALLOW",
+      "phase": "stand",
+      "dist_min_g1_body": 0.9542366218566894
+    },
+    {
+      "sim_step": 280,
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_a_capture_20260722/scene/frame_000280_env0.png",
+      "sha256": "d2bc91da585e364f2bf5b409514cb9328f3abae84a648d9e0a31b9f863430823",
+      "roi_area_px2": 4395.013224757826,
+      "centroid_uv": [277.68603557653444, 337.63445199603996],
+      "roi_source": "projected_g1_body_points",
+      "gate": "ALLOW",
+      "phase": "stand",
+      "dist_min_g1_body": 0.9222702932357788
+    }
+  ],
+  "centroid_displacement_px": 4.537469617663291,
+  "visual_gate_ok": false,
+  "geometry_window": {
+    "window": [210, 280],
+    "ok": false,
+    "allow": 70,
+    "slow": 1,
+    "stop": 0,
+    "replan": 0,
+    "fail_step": 213,
+    "fail_gate": "SLOW_DOWN",
+    "fail_trigger": "dynamic_ttc_warning: 0.791s",
+    "dist_min": 0.9059,
+    "dist_mean": 0.944469014084507,
+    "dist_max": 0.9708,
+    "capture_steps_allow": true
+  },
+  "episode_gates": {
+    "ALLOW": 493,
+    "STOP": 5,
+    "SLOW_DOWN": 2,
+    "stop_steps": [85, 93, 115, 126, 147],
+    "slow_steps": [150, 213],
+    "note": "Early episode TTC gates reported separately; formal Dyn-A gate uses 210-280."
+  },
+  "xid_before": "no_new_xid_observed",
+  "xid_after": "no_new_xid_observed",
+  "historical_assets_untouched": true,
+  "results_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_a_capture_20260722",
+  "fail_reasons": {
+    "geometry": "step 213 SLOW_DOWN dynamic_ttc_warning within 210-280 window",
+    "visual": "centroid_displacement_px≈4.54 < 40 (both frames in stand phase)"
+  }
+}
