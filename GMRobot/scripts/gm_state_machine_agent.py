@@ -147,6 +147,37 @@ def build_arg_parser() -> argparse.ArgumentParser:
         help="Call VLM every N control steps (~1 Hz at 50).",
     )
     parser.add_argument(
+        "--enable_five_stage_shadow",
+        action="store_true",
+        default=False,
+        help="Enable V0-A five-stage VLM/perception shadow (async; requires cameras; does NOT require --enable_safety; no control side effects).",
+    )
+    parser.add_argument(
+        "--five_stage_shadow_config",
+        type=str,
+        default=None,
+        help="Path to five_stage_shadow.yaml (default: configs/five_stage_shadow.yaml).",
+    )
+    parser.add_argument(
+        "--enable_semantic_supervisor_shadow",
+        action="store_true",
+        default=False,
+        help=(
+            "Enable V1-C0 SemanticSafetySupervisor online shadow (requires "
+            "--enable_five_stage_shadow and --enable_safety; mutually exclusive with "
+            "live --enable_vlm / --enable_replan; no control side effects)."
+        ),
+    )
+    parser.add_argument(
+        "--semantic_supervisor_config",
+        type=str,
+        default=None,
+        help=(
+            "Path to semantic supervisor YAML "
+            "(default: configs/semantic_safety_supervisor_shadow_live.yaml)."
+        ),
+    )
+    parser.add_argument(
         "--enable_perception",
         action="store_true",
         default=False,
@@ -288,6 +319,13 @@ from GMRobot.safety.replan import (
 )
 from GMRobot.perception import PerceptionClient, PerceptionTrackSession
 from GMRobot.vlm import VLMClient
+from GMRobot.shadow import (
+    FiveStageShadowLogger,
+    FiveStageShadowScheduler,
+    FiveStageShadowWorker,
+    resolve_shadow_client_configs,
+    validate_semantic_supervisor_shadow_flags,
+)
 from isaaclab_tasks.utils import parse_env_cfg
 
 from pick_and_place_policy import (
@@ -1688,6 +1726,13 @@ def main():
     perception_client: PerceptionClient | None = None
     grasp_supervisor: VLMGraspSupervisor | None = None
     hand_trajectory_filter: HandTrajectoryFilter | None = None
+    five_stage_worker: FiveStageShadowWorker | None = None
+    five_stage_logger: FiveStageShadowLogger | None = None
+    five_stage_scheduler: FiveStageShadowScheduler | None = None
+    five_stage_cfg: dict = {}
+    five_stage_interval = 50
+    semantic_bridge = None
+    semantic_supervisor_cfg = None
 
     if args_cli.enable_vlm and not args_cli.enable_cameras:
         raise RuntimeError("--enable_vlm requires --enable_cameras.")
@@ -1697,6 +1742,139 @@ def main():
         raise RuntimeError("--enable_perception requires --enable_cameras.")
     if args_cli.enable_perception_track and not args_cli.enable_perception:
         raise RuntimeError("--enable_perception_track requires --enable_perception.")
+    if args_cli.enable_five_stage_shadow and not args_cli.enable_cameras:
+        raise RuntimeError("--enable_five_stage_shadow requires --enable_cameras.")
+
+    # V1-C0: validate semantic supervisor shadow CLI before constructing pipelines.
+    if args_cli.enable_semantic_supervisor_shadow:
+        import yaml as _yaml_sem
+
+        sem_cfg_path = (
+            args_cli.semantic_supervisor_config
+            or "/root/GMRobot/configs/semantic_safety_supervisor_shadow_live.yaml"
+        )
+        with open(sem_cfg_path, encoding="utf-8") as f:
+            semantic_supervisor_cfg = _yaml_sem.safe_load(f) or {}
+        validate_semantic_supervisor_shadow_flags(
+            enable_semantic_supervisor_shadow=True,
+            enable_five_stage_shadow=bool(args_cli.enable_five_stage_shadow),
+            enable_safety=bool(args_cli.enable_safety),
+            enable_vlm=bool(args_cli.enable_vlm),
+            enable_replan=bool(args_cli.enable_replan),
+            enable_vlm_grasp_supervisor=bool(args_cli.enable_vlm_grasp_supervisor),
+            enforcement_mode=str(
+                semantic_supervisor_cfg.get("enforcement_mode", "shadow")
+            ),
+        )
+
+    if args_cli.enable_five_stage_shadow:
+        import yaml as _yaml
+
+        cfg_path = args_cli.five_stage_shadow_config or "/root/GMRobot/configs/five_stage_shadow.yaml"
+        with open(cfg_path, encoding="utf-8") as f:
+            five_stage_cfg = _yaml.safe_load(f) or {}
+        if str(five_stage_cfg.get("enforcement_mode", "shadow")).lower() != "shadow":
+            raise RuntimeError("V0-A five_stage_shadow.enforcement_mode must be 'shadow'")
+        vlm_cfg_path, perc_cfg_path = resolve_shadow_client_configs(
+            five_stage_cfg,
+            shadow_config_path=cfg_path,
+        )
+        print(
+            f"[INFO]: five-stage shadow client configs resolved: "
+            f"vlm={vlm_cfg_path} perception={perc_cfg_path}"
+        )
+        fs_vlm = VLMClient.from_yaml(str(vlm_cfg_path))
+        fs_perc = PerceptionClient.from_yaml(str(perc_cfg_path))
+        hz = float(five_stage_cfg.get("inference_hz", 1.0) or 1.0)
+        five_stage_interval = max(1, int(round(50.0 / max(hz, 1e-6))))
+        max_submissions = int(five_stage_cfg.get("max_submissions", 0) or 0)
+        stop_on_pipe_err = bool(five_stage_cfg.get("stop_submissions_on_pipeline_error", True))
+        shutdown_drain_timeout_s = float(five_stage_cfg.get("shutdown_drain_timeout_s", 15.0) or 15.0)
+        # Stateful track session lives in LegacyPerceptionGateway (not agent locals).
+        perc_track = None
+        if getattr(fs_perc.config, "contract_mode", "canonical_v0a") == "legacy_v2":
+            perc_track = lambda rgb, **kw: fs_perc.legacy_track_callback(rgb, **kw)
+        five_stage_worker = FiveStageShadowWorker(
+            vlm_analyze=lambda rgb, **kw: fs_vlm.analyze(rgb, **kw),
+            perception_ground=lambda rgb, **kw: fs_perc.ground(rgb, **kw),
+            perception_track=perc_track,
+            queue_size=int(five_stage_cfg.get("queue_size", 1) or 1),
+            max_result_age_s=float(five_stage_cfg.get("max_result_age_s", 2.0) or 2.0),
+            enforcement_mode="shadow",
+        )
+        five_stage_worker.start()
+        five_stage_logger = FiveStageShadowLogger(
+            five_stage_cfg.get("log_dir") or "output/five_stage_shadow",
+            episode_id="0",
+            enabled=True,
+        )
+
+        def _extract_shadow_rgb(obs_obj):
+            obs_np = to_numpy(obs_obj)
+            if "camera" in obs_np and "scene_rgb" in obs_np["camera"]:
+                return obs_np["camera"]["scene_rgb"]
+            return None
+
+        on_unique = None
+        if args_cli.enable_semantic_supervisor_shadow:
+            from GMRobot.safety.semantic_supervisor import (
+                SemanticSafetySupervisor,
+                SemanticSupervisorConfig,
+            )
+            from GMRobot.safety.semantic_supervisor_logger import SemanticSupervisorLogger
+            from GMRobot.shadow.semantic_bridge import SemanticShadowBridge
+
+            sem_dict = dict(semantic_supervisor_cfg or {})
+            # CLI enables evaluation; keep V1-B thresholds from YAML (do not retune).
+            sem_dict["enabled"] = True
+            sem_dict["enforcement_mode"] = "shadow"
+            sem_cfg_obj = SemanticSupervisorConfig.from_dict(sem_dict)
+            if sem_cfg_obj.enforcement_mode != "shadow":
+                raise RuntimeError("semantic supervisor enforcement_mode must be shadow")
+            if sem_cfg_obj.allow_stop or sem_cfg_obj.allow_replan:
+                raise RuntimeError("V1-C0 forbids allow_stop/allow_replan")
+            sem_log_dir = str(
+                sem_dict.get("log_dir")
+                or five_stage_cfg.get("log_dir")
+                or "results/paper_demo/v1c0_semantic_supervisor_shadow"
+            )
+            sem_logger = SemanticSupervisorLogger(sem_log_dir, enabled=True)
+            control_dt = 0.02
+            semantic_bridge = SemanticShadowBridge(
+                supervisor=SemanticSafetySupervisor(sem_cfg_obj),
+                logger=sem_logger,
+                config=sem_cfg_obj,
+                control_dt=control_dt,
+                episode_id="0",
+            )
+            on_unique = semantic_bridge.enqueue_unique_result
+            print(
+                "[INFO]: semantic supervisor shadow enabled "
+                f"(log_dir={sem_log_dir}; enforcement_mode=shadow; "
+                "advisory only — no gate/action/clock/replan side effects)"
+            )
+
+        five_stage_scheduler = FiveStageShadowScheduler(
+            five_stage_worker,
+            five_stage_logger,
+            interval=five_stage_interval,
+            max_submissions=max_submissions,
+            stop_submissions_on_pipeline_error=stop_on_pipe_err,
+            shutdown_drain_timeout_s=shutdown_drain_timeout_s,
+            episode_id="0",
+            extract_rgb=_extract_shadow_rgb,
+            on_unique_result=on_unique,
+        )
+        print(
+            f"[INFO]: five-stage shadow enabled (interval={five_stage_interval}, "
+            f"max_submissions={max_submissions}, "
+            f"stop_submissions_on_pipeline_error={stop_on_pipe_err}, "
+            f"shutdown_drain_timeout_s={shutdown_drain_timeout_s}, "
+            f"contract_mode_vlm={getattr(fs_vlm.config, 'contract_mode', '')}, "
+            f"contract_mode_perc={getattr(fs_perc.config, 'contract_mode', '')}, "
+            "enforcement_mode=shadow; independent of enable_safety; "
+            "no gate/action/clock/replan side effects)"
+        )
 
     if args_cli.enable_vlm:
         vlm_cfg_path = args_cli.vlm_config or "/root/GMRobot/configs/vlm_client.yaml"
@@ -1865,6 +2043,11 @@ def main():
             if human_motion is not None:
                 human_motion.apply_to_env(env, step_counter)
 
+            # Five-stage shadow: independent of enable_safety; poll every step.
+            if five_stage_scheduler is not None:
+                five_stage_scheduler.on_step(obs, step_counter)
+
+            advance_mask = None
             if args_cli.enable_safety and rule_engine is not None and safety_gate is not None:
                 proposed_actions = policy.get_action(obs, advance=False)
                 if prev_actions is None:
@@ -1878,6 +2061,7 @@ def main():
                     vlm_client is not None
                     and args_cli.vlm_interval > 0
                     and step_counter % args_cli.vlm_interval == 0
+                    and five_stage_worker is None  # live VLM path only when five-stage shadow off
                 ):
                     vlm_fields = run_vlm_inference(
                         vlm_client,
@@ -2091,10 +2275,48 @@ def main():
                     part_tracker=part_tracker,
                 )
                 policy.advance_time_steps(advance_mask)
+
+                # V1-C0: semantic advisory after decision-time geometry gate is known.
+                # effective_control_gate remains geometry; never apply evaluated semantic gate.
+                if semantic_bridge is not None:
+                    geo0 = int(last_g_rules[0]) if last_g_rules else 0
+                    task_ts = int(policy.single_env_policies[0].time_step)
+                    snap = {
+                        "gate_decision": geo0,
+                        "action": actions,
+                        "should_advance": list(advance_mask) if advance_mask is not None else None,
+                        "protocol_phase": None,
+                        "replan_event": None,
+                        "task_progression": task_ts,
+                    }
+                    semantic_bridge.flush(
+                        geometry_gate=geo0,
+                        geometry_gate_reason="geometry_l1",
+                        decision_sim_step=int(step_counter),
+                        decision_time_s=float(step_counter) * float(
+                            getattr(semantic_bridge, "control_dt", 0.02)
+                        ),
+                        control_snapshot=snap,
+                    )
             else:
                 actions = policy.get_action(obs, advance=True)
                 if prev_actions is None:
                     prev_actions = actions.copy()
+                if semantic_bridge is not None:
+                    # Requires enable_safety by CLI validation; keep no-op safe path.
+                    semantic_bridge.flush(
+                        geometry_gate=0,
+                        geometry_gate_reason="safety_disabled",
+                        decision_sim_step=int(step_counter),
+                        control_snapshot={
+                            "gate_decision": 0,
+                            "action": actions,
+                            "should_advance": True,
+                            "protocol_phase": None,
+                            "replan_event": None,
+                            "task_progression": int(policy.single_env_policies[0].time_step),
+                        },
+                    )
 
             actions = torch.from_numpy(actions).to(
                 device=env.unwrapped.device,
@@ -2164,6 +2386,33 @@ def main():
                     flush=True,
                 )
                 break
+
+    if five_stage_scheduler is not None:
+        drain_s = float(five_stage_cfg.get("shutdown_drain_timeout_s", 15.0) or 15.0)
+        five_stage_scheduler.shutdown(stop_timeout_s=2.0, drain_timeout_s=drain_s)
+
+    if semantic_bridge is not None:
+        # Flush any results logged during shutdown drain with last known geometry.
+        geo0 = int(last_g_rules[0]) if last_g_rules else 0
+        semantic_bridge.flush(
+            geometry_gate=geo0,
+            geometry_gate_reason="shutdown_drain",
+            decision_sim_step=int(step_counter),
+            control_snapshot={
+                "gate_decision": geo0,
+                "action": None,
+                "should_advance": False,
+                "protocol_phase": None,
+                "replan_event": None,
+                "task_progression": None,
+            },
+        )
+        sem_summary = semantic_bridge.close()
+        print(
+            "[INFO]: semantic supervisor shadow summary: "
+            f"advisories={sem_summary.get('semantic_advisory_count')} "
+            f"leakage={sem_summary.get('semantic_leakage')}"
+        )
 
     if safety_logger is not None:
         safety_logger.flush()
