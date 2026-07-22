@@ -1,0 +1,32 @@
+# V1-D1B: functional blockage of placement target B (capture-only / future D1).
+# Semantic evidence: existing part_5000.usd occupying box_B (via GMROBOT_V1D1B_FUNCTIONAL_BLOCK=1).
+# human_hand is parked FAR and is NOT the semantic evidence (D1A lesson).
+#
+# Does NOT modify frozen B0–B4, D1A configs/results, or Layer-1 distance/TTC thresholds.
+base: ivj/_base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.30
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+log_enabled: true
+log_dir: /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1d1b_functional_blockage_capture_20260722/safety_logs
+
+human_enabled: true
+human_hand_radius: 0.05
+human_torso_radius: 0.0
+
+# Park kinematic hand far from EE workspace for entire episode (static; not semantic proxy).
+human_trajectory:
+  type: linear_approach
+  start_pos: [0.25, -0.75, 0.60]
+  end_pos: [0.25, -0.75, 0.60]
+  start_step: 0
+  duration_steps: 1
+  hold_steps: 400
+  hold_far: true
+
+envelope:
+  gating_enabled: false

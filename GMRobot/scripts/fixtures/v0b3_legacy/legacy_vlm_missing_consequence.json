@@ -1,0 +1,7 @@
+{
+  "model_id": "fixture-model",
+  "latency_ms": 1.0,
+  "text": "{\"scene_summary\": \"s\", \"keywords\": [\"robot\"], \"risk_type\": \"none\", \"risk_confidence\": 0.1, \"affected_entities\": [\"robot\"], \"prediction_horizon_s\": 1.0, \"explanation\": \"e\", \"suggested_action\": \"continue\", \"spatial_hint\": \"none\"}",
+  "vlm_risk_type": "static",
+  "vlm_suggested_action": "slow_down"
+}

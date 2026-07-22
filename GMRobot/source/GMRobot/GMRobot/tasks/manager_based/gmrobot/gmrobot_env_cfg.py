@@ -69,6 +69,11 @@ PART_HEIGHT = 0.17
 PART_DEFAULT_ROT = (0.7071068, 0.0, -0.7071068, 0.0)
 PART_SLOT_COUNT = CONTAINER_X_SLOTS * CONTAINER_Y_SLOTS
 PART_LOCATIONS = [f"A@{i}" for i in range(1, PART_SLOT_COUNT + 1)]
+# V1-D1B functional blockage (opt-in): relocate existing part_5000 USD into box_B.
+# Default layout unchanged unless GMROBOT_V1D1B_FUNCTIONAL_BLOCK=1 at process start.
+# Does not add USD assets; does not touch frozen g1 B0–B4 paper trees.
+if os.environ.get("GMROBOT_V1D1B_FUNCTIONAL_BLOCK", "").strip().lower() in {"1", "true", "yes"}:
+    PART_LOCATIONS[19] = "B@10"  # part_20 → container B slot 10
 
 ARM_JOINT_NAMES = [
     "shoulder_pan_joint",

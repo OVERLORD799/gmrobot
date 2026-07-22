@@ -1,0 +1,23 @@
+# V1-C0 online shadow wiring config for Semantic Safety Supervisor.
+# Default OFF. CLI --enable_semantic_supervisor_shadow turns evaluation on.
+# Thresholds frozen to V1-B semantics — do not retune to manufacture accepts.
+# Does not write action/gate/clock/replan. Not paper five-stage complete.
+enabled: false
+enforcement_mode: shadow
+allowed_actions:
+  - slow_down
+allowed_risk_types:
+  - dynamic
+  - functional
+min_risk_confidence: 0.85
+max_result_age_s: 2.0
+min_prediction_horizon_s: 0.0
+max_prediction_horizon_s: 3.0
+min_consistent_results: 2
+consistency_window_s: 10.0
+cooldown_s: 5.0
+limited_active_speed_scale: 0.5
+reject_static_risk_in_v1: true
+allow_stop: false
+allow_replan: false
+log_dir: "results/paper_demo/v1c0_semantic_supervisor_shadow"

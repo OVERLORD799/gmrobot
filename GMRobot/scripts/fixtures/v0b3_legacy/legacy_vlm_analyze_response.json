@@ -1,0 +1,14 @@
+{
+  "model_id": "Qwen2.5-VL-7B-Instruct-4bit-nf4",
+  "latency_ms": 4233.628511428833,
+  "text": "{\n  \"scene_summary\": \"A robotic arm is positioned near a small electronic device with green and black components.\",\n  \"keywords\": [\"robotic arm\", \"electronic device\", \"human safety\"],\n  \"risk_type\": \"static\",\n  \"risk_confidence\": 0.7,\n  \"affected_entities\": [\"robotic arm\", \"electronic device\"],\n  \"predicted_consequence\": \"potential collision or damage to the electronic device\",\n  \"prediction_horizon_s\": 1.5,\n  \"explanation\": \"The robotic arm appears to be close to the electronic device, which could lead to accidental contact or damage if the arm moves unexpectedly.\",\n  \"suggested_action\": \"slow_down\",\n  \"spatial_hint\": \"left\"\n}",
+  "vlm_keywords": [
+    "robotic arm",
+    "electronic device",
+    "human safety"
+  ],
+  "vlm_risk_type": "static",
+  "vlm_risk_confidence": 0.7,
+  "vlm_suggested_action": "slow_down",
+  "vlm_explanation": "The robotic arm appears to be close to the electronic device, which could lead to accidental contact or damage if the arm moves unexpectedly."
+}

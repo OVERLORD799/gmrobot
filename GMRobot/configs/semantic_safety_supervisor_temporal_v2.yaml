@@ -1,0 +1,22 @@
+# V1-D2A semantic supervisor for temporal fusion (explicit opt-in).
+# min_risk_confidence remains 0.85 — never lowered.
+enabled: false
+enforcement_mode: shadow
+allowed_actions:
+  - slow_down
+allowed_risk_types:
+  - dynamic
+  - functional
+min_risk_confidence: 0.85
+max_result_age_s: 2.0
+min_prediction_horizon_s: 0.0
+max_prediction_horizon_s: 3.0
+min_consistent_results: 2
+consistency_window_s: 10.0
+cooldown_s: 5.0
+limited_active_speed_scale: 0.5
+reject_static_risk_in_v1: true
+allow_stop: false
+allow_replan: false
+semantic_key_version: v2
+log_dir: "results/paper_demo/v1d2a_temporal_fusion_offline_20260722"

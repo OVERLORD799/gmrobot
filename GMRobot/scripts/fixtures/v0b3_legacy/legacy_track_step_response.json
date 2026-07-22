@@ -1,0 +1,30 @@
+{
+  "session_id": "fixture-session-token",
+  "frame_index": 10,
+  "re_detected": false,
+  "latency_ms": 32.2,
+  "tracks": [
+    {
+      "track_id": 0,
+      "label": "electronic device",
+      "box_xyxy": [
+        217.0,
+        74.0,
+        423.0,
+        364.0
+      ],
+      "center_xy": [
+        320.0,
+        219.0
+      ],
+      "velocity_xy_px_s": [
+        0.0,
+        0.0
+      ],
+      "speed_px_s": 0.0,
+      "direction_deg": 0.0,
+      "mask_area": 56243,
+      "sam2_score": 0.9186580181121826
+    }
+  ]
+}

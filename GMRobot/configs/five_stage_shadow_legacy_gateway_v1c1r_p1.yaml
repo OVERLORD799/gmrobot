@@ -1,0 +1,18 @@
+# V1-C1R-P1 runtime config (bind-mount only).
+# Identical to v1c1r except log_dir → independent P1 results tree.
+# shutdown_drain_timeout_s=60 (lazy-load plan A). max_submissions=2.
+# No credentials. Formal run requires CLI --enable_five_stage_shadow.
+enabled: false
+enforcement_mode: shadow
+contract_mode: legacy_v2
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 2
+stop_submissions_on_pipeline_error: true
+shutdown_drain_timeout_s: 60.0
+max_result_age_s: 10.0
+log_dir: "results/paper_demo/v1c1r_p1_isaac_semantic_shadow_20260722"
+vlm_config: "configs/vlm_client_legacy_gateway.yaml"
+perception_config: "configs/perception_client_legacy_gateway.yaml"
+prompt_version: "five_stage_safety_v1"
+schema_version: "five_stage_vlm_v1"

@@ -5,9 +5,11 @@ track_endpoint: "/track"
 health_endpoint: "/health"
 text_prompt: "gloved hand . robot gripper"
 box_threshold: 0.2
+text_threshold: 0.25
+max_detections: 10
 run_sam2: true
-timeout_s: 30.0
+timeout_s: 300.0
 track_target_label: "hand"
 track_re_detect_every_n: 100
 track_dt_s: 0.02
-contract_mode: canonical_v0a
+contract_mode: legacy_v2

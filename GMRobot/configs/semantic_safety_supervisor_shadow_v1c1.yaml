@@ -1,0 +1,22 @@
+# V1-C1 runtime snapshot of semantic supervisor shadow config (bind-mount).
+# Thresholds identical to semantic_safety_supervisor_shadow_live.yaml (V1-B frozen).
+# Only log_dir points at the independent V1-C1 results tree.
+enabled: false
+enforcement_mode: shadow
+allowed_actions:
+  - slow_down
+allowed_risk_types:
+  - dynamic
+  - functional
+min_risk_confidence: 0.85
+max_result_age_s: 2.0
+min_prediction_horizon_s: 0.0
+max_prediction_horizon_s: 3.0
+min_consistent_results: 2
+consistency_window_s: 10.0
+cooldown_s: 5.0
+limited_active_speed_scale: 0.5
+reject_static_risk_in_v1: true
+allow_stop: false
+allow_replan: false
+log_dir: "results/paper_demo/v1c1_isaac_semantic_shadow_20260722"

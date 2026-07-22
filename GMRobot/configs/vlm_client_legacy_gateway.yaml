@@ -2,8 +2,8 @@ backend: remote_http
 base_url: "http://127.0.0.1:18080"
 endpoint: "/analyze"
 health_endpoint: "/health"
-model_id: "Qwen2.5-VL-7B-Instruct-awq"
-timeout_s: 5.0
+model_id: "Qwen2.5-VL-7B-Instruct"
+timeout_s: 180.0
 prompt_version: "five_stage_safety_v1"
 schema_version: "five_stage_vlm_v1"
-contract_mode: canonical_v0a
+contract_mode: legacy_v2

@@ -1,0 +1,15 @@
+# Five-stage shadow via local Legacy Compatibility Gateway (V0-B3).
+# Default OFF. Explicit contract_mode=legacy_v2 — never auto-switch from health.
+# Localhost only. No remote hosts, passwords, or tokens.
+enabled: false
+enforcement_mode: shadow
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 0
+max_result_age_s: 2.0
+log_dir: "output/five_stage_shadow_legacy"
+contract_mode: legacy_v2
+vlm_config: "configs/vlm_client_legacy_gateway.yaml"
+perception_config: "configs/perception_client_legacy_gateway.yaml"
+prompt_version: "five_stage_safety_v1"
+schema_version: "five_stage_vlm_v1"

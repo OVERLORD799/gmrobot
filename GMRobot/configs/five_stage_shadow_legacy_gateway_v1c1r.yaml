@@ -1,0 +1,19 @@
+# V1-C1R runtime config (bind-mount only; independent of V1-C1 FAIL/NOT_RUN dirs).
+# Default OFF. Explicit contract_mode=legacy_v2. Localhost endpoints only.
+# Only intentional delta vs v1c1: shutdown_drain_timeout_s=60 (lazy-load plan A).
+# log_dir points at V1-C1R results tree (must not overwrite V1-C1 evidence).
+# Formal run requires CLI --enable_five_stage_shadow; no credentials in this file.
+enabled: false
+enforcement_mode: shadow
+contract_mode: legacy_v2
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 2
+stop_submissions_on_pipeline_error: true
+shutdown_drain_timeout_s: 60.0
+max_result_age_s: 10.0
+log_dir: "results/paper_demo/v1c1r_isaac_semantic_shadow_20260722"
+vlm_config: "configs/vlm_client_legacy_gateway.yaml"
+perception_config: "configs/perception_client_legacy_gateway.yaml"
+prompt_version: "five_stage_safety_v1"
+schema_version: "five_stage_vlm_v1"

@@ -1,0 +1,17 @@
+# V0-C3 runtime config (bind-mount only; do not reuse v0c1/v0c2 log_dir).
+# Default OFF. Explicit contract_mode=legacy_v2. Localhost endpoints only.
+# Formal run requires CLI --enable_five_stage_shadow; no credentials in this file.
+enabled: false
+enforcement_mode: shadow
+contract_mode: legacy_v2
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 2
+stop_submissions_on_pipeline_error: true
+shutdown_drain_timeout_s: 15.0
+max_result_age_s: 10.0
+log_dir: "results/paper_demo/v0c3_isaac_shadow_20260721"
+vlm_config: "configs/vlm_client_legacy_gateway.yaml"
+perception_config: "configs/perception_client_legacy_gateway.yaml"
+prompt_version: "five_stage_safety_v1"
+schema_version: "five_stage_vlm_v1"

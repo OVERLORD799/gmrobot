@@ -1,0 +1,13 @@
+# Five-stage VLM/perception shadow (V0-A). Default OFF — no control side effects.
+enabled: false
+enforcement_mode: shadow
+inference_hz: 1.0
+queue_size: 1
+max_submissions: 0
+max_result_age_s: 2.0
+log_dir: "output/five_stage_shadow"
+contract_mode: canonical_v0a
+vlm_config: "configs/vlm_client.yaml"
+perception_config: "configs/perception_client.yaml"
+prompt_version: "five_stage_safety_v1"
+schema_version: "five_stage_vlm_v1"

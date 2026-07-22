@@ -1,0 +1,40 @@
+# V1-D1A: far-corridor human_hand lateral motion (capture-only / future D1).
+# Visual proxy is the existing kinematic red sphere (radius=0.05).
+# visual_semantic_risk=low — filename "human_hand" does NOT imply VLM can recognize a hand.
+#
+# Geometry: keep proxy outside A↔B transport corridor laterally and elevated so
+# Layer-1 stays ALLOW (dist >> warn/hard; no held_critical / near-field TTC).
+# Does NOT modify frozen B0–B4 physical baselines or semantic thresholds.
+base: ivj/_base.yaml
+
+safe_dist_hard_stop: 0.13
+safe_dist_warn: 0.16
+slow_down_alpha: 0.30
+ttc_threshold: 0.5
+ttc_warn_threshold: 1.5
+
+# Capture / audit logs land under the V1-D1A results tree (host bind-mount).
+log_enabled: true
+# Absolute under docker RESULTS_DIR bind-mount.
+log_dir: /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1d1a_far_corridor_capture_20260722/safety_logs
+
+human_enabled: true
+human_hand_radius: 0.05
+human_torso_radius: 0.0
+
+human_trajectory:
+  type: linear_approach
+  # Lateral sweep parallel to A↔B channel, on the camera-near side (x≈0.40).
+  # Channel centers ≈ (0.75, ±0.25). Motion y: -0.55 → +0.55 at fixed x/z.
+  start_pos: [0.40, -0.55, 0.50]
+  end_pos: [0.40, 0.55, 0.50]
+  start_step: 0
+  duration_steps: 200
+  hold_steps: 40
+  retreat_pos: [0.40, -0.55, 0.50]
+  retreat_duration_steps: 40
+  hold_far: true
+
+# Envelope gating left default-off via base; do not enable held-object knock paths.
+envelope:
+  gating_enabled: false

@@ -1,0 +1,21 @@
+# V1-B Deterministic Semantic Safety Supervisor (offline / shadow only).
+# Default OFF. Does not write action/gate/clock/replan.
+# Not paper five-stage complete; no live control coupling in V1-B.
+enabled: false
+enforcement_mode: shadow
+allowed_actions:
+  - slow_down
+allowed_risk_types:
+  - dynamic
+  - functional
+min_risk_confidence: 0.85
+max_result_age_s: 2.0
+min_prediction_horizon_s: 0.0
+max_prediction_horizon_s: 3.0
+min_consistent_results: 2
+consistency_window_s: 10.0
+cooldown_s: 5.0
+limited_active_speed_scale: 0.5
+reject_static_risk_in_v1: true
+allow_stop: false
+allow_replan: false
