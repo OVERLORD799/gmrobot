@@ -241,6 +241,59 @@ def test_validate_manifest_rejects_reference_visual_pending_user_confirmation_ba
         assert any("reference_bin_visual_contract_pass must be true under reference visual pending user confirmation status" in e for e in errors)
 
 
+def test_validate_manifest_accepts_func_c_formal_visual_capture_pass_state() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["dataset_sufficiency"] = {
+            "functional_formal_visual_group_count": 1,
+            "dynamic_technical_candidate_group_count": 1,
+            "overall_status": "DATASET_INSUFFICIENT",
+            "eligible_for_live_or_active": False,
+        }
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "func_c_formal_visual_capture_pass"
+        func["reviewer_approved"] = True
+        func["formal_recapture_allowed"] = False
+        func["consumed"] = True
+        func["group_count"] = 1
+        func["frames_split_into_independent_samples"] = False
+        func["audited_visual_dataset_verdict"] = "FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE"
+        func["raw_automation_verdict"] = "FAIL_FINAL"
+        func["composite_assertion_evidence"] = {"is_native_runtime_assertion_for_this_run": False}
+        assert validate_manifest(manifest, repo_root) == []
+
+
+def test_validate_manifest_rejects_func_c_formal_visual_capture_pass_bad_flags() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["dataset_sufficiency"] = {
+            "functional_formal_visual_group_count": 0,
+            "dynamic_technical_candidate_group_count": 0,
+            "overall_status": "READY",
+            "eligible_for_live_or_active": True,
+        }
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "func_c_formal_visual_capture_pass"
+        func["reviewer_approved"] = False
+        func["formal_recapture_allowed"] = True
+        func["consumed"] = False
+        func["group_count"] = 2
+        func["frames_split_into_independent_samples"] = True
+        func["audited_visual_dataset_verdict"] = "OTHER"
+        func["raw_automation_verdict"] = "PASS"
+        func["composite_assertion_evidence"] = {"is_native_runtime_assertion_for_this_run": True}
+        errors = validate_manifest(manifest, repo_root)
+        assert any("reviewer_approved must be true under formal visual capture pass status" in e for e in errors)
+        assert any("formal_recapture_allowed must be false under formal visual capture pass status" in e for e in errors)
+        assert any("dataset_sufficiency.overall_status must remain DATASET_INSUFFICIENT" in e for e in errors)
+
+
 if __name__ == "__main__":
     test_validate_manifest_ok()
     test_validate_manifest_detects_errors()
@@ -251,4 +304,6 @@ if __name__ == "__main__":
     test_validate_manifest_accepts_occlusion_fix_pending_state()
     test_validate_manifest_accepts_reference_visual_pending_user_confirmation_state()
     test_validate_manifest_rejects_reference_visual_pending_user_confirmation_bad_flags()
+    test_validate_manifest_accepts_func_c_formal_visual_capture_pass_state()
+    test_validate_manifest_rejects_func_c_formal_visual_capture_pass_bad_flags()
     print(json.dumps({"ok": True}))

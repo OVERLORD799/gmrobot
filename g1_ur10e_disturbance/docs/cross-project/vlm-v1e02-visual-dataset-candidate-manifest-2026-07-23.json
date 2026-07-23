@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.1.2",
+  "manifest_version": "3.1.3",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -57,8 +57,8 @@
         200
       ],
       "temporal_pair_required": false,
-      "reviewer_approved": false,
-      "technical_review_status": "reference_visual_pass_pending_user_confirmation",
+      "reviewer_approved": true,
+      "technical_review_status": "func_c_formal_visual_capture_pass",
       "formal_recapture_allowed": false,
       "semantic_clarity": "user_confirmation_required",
       "artifact_removal_technical_pass": true,
@@ -120,7 +120,7 @@
           "stability_only": false
         }
       ],
-      "status": "func_c_formal_capture_fail_final",
+      "status": "func_c_formal_visual_capture_pass",
       "formal": false,
       "m1f10_user_rejected": true,
       "m1f10_route_status": "ABANDONED_WASTEFUL_LOOP",
@@ -165,7 +165,17 @@
           "status": "FAIL_FINAL",
           "note": "invalid_quota_consumption_corrected; root_cause_bind_mount_override_not_script_missing"
         }
-      ]
+      ],
+      "group_count": 1,
+      "frames_split_into_independent_samples": false,
+      "audited_visual_dataset_verdict": "FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE",
+      "raw_automation_verdict": "FAIL_FINAL",
+      "composite_assertion_evidence": {
+        "is_native_runtime_assertion_for_this_run": false,
+        "source_runtime_assertions_run": "v1e01_func_c_dual_reference_smoke_m1f13_20260723",
+        "runtime_scene_assertions_ok": true,
+        "claim": "A empty and B has 20 slots in target visual mode with matching camera/scene initialization"
+      }
     },
     {
       "id": "E02-DYN-B-M1Z9-STEP220-330",
@@ -314,5 +324,19 @@
       }
     }
   ],
-  "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py"
+  "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",
+  "dataset_sufficiency": {
+    "functional_formal_visual_group_count": 1,
+    "dynamic_technical_candidate_group_count": 1,
+    "required_minimum": {
+      "independent_groups": 2,
+      "category_coverage": [
+        "functional",
+        "dynamic"
+      ]
+    },
+    "overall_status": "DATASET_INSUFFICIENT",
+    "eligible_for_live_or_active": false,
+    "reason": "insufficient independent groups and category-level formal coverage"
+  }
 }

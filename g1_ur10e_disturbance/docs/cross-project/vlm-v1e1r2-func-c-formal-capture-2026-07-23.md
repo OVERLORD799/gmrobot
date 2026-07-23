@@ -37,3 +37,10 @@
 - JSONL: `/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r2-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl`
 - Summary: `/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r2-func-c-formal-capture-2026-07-23.artifact-summary.json`
 - group_count: `1`
+
+
+## 审计追加（V1-E1R2.1，离线事实更正与正式视觉冻结）
+- raw verdict 保持不变：`FAIL_FINAL`（不覆盖）
+- 新增 audited verdict：`FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE`
+- 说明：composite_assertion_evidence 来自 M1F13 runtime assertions + E1R2 stdout 观测项，仅作跨 run 复合证据，不可声明为本 run 原生 runtime assertion。
+- 审计报告：`/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r21-func-c-formal-visual-audit-2026-07-23.md` / `/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r21-func-c-formal-visual-audit-2026-07-23.json`

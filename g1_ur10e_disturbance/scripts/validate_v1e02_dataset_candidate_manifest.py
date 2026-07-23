@@ -14,6 +14,7 @@ ALLOWED_TECHNICAL_REVIEW_STATUS = {
     "technical_temporal_pass_pending_user",
     "artifact_removed_semantic_clarity_pending_user",
     "reference_visual_pass_pending_user_confirmation",
+    "func_c_formal_visual_capture_pass",
     "visual_rework_in_progress_reference_locked",
     "visual_rework_parts_occlusion_fix_pending",
     "fail",
@@ -56,7 +57,7 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
         seen_risk_types.add(risk_type)
         if c.get("category") != "provisional":
             errors.append(f"{rid}: category must be provisional")
-        if c.get("reviewer_approved") is not False:
+        if c.get("reviewer_approved") is not False and c.get("technical_review_status") != "func_c_formal_visual_capture_pass":
             errors.append(f"{rid}: reviewer_approved must be false")
         if c.get("technical_review_status") not in ALLOWED_TECHNICAL_REVIEW_STATUS:
             errors.append(f"{rid}: technical_review_status invalid")
@@ -77,9 +78,34 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
                 errors.append(f"{rid}: artifact_removal_technical_pass must be true under reference visual pending user confirmation status")
             if c.get("reference_bin_visual_contract_pass") is not True:
                 errors.append(f"{rid}: reference_bin_visual_contract_pass must be true under reference visual pending user confirmation status")
+        if status == "func_c_formal_visual_capture_pass":
+            if c.get("reviewer_approved") is not True:
+                errors.append(f"{rid}: reviewer_approved must be true under formal visual capture pass status")
+            if c.get("formal_recapture_allowed") is not False:
+                errors.append(f"{rid}: formal_recapture_allowed must be false under formal visual capture pass status")
+            if c.get("consumed") is not True:
+                errors.append(f"{rid}: consumed must be true under formal visual capture pass status")
+            if int(c.get("group_count", 0)) != 1:
+                errors.append(f"{rid}: group_count must be 1 under formal visual capture pass status")
+            if c.get("frames_split_into_independent_samples") is not False:
+                errors.append(
+                    f"{rid}: frames_split_into_independent_samples must be false under formal visual capture pass status"
+                )
+            if c.get("audited_visual_dataset_verdict") != "FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE":
+                errors.append(
+                    f"{rid}: audited_visual_dataset_verdict must be FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE"
+                )
+            if c.get("raw_automation_verdict") != "FAIL_FINAL":
+                errors.append(f"{rid}: raw_automation_verdict must remain FAIL_FINAL")
+            comp = c.get("composite_assertion_evidence", {})
+            if not isinstance(comp, dict):
+                errors.append(f"{rid}: composite_assertion_evidence object required")
+            elif comp.get("is_native_runtime_assertion_for_this_run") is not False:
+                errors.append(f"{rid}: composite evidence must declare non-native runtime assertion provenance")
         if "semantic_clarity" in c and status not in {
             "artifact_removed_semantic_clarity_pending_user",
             "reference_visual_pass_pending_user_confirmation",
+            "func_c_formal_visual_capture_pass",
             "visual_rework_in_progress_reference_locked",
             "visual_rework_parts_occlusion_fix_pending",
         }:
@@ -140,6 +166,17 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
                 errors.append(f"{rid}: PPE must be false when set")
             if c.get("motion_attribution") not in {None, "SCRIPTED_G1_MOTION_SUPPORTED", "INSUFFICIENT"}:
                 errors.append(f"{rid}: invalid motion_attribution")
+
+    suff = manifest.get("dataset_sufficiency", {})
+    if suff:
+        if suff.get("overall_status") != "DATASET_INSUFFICIENT":
+            errors.append("dataset_sufficiency.overall_status must remain DATASET_INSUFFICIENT")
+        if suff.get("eligible_for_live_or_active") is not False:
+            errors.append("dataset_sufficiency.eligible_for_live_or_active must be false")
+        if int(suff.get("functional_formal_visual_group_count", 0)) < 1:
+            errors.append("dataset_sufficiency.functional_formal_visual_group_count must be >= 1")
+        if int(suff.get("dynamic_technical_candidate_group_count", 0)) < 1:
+            errors.append("dataset_sufficiency.dynamic_technical_candidate_group_count must be >= 1")
     return errors
 
 

@@ -1,0 +1,82 @@
+{
+  "task": "V1-E1R2.1 Func-C formal visual audit and freeze (offline)",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head": "f035cfa346bc1a7a2a86345e92e9380c8c04aec1",
+    "actual_head": "f035cfa346bc1a7a2a86345e92e9380c8c04aec1",
+    "origin_main_match": true,
+    "worktree_clean": true,
+    "offline_only": true,
+    "docker_isaac_network_model_executed": false
+  },
+  "e1r2_source_report": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r2-func-c-formal-capture-2026-07-23.json",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723",
+  "fixed_facts": {
+    "frame_000100_env0_png_exists": true,
+    "frame_000200_env0_png_exists": true,
+    "frame_sha256": {
+      "frame_000100_env0.png": "97c1998fa08e6ead3ade1ed7bd49d3fe4640f724bb5f557ca7e7a808b3e8b934",
+      "frame_000200_env0.png": "626e8c6be85324b64b7756cda58d52d5933df2c6b6d682fa14a7da7a4e480417"
+    },
+    "raw_exit_code": 0,
+    "elapsed_seconds": 46,
+    "human_visual_review_pass": {
+      "dual_green_bins_with_white_grid": true,
+      "box_A_empty": true,
+      "box_B_has_20_slots_filled": true,
+      "no_white_tray_stairs_fan_artifact": true
+    }
+  },
+  "composite_assertion_evidence": {
+    "is_native_runtime_assertion_for_this_run": false,
+    "provenance_statement": "E1R2 run lacks native runtime_scene_assertions.json; composite evidence is derived from M1F13 runtime assertions under matching visual mode/camera/scene initialization and E1R2 stdout observation-term evidence.",
+    "e1r2_runtime_assertions_present": false,
+    "m1f13_runtime_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/runtime_scene_assertions.json",
+    "m1f13_runtime_assertions_ok": true,
+    "m1f13_claims": {
+      "target_slots_container": "B",
+      "part_count": 20,
+      "other_box_empty": true
+    },
+    "shared_visual_context": {
+      "image_tag": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723",
+      "camera_pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "camera_rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ],
+      "visual_mode_env": "GMDISTURB_V1E01_FUNC_C_VISUAL=1"
+    },
+    "e1r2_observation_terms_evidence": {
+      "stdout_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723/meta/capture_stdout.txt",
+      "contains_part_1_to_part_20_terms": true,
+      "contains_slot_A_1_to_A_20_terms": true,
+      "contains_slot_B_1_to_B_20_terms": true
+    }
+  },
+  "physics_limitations": {
+    "geometry_evidence": false,
+    "control_evidence": false,
+    "physics_clean": false,
+    "blocking_stderr_errors_preserved": [
+      "Rigid Body hierarchy xformstack reset missing for ContainerA/Container/Ref and ContainerB/Container/Ref",
+      "PxRigidBody::setRigidBodyFlag(): kinematic bodies with CCD enabled are not supported"
+    ]
+  },
+  "verdicts": {
+    "raw_automation_verdict": "FAIL_FINAL",
+    "audited_visual_dataset_verdict": "FORMAL_VISUAL_CAPTURE_PASS_WITH_COMPOSITE_ASSERTION_EVIDENCE"
+  },
+  "dataset_activation_guard": {
+    "eligible_for_live_or_active": false,
+    "reason": "dataset remains insufficient despite formal visual artifact acceptance"
+  },
+  "generated_at_utc": "2026-07-23T11:26:47.803814+00:00"
+}
