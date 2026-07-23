@@ -1,0 +1,44 @@
+{
+  "task": "V1-M1F7.1",
+  "title": "Fix M1F7 smoke pre-assertion runtime context",
+  "date": "2026-07-23",
+  "precondition": {
+    "head_expected_short": "f361363",
+    "worktree_required_clean": true
+  },
+  "root_cause": "Host/shell pre-assertion imported pxr outside Isaac/Kit runtime context, causing ModuleNotFoundError and startup abort before frame/runtime audit.",
+  "implementation": {
+    "host_prebuild_checks_only": [
+      "file sha contract",
+      "env/config gate",
+      "source contract checks"
+    ],
+    "runtime_assertions_context": "inside AppLauncher/Kit stage",
+    "runtime_artifact": "runtime_scene_assertions.json",
+    "runtime_assertions_mandatory": true,
+    "allow_warning_downgrade": false
+  },
+  "required_runtime_checks": {
+    "part_count_zero": true,
+    "containerA_exists": true,
+    "gridA_exists": true,
+    "containerB_exists": true,
+    "task_execution_false": true,
+    "visual_dataset_only_true": true,
+    "spawn_task_parts_false": true
+  },
+  "status_correction": {
+    "raw_startup_status": "failed",
+    "frame_status": "absent",
+    "verdict": "SMOKE_STARTUP_FAIL_FINAL",
+    "next_gate": "FIX_VALIDATION_CONTEXT_ONLY",
+    "visual_review_claimed": false
+  },
+  "record_preservation": {
+    "kept_previous_doc_refs": [
+      "vlm-v1m1f7-func-c-empty-source-visual-smoke-2026-07-23.md",
+      "vlm-v1m1f7-func-c-empty-source-visual-smoke-2026-07-23.json"
+    ],
+    "kept_previous_commit_ref": "f361363"
+  }
+}

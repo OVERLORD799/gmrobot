@@ -326,6 +326,8 @@ from GMRobot.shadow import (
     resolve_shadow_client_configs,
     validate_semantic_supervisor_shadow_flags,
 )
+from GMRobot.shadow.runtime_scene_assertions import run_runtime_scene_assertions
+from GMRobot.tasks.manager_based.gmrobot import gmrobot_env_cfg as gmrobot_env_cfg_runtime
 from isaaclab_tasks.utils import parse_env_cfg
 
 from pick_and_place_policy import (
@@ -1706,6 +1708,22 @@ def main():
 
     obs, info = env.reset()
     policy.reset(obs)
+    runtime_scene_assertions_path = os.environ.get("GMROBOT_RUNTIME_SCENE_ASSERTIONS_PATH")
+    runtime_flags = {"GMROBOT_V1E01_TARGET_FULL": "1", "GMROBOT_V1E01_VISUAL_ONLY": "1"}
+    if runtime_scene_assertions_path and all(
+        str(os.environ.get(k, "")) == v for k, v in runtime_flags.items()
+    ):
+        runtime_assertions = run_runtime_scene_assertions(
+            output_path=runtime_scene_assertions_path,
+            env=os.environ,
+            container_assets=gmrobot_env_cfg_runtime.CONTAINER_ASSETS,
+            part_assets=gmrobot_env_cfg_runtime.PART_ASSETS,
+        )
+        print(
+            "[INFO]: runtime_scene_assertions_ok "
+            f"path={runtime_scene_assertions_path} "
+            f"part_count_cfg={runtime_assertions['part_count_cfg']}"
+        )
 
     safety_config = None
     rule_engine = None

@@ -1,6 +1,6 @@
 # V1-M1F7 Func-C visual-only 去遮挡修复：source-only build + 单次 visual smoke（2026-07-23）
 
-结论：`STOP_NO_RETRY`（唯一 smoke 已失败，未重试）；当前视觉结论保持 `VISUAL_REVIEW_REQUIRED`（不得自动PASS）。
+结论：`SMOKE_STARTUP_FAIL_FINAL`（唯一 smoke 已失败，未重试）；`next_gate=FIX_VALIDATION_CONTEXT_ONLY`。
 
 ## 前置核验（执行前）
 - HEAD：`86b07d0`（完整匹配）
@@ -37,6 +37,7 @@
 - `无Traceback`：FAIL（出现 Traceback）
 - `无DEVICE_LOST/newXid/residual`：PASS
 
-## 人工复核状态
-- 按要求保持：`VISUAL_REVIEW_REQUIRED`
-- 未进行自动视觉 PASS
+## 状态修正
+- raw 启动失败与 frame 缺失事实保留
+- 不伪称 visual review
+- 下一门禁：`FIX_VALIDATION_CONTEXT_ONLY`

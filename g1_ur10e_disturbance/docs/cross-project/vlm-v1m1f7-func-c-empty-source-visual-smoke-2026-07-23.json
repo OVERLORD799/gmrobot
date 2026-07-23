@@ -93,5 +93,7 @@
     "model_call": false,
     "retries_performed": 0
   },
-  "visual_verdict": "VISUAL_REVIEW_REQUIRED"
+  "visual_verdict": "SMOKE_STARTUP_FAIL_FINAL",
+  "next_gate": "FIX_VALIDATION_CONTEXT_ONLY",
+  "visual_review_claimed": false
 }
