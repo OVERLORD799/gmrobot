@@ -1,0 +1,104 @@
+{
+  "task": "V1-M1F8 Kit scene assertions fix strict single source-only build + visual smoke",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head_short": "655ee79",
+    "head_full": "655ee79d04240dc7cd44daacad429ffcb8111ccd",
+    "origin_main_full": "655ee79d04240dc7cd44daacad429ffcb8111ccd",
+    "origin_main_match": true,
+    "worktree_clean_preflight": true,
+    "m1f71_offline_tests_pass": true
+  },
+  "budget": {
+    "build": 1,
+    "smoke": 1,
+    "retry": 0
+  },
+  "constraints": {
+    "dockerfile_copy_only": true,
+    "pip_or_dependency_change": false,
+    "forbidden_formal_recapture": false,
+    "forbidden_network": false,
+    "forbidden_models": false
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/GMRobot/docker/Dockerfile.e01-func-c-empty-source-m1f7",
+    "dockerfile_sha256": "fb41008edb151e4d00e54ef310a83b8625974c1f3e6c714c3d77c0692cee7d27",
+    "tag": "gmdisturb:e01-func-c-empty-source-m1f8-20260723",
+    "image": "gmdisturb:e01-func-c-empty-source-m1f8-20260723",
+    "image_id": "sha256:2832023b982f964d8c0c9c057eac55cc66a4e3fd5a81739da5dbb517454c4249",
+    "exit_code": 0
+  },
+  "smoke": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_empty_source_smoke_m1f8_20260723",
+    "env": {
+      "TARGET_FULL": "1",
+      "VISUAL_ONLY": "1",
+      "GMROBOT_V1E01_TARGET_FULL": "1",
+      "GMROBOT_V1E01_VISUAL_ONLY": "1"
+    },
+    "exit_code": 0,
+    "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_empty_source_smoke_m1f8_20260723/scene/frame_000000_env0.png",
+    "frame_sha256": "3696dd2f4d494973ec10b040c3f81f8000c02c227161d18bf87485f7bf1555c7",
+    "reference_frame330_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+    "reference_frame330_sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_empty_source_smoke_m1f8_20260723/meta/runtime_scene_assertions.json",
+    "runtime_scene_assertions_present": false,
+    "runtime_scene_assertions": null,
+    "left_nonblack_ratio": 0.9910481770833334,
+    "right_nonblack_ratio": 0.9990169270833333,
+    "stderr_error_lines_present": true
+  },
+  "runtime_assertion_required": {
+    "required": "passed=true + Part_count0 + ContainerA/GridA/ContainerB exists + asset flags correct",
+    "passed": false,
+    "part_count_cfg": null,
+    "part_count_stage": null,
+    "containers": null,
+    "checks": null
+  },
+  "camera": {
+    "pos": [
+      0.35,
+      0.0,
+      2.5
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ]
+  },
+  "prim_counts": {
+    "stage_prim_total": null,
+    "part_count_stage": null
+  },
+  "gpu_xid": {
+    "gpu_info": "GPU 0: NVIDIA GeForce RTX 5090 Laptop GPU (UUID: GPU-6b6f962a-ac86-00b4-e732-e8caafeca73d)",
+    "gpu_xid_pre_has_xid": false,
+    "gpu_xid_post_has_xid": false,
+    "dmesg_xid_pre_lines": 1,
+    "dmesg_xid_post_lines": 1,
+    "new_xid": false
+  },
+  "gates": {
+    "exit0": true,
+    "png_non_black": true,
+    "doubleROI": true,
+    "rightcontent": true,
+    "assertions": false,
+    "POST0": false,
+    "no_errors": false,
+    "no_residual": true,
+    "no_traceback": true,
+    "no_device_lost": true,
+    "no_new_xid": true
+  },
+  "visual_verdict": "VISUAL_REVIEW_REQUIRED",
+  "overall_status": "STOP_NO_RETRY",
+  "stop_reason": "runtime_scene_assertions_missing_or_failed and/or other gate failure",
+  "manual_review_required": true,
+  "manual_review_note": "主agent需将本次frame与reference frame330人工对比；本记录不自动给visual PASS。"
+}
