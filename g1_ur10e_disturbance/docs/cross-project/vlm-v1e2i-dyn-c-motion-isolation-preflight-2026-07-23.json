@@ -1,0 +1,175 @@
+{
+  "milestone": "V1-E2I",
+  "date": "2026-07-23",
+  "task": "Dyn-C motion-isolation short preflight (single-run, non-formal sample)",
+  "status": "motion_isolation_preflight_fail",
+  "verdict": "FAIL_STOP_NO_RETRY_NO_FORMAL_CAPTURE",
+  "gate": "STOP_NO_FORMAL_CAPTURE",
+  "next": "STOP",
+  "repo": "/home/czz/GMrobot",
+  "worktree": "/home/czz/GMrobot",
+  "head": {
+    "branch": "main",
+    "short": "992cabb",
+    "full": "992cabb4128fa759afa8bebe990bb23727d1ff58",
+    "expected": "992cabb",
+    "matches_expected": true
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "tag": "gmdisturb:e01-dyn-c-motion-isolation-preflight-m1e2i-20260723",
+    "base_from": "gmdisturb:b4-p010-20260721",
+    "base_id": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "base_repo_digests": "gmdisturb@sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "image_id": "sha256:c52c4a56746a175fd20a4f9ad004147cc0cadc62a17a4c2267a163a181dc8dd5",
+    "image_repo_digests": "gmdisturb@sha256:c52c4a56746a175fd20a4f9ad004147cc0cadc62a17a4c2267a163a181dc8dd5",
+    "build_attempts": 1,
+    "run_attempts": 1
+  },
+  "contract": {
+    "scenario": "mirrored_outer_lateral_patrol",
+    "seed": 44,
+    "freeze_ur10e": true,
+    "max_steps": 260,
+    "camera": {
+      "pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "capture_steps": [
+      149,
+      150,
+      219,
+      220
+    ],
+    "post_must_be_zero": true,
+    "vlm_off": true,
+    "freeze_thresholds_unchanged": {
+      "ur10_action_norm_max": 1e-06,
+      "ur10_joint_delta_max_abs": 1e-06,
+      "min_projected_displacement_px": 40,
+      "min_roi_area_fraction": 0.012
+    }
+  },
+  "host_prechecks": {
+    "tests": [
+      "scripts/test_motion_isolation_unit.py",
+      "scripts/test_v1e2e_dyn_c_motion_preflight_unit.py",
+      "scripts/test_v1e2e_dyn_c_motion_preflight_config_unit.py",
+      "scripts/test_v1e2g1_postrun_analyzer_unit.py"
+    ],
+    "py_compile": [
+      "motion_isolation.py",
+      "runtime_telemetry_csv.py",
+      "e01_dyn_b_runtime_guard.py",
+      "scripts/run_phase3.py",
+      "scripts/v1e2g1_postrun_analyzer.py",
+      "scripts/dyn_c_motion_attribution_audit.py"
+    ],
+    "prebuild": "scripts/v1e2b1_dyn_c_import_closure_prebuild.py --project-root ... --dockerfile .../Dockerfile.e01-dyn-c-mirrored-m1e2b --entrypoint scripts/run_phase3.py",
+    "all_passed": true
+  },
+  "runtime": {
+    "exit_code": 0,
+    "traceback": false,
+    "xid": false,
+    "g1_fell": false,
+    "post_scan": {
+      "POST": 0,
+      "/analyze": 0,
+      "/ground": 0,
+      "enable_vlm": 0,
+      "enable_perception": 0
+    }
+  },
+  "metrics": {
+    "g1_commanded_xy_m": [
+      1.1164,
+      -0.29279999999999995
+    ],
+    "g1_actual_xy_m": [
+      1.0598589999999999,
+      -0.28755200000000003
+    ],
+    "g1_direction_dot": 1.2674218132,
+    "g1_direction_consistent": true,
+    "projected_roi_exists_all_frames": true,
+    "projected_max_displacement_px": 36.88848765316308,
+    "projected_centroid_ge40_count": 0,
+    "projected_centroid_ge40_frames": [],
+    "max_roi_area_fraction": 0.01949922108351044,
+    "ur10_action_norm_max": 1.336388,
+    "ur10_joint_delta_max_abs_settled_max": 0.314159,
+    "ur10_ee_displacement_settled_max_m": 3.129243850708008e-07,
+    "ur10_ee_displacements_m": [
+      {
+        "from": 149,
+        "to": 150,
+        "disp_m": 3.129243850708008e-07
+      },
+      {
+        "from": 150,
+        "to": 219,
+        "disp_m": 3.129243850708008e-07
+      },
+      {
+        "from": 219,
+        "to": 220,
+        "disp_m": 0.0
+      }
+    ]
+  },
+  "gates": {
+    "exit0": true,
+    "no_traceback": true,
+    "no_xid": true,
+    "post0_vlm_off": true,
+    "g1_no_fall": true,
+    "g1_actual_direction_consistent": true,
+    "projected_roi_exists": true,
+    "projected_two_audit_frames_centroid_ge40": false,
+    "ur10_joint_delta_settled_near_zero": false,
+    "ur10_ee_displacement_settled_near_zero": true
+  },
+  "attribution_proof": {
+    "g1_actual_root_telemetry_support": {
+      "actual_xy_m": [
+        1.0598589999999999,
+        -0.28755200000000003
+      ],
+      "direction_dot": 1.2674218132
+    },
+    "g1_projected_link_support": {
+      "frame_count": 4,
+      "max_projected_px": 36.88848765316308
+    },
+    "ur10_not_primary_source_evidence": {
+      "ur10_ee_disp_settled_max_m": 3.129243850708008e-07,
+      "note": "EE displacement near numerical noise; however freeze joint-delta gate still FAIL due 0.314159 > 1e-6"
+    },
+    "conclusion": "Attribution contract not fully satisfied because projected centroid >=40px on at least two audit frames is unmet."
+  },
+  "artifacts": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723",
+    "runtime_telemetry_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/safety_logs/phase3_runtime_telemetry.csv",
+    "runtime_telemetry_sha256": "9fcec5da3bd6093eb30353e3a95267522373321615c7c2a3635fa4153f706483",
+    "runtime_telemetry_rows": 264,
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/safety_logs/phase3_steps.csv",
+    "steps_rows": 6,
+    "phase3_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/safety_logs/phase3.csv",
+    "body_pose_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/body_poses.jsonl",
+    "camera_pose_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/camera_pose.json",
+    "frame_inventory_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/frame_inventory.json",
+    "postrun_analyzer_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/v1e2i_postrun_analyzer.json",
+    "docker_log": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/docker_run.log"
+  },
+  "policy": "FAIL -> no rerun, no retune, no formal capture; preserve evidence only."
+}
