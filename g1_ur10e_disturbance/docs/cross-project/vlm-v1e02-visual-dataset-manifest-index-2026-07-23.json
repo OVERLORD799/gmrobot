@@ -62,6 +62,22 @@
     {
       "kind": "dyn_c_formal_capture_artifact_summary_json_v1e2b",
       "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.artifact-summary.json"
+    },
+    {
+      "kind": "review_doc_md_v1e2c",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2c-dyn-c-mirrored-capture-2026-07-23.md"
+    },
+    {
+      "kind": "review_doc_json_v1e2c",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2c-dyn-c-mirrored-capture-2026-07-23.json"
+    },
+    {
+      "kind": "dyn_c_formal_capture_artifact_manifest_jsonl_v1e2c",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2c-dyn-c-mirrored-capture-2026-07-23.artifact-manifest.jsonl"
+    },
+    {
+      "kind": "dyn_c_formal_capture_artifact_summary_json_v1e2c",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2c-dyn-c-mirrored-capture-2026-07-23.artifact-summary.json"
     }
   ],
   "results_large_files_included": false

@@ -1,0 +1,145 @@
+{
+  "task": "V1-E2C Dyn-C mirrored replacement formal visual capture",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "84295d8a2dc9c1a8ee05cd0c692308d1038dab67",
+    "actual_head": "84295d8a2dc9c1a8ee05cd0c692308d1038dab67",
+    "origin_main": "84295d8a2dc9c1a8ee05cd0c692308d1038dab67",
+    "worktree_clean_at_start": true,
+    "import_closure_preflight_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/meta/import_closure_preflight.json",
+    "import_closure_preflight_ok": true,
+    "import_closure_unit": "PASS test_v1e2b1_dyn_c_import_closure_unit"
+  },
+  "policy": {
+    "build_count": 1,
+    "run_count": 1,
+    "retry_used": false,
+    "stop_policy": "STOP_NO_RETRY"
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "dockerfile_sha256": "3619517218fea8caaa86162272e659792dd92a349913c5b19c73bd2111f9738a",
+    "tag": "gmdisturb:e01-dyn-c-mirrored-m1e2c-20260723",
+    "image_sha": "sha256:9746640efdf706a721c4bb876ad65e96d33d9176ed4b753b7f6503a6b56c5c83",
+    "image_digest": "gmdisturb@sha256:9746640efdf706a721c4bb876ad65e96d33d9176ed4b753b7f6503a6b56c5c83",
+    "copy_only": true,
+    "pip_or_dependency_mutation": false
+  },
+  "run": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723",
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "camera_fixed": {
+      "pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "max_steps": 312,
+    "capture_steps_primary": [
+      240,
+      310
+    ],
+    "capture_steps_stability": [
+      239,
+      241,
+      309,
+      311
+    ],
+    "task_execution": false,
+    "visual_dataset_only": true,
+    "start_utc": "2026-07-23T11:59:34Z",
+    "end_utc": "2026-07-23T11:59:35Z",
+    "exit_code": 1,
+    "elapsed_seconds": 0.510093
+  },
+  "runtime_evidence": {
+    "scene_frames": [
+      {
+        "step": 239,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000239_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 240,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000240_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 241,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000241_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 309,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000309_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 310,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000310_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 311,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/scene/frame_000311_env0.png",
+        "exists": false,
+        "sha256": null
+      }
+    ],
+    "frame_inventory_find": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/meta/find_frames.txt",
+    "frame_inventory_sha256": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2c_dyn_c_mirrored_capture_20260723/meta/sha256_frames.txt",
+    "post_count": 0,
+    "models_or_inference_ref_count": 0,
+    "isaac_get_allowed": true,
+    "traceback_found": true,
+    "trajectory_id_dyn_c": "7beb111400ccc2f8cd5d9ed1ab19192705714ff3d6cbc7dc3ccb16154c74683c",
+    "trajectory_id_dyn_b_seed43": "759e778529465b118250e90b84d9cfafade6dca9c7011603794f05724d9d164e",
+    "trajectory_hash_distinct_from_dyn_b": true
+  },
+  "metrics": {
+    "body_link_roi_area_fraction": null,
+    "centroid_240_to_310_px": null,
+    "visibility_links_min": null,
+    "clipping_ratio_max": null,
+    "local_pixel_motion": {
+      "239_240": null,
+      "240_241": null,
+      "309_310": null,
+      "310_311": null
+    },
+    "available": false,
+    "reason": "required frames/body_poses not produced before early failure"
+  },
+  "gates": {
+    "exit0": false,
+    "all_6_frames_valid": false,
+    "roi_metric_available": false,
+    "centroid_240_310_ge_30px": false
+  },
+  "forbidden_checks": {
+    "task_execution_false": true,
+    "visual_only_true": true,
+    "inference_post_zero": true,
+    "models_ref_zero": true
+  },
+  "status": {
+    "requested_initial_verdict": "REVIEW_REQUIRED",
+    "reviewer_approved": false,
+    "verdict": "FAIL_FINAL",
+    "next_gate": "STOP_NO_RETRY",
+    "failure_reason": "AttributeError: 'bool' object has no attribute 'get' (config virtual_hand schema)"
+  }
+}
