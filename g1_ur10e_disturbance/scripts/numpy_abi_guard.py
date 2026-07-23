@@ -59,6 +59,31 @@ def _write_json(path: str | None, payload: dict[str, Any]) -> None:
     out.write_text(json.dumps(payload, ensure_ascii=True, indent=2) + "\n", encoding="utf-8")
 
 
+def verify_typing_extensions_paramspec(
+    *,
+    stage: str,
+    json_out: str | None = None,
+) -> dict[str, Any]:
+    """Require typing_extensions.ParamSpec without mutating packages."""
+    te = importlib.import_module("typing_extensions")
+    te_file = str(getattr(te, "__file__", ""))
+    te_version = getattr(te, "__version__", None)
+    has_param_spec = hasattr(te, "ParamSpec")
+    ok = bool(has_param_spec) and bool(te_file)
+    payload: dict[str, Any] = {
+        "stage": stage,
+        "ok": ok,
+        "typing_extensions_file": te_file,
+        "typing_extensions_version": te_version,
+        "ParamSpec_available": bool(has_param_spec),
+    }
+    _write_json(json_out, payload)
+    if not ok:
+        msg = json.dumps(payload, ensure_ascii=True)
+        raise RuntimeError(f"TYPING_EXTENSIONS_PARAMSPEC_FAIL {msg}")
+    return payload
+
+
 def verify_numpy_single_root(
     *,
     stage: str,

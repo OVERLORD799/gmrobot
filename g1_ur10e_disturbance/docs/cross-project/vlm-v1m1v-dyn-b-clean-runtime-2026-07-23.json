@@ -1,0 +1,86 @@
+{
+  "doc": "vlm-v1m1v-dyn-b-clean-runtime-2026-07-23",
+  "verdict": "CLEAN_BASE_APP_LAUNCHER_FAIL",
+  "next_gate": "STOP_NO_CAPTURE",
+  "allow_formal_dyn_b_preflight_request": false,
+  "formal_dyn_b_capture_run": false,
+  "build_count": 1,
+  "smoke_count": 1,
+  "rerun_forbidden": true,
+  "package_mutation": false,
+  "head_at_start": "510761fd221d037b191c4bedf4736108e805e39d",
+  "m1u23_verdict": "NUMPY_DEDUP_FAIL_FINAL_STOP",
+  "historical_fail_dirs_preserved": [
+    "results/paper_demo/v1m1t_smoke_20260723",
+    "results/paper_demo/v1m1t_smoke2_20260723",
+    "results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723"
+  ],
+  "base_image": {
+    "tag": "gmdisturb:b4-p010-20260721",
+    "id": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "numpy_file": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy/__init__.py",
+    "numpy_version": "1.26.0",
+    "numpy_random_file": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy/random/__init__.py",
+    "typing_extensions_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/typing_extensions.py",
+    "ParamSpec": true
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1v-20260723",
+    "id": "sha256:1c75ea8a6e247bb49f75e65c701c545a38e9e1530bea955801d5b3a4532127d9",
+    "created": "2026-07-23T14:10:14.557281565+08:00",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-clean-m1v",
+    "dockerfile_sha256": "572bf0dbdc368dd5f8525f8d93bf0599569edbf8736e46aec4f1bd5a85cb0dd1",
+    "build_exit": 0,
+    "build_elapsed_seconds": 2
+  },
+  "protected_images_unchanged": [
+    "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+    "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "sha256:19196c23cbaf754865e77936198e432c69fffad3f783c81e79471d45b9e3a96c",
+    "sha256:8b70b0b16f973c0a3297c960d12492300af6b3f9f90fe709cfc14687f11c1c84"
+  ],
+  "smoke": {
+    "exit_code": 86,
+    "returncode_raw": 0,
+    "elapsed_monotonic_sec": 31.398620357,
+    "app_launcher_created": true,
+    "simulation_steps_completed": 0,
+    "outer_lateral_patrol_accepted": true,
+    "csv_exists": false,
+    "csv_rows": 0,
+    "post_count": 0,
+    "host_code_bind_mounted": false,
+    "failure_class": "MISSING_BAKED_MODULE_scene_camera_override",
+    "failure_detail": "ModuleNotFoundError: No module named 'scene_camera_override'"
+  },
+  "numpy_pre_post": {
+    "pre_ok": true,
+    "post_ok": true,
+    "root": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle",
+    "version": "1.26.0",
+    "single_compatible_root": true,
+    "kit_site_packages_numpy_mixed_in": false
+  },
+  "typing_extensions_pre_post": {
+    "pre_ParamSpec_available": true,
+    "post_ParamSpec_available": true,
+    "file": "/isaac-sim/kit/python/lib/python3.11/site-packages/typing_extensions.py"
+  },
+  "xid": {
+    "before_count": 0,
+    "after_count": 0,
+    "new_xid": false
+  },
+  "tests": {
+    "test_e01_dyn_b_m1v_clean_runtime_unit": "PASS",
+    "test_e01_dyn_b_runtime_guard_unit": "PASS",
+    "test_e01_dyn_b_offline_readiness_unit": "PASS",
+    "test_e01_dyn_b_m1u0_image_bake_unit": "PASS",
+    "test_numpy_abi_guard_unit": "PASS",
+    "test_capture_one_shot_runner_unit": "PASS"
+  },
+  "results_dir": "g1_ur10e_disturbance/results/paper_demo/v1m1v_dyn_b_clean_runtime_20260723",
+  "results_committed": false,
+  "note": "Clean B4-derived image cleared NumPy/ParamSpec gates; smoke failed on missing baked scene_camera_override.py. No package mutation; no formal capture; no retry."
+}

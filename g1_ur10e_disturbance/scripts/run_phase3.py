@@ -27,7 +27,7 @@ import json
 import os
 import sys
 
-from numpy_abi_guard import verify_numpy_single_root
+from numpy_abi_guard import verify_numpy_single_root, verify_typing_extensions_paramspec
 
 from isaaclab.app import AppLauncher
 
@@ -266,6 +266,18 @@ parser.add_argument(
     default="",
     help="Optional JSON path to persist NumPy origin guard after AppLauncher.",
 )
+parser.add_argument(
+    "--typing-extensions-pre-json",
+    type=str,
+    default="",
+    help="Optional JSON path for typing_extensions/ParamSpec guard before AppLauncher.",
+)
+parser.add_argument(
+    "--typing-extensions-post-json",
+    type=str,
+    default="",
+    help="Optional JSON path for typing_extensions/ParamSpec guard after AppLauncher.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
@@ -352,6 +364,10 @@ _numpy_pre = verify_numpy_single_root(
     eager=True,
     json_out=(args_cli.numpy_origin_pre_json or None),
 )
+_te_pre = verify_typing_extensions_paramspec(
+    stage="before_app_launcher",
+    json_out=(args_cli.typing_extensions_pre_json or None),
+)
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
 _numpy_post = verify_numpy_single_root(
@@ -359,6 +375,10 @@ _numpy_post = verify_numpy_single_root(
     eager=False,
     expected_root=str(_numpy_pre.get("numpy_root", "")),
     json_out=(args_cli.numpy_origin_post_json or None),
+)
+_te_post = verify_typing_extensions_paramspec(
+    stage="after_app_launcher",
+    json_out=(args_cli.typing_extensions_post_json or None),
 )
 
 import numpy as np

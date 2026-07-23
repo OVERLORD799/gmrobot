@@ -1,0 +1,23 @@
+# V1-M1V: rebuild Dyn-B runtime from clean physical B4 baseline.
+# No pip/conda/apt mutation. No package tree moves. Copy project sources only.
+FROM gmdisturb:b4-p010-20260721
+
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/numpy_abi_guard.py /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_b_offline_readiness.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_offline_readiness.py
+COPY configs/e01_dyn_b_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml
+COPY scripts/isaac_abi_import_preflight.py /opt/projects/g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py
+COPY scripts/test_e01_dyn_b_runtime_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py
+COPY scripts/test_e01_dyn_b_m1v_clean_runtime_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1v_clean_runtime_unit.py
+COPY scripts/test_numpy_abi_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py
+
+# Static bake assertions only (no package install/uninstall/tree moves).
+RUN ["/bin/bash","-lc","set -euo pipefail; grep -q outer_lateral_patrol /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py; grep -q outer_lateral_patrol /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py; grep -q scripted_g1_outer_lateral_patrol /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml; grep -q ParamSpec /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py"]
+
+LABEL gmdisturb.e01_dyn_b_clean_m1v="20260723" \
+      gmdisturb.base_tag="gmdisturb:b4-p010-20260721" \
+      gmdisturb.base_id="sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68" \
+      gmdisturb.milestone="V1-M1V" \
+      gmdisturb.package_mutation="none"

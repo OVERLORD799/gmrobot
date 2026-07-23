@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+# Historical M1U2.3 tag (NumPy-dedup series; do not reuse for M1V).
 M1U2_IMAGE_TAG = "gmdisturb:e01-dyn-b-m1u23-20260723"
 M1U2_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-m1u23"
 M1U2_BAKE_FILES: tuple[str, ...] = (
@@ -18,6 +19,25 @@ M1U2_BAKE_FILES: tuple[str, ...] = (
     "scripts/assert_numpy_dedup_report.py",
 )
 
+# V1-M1V clean physical baseline rebuild.
+M1V_IMAGE_TAG = "gmdisturb:e01-dyn-b-clean-m1v-20260723"
+M1V_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-clean-m1v"
+M1V_BASE_IMAGE = "gmdisturb:b4-p010-20260721"
+M1V_BASE_IMAGE_SHA = "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+M1V_BAKE_FILES: tuple[str, ...] = (
+    "scripts/run_phase3.py",
+    "g1_disturbance_controller.py",
+    "e01_dyn_b_runtime_guard.py",
+    "e01_dyn_b_offline_readiness.py",
+    "configs/e01_dyn_b_capture.yaml",
+    "scripts/isaac_abi_import_preflight.py",
+    "scripts/numpy_abi_guard.py",
+)
+
+M1V_RESULT_ROOT = (
+    "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1v_dyn_b_clean_runtime_20260723"
+)
+
 
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
     preflight = Path(project_root) / "scripts" / "isaac_abi_import_preflight.py"
@@ -30,6 +50,8 @@ def run_phase3_command(
     output_csv: str = "/tmp/e01_dyn_b_preflight.csv",
     numpy_origin_pre_json: str = "",
     numpy_origin_post_json: str = "",
+    typing_extensions_pre_json: str = "",
+    typing_extensions_post_json: str = "",
 ) -> str:
     script = Path(project_root) / "scripts" / "run_phase3.py"
     cmd = (
@@ -42,22 +64,30 @@ def run_phase3_command(
         cmd += f" --numpy-origin-pre-json {numpy_origin_pre_json}"
     if numpy_origin_post_json:
         cmd += f" --numpy-origin-post-json {numpy_origin_post_json}"
+    if typing_extensions_pre_json:
+        cmd += f" --typing-extensions-pre-json {typing_extensions_pre_json}"
+    if typing_extensions_post_json:
+        cmd += f" --typing-extensions-post-json {typing_extensions_post_json}"
     return cmd
 
 
 def canonical_dyn_b_smoke_shell(
     *,
     project_root: str = "/opt/projects/g1_ur10e_disturbance",
-    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
-    numpy_origin_pre_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
-    numpy_origin_post_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
+    output_csv: str = f"{M1V_RESULT_ROOT}/safety_logs/phase3.csv",
+    numpy_origin_pre_json: str = f"{M1V_RESULT_ROOT}/meta/numpy_origin_pre.json",
+    numpy_origin_post_json: str = f"{M1V_RESULT_ROOT}/meta/numpy_origin_post.json",
+    typing_extensions_pre_json: str = f"{M1V_RESULT_ROOT}/meta/typing_extensions_pre.json",
+    typing_extensions_post_json: str = f"{M1V_RESULT_ROOT}/meta/typing_extensions_post.json",
 ) -> str:
-    """Single-shell command: record NumPy origins then run AppLauncher smoke."""
+    """Single-shell AppLauncher smoke with NumPy + typing_extensions pre/post guards."""
     phase3 = run_phase3_command(
         project_root=project_root,
         output_csv=output_csv,
         numpy_origin_pre_json=numpy_origin_pre_json,
         numpy_origin_post_json=numpy_origin_post_json,
+        typing_extensions_pre_json=typing_extensions_pre_json,
+        typing_extensions_post_json=typing_extensions_post_json,
     )
     return "set -euo pipefail; " + phase3
 
@@ -71,14 +101,11 @@ def assert_no_host_code_bind_mount(docker_argv: list[str] | tuple[str, ...]) -> 
         if i + 1 >= len(argv):
             continue
         spec = argv[i + 1]
-        # results + cache mounts are allowed
         if ":/opt/projects/g1_ur10e_disturbance/results" in spec:
             continue
         if "/.cache/" in spec or ":/isaac-sim/kit/cache" in spec or ":/root/" in spec:
             continue
-        # Full project tree or GMRobot source mounts are forbidden for M1U0 smoke.
         if ":/opt/projects/g1_ur10e_disturbance" in spec and "/results" not in spec.split(":")[-1]:
-            # destination is exactly project root (not a results subpath)
             dest = spec.rsplit(":", 1)[-1]
             if dest.rstrip("/") == "/opt/projects/g1_ur10e_disturbance":
                 raise AssertionError(f"host code bind-mount forbidden: {spec}")
@@ -105,19 +132,38 @@ def smoke_enables_network_models(command: str) -> bool:
     return any(n in low for n in needles)
 
 
+def dockerfile_is_clean_m1v(dockerfile_text: str) -> dict[str, bool]:
+    """Static policy checks for the clean-base Dockerfile."""
+    low = dockerfile_text.lower()
+    return {
+        "from_b4": "FROM gmdisturb:b4-p010-20260721" in dockerfile_text,
+        "copies_run_phase3": "COPY scripts/run_phase3.py" in dockerfile_text,
+        "copies_controller": "COPY g1_disturbance_controller.py" in dockerfile_text,
+        "no_pip_install": "pip install" not in low and "pip uninstall" not in low and "pip upgrade" not in low,
+        "no_conda": "conda " not in low and "conda\n" not in low,
+        "no_apt": "apt-get" not in low and "apt install" not in low,
+        "no_numpy_quarantine": "quarantine" not in low and "pip_prebundle_numpy_dedup" not in dockerfile_text,
+        "no_site_packages_copy": "site-packages" not in low,
+        "no_prebundle_pythonpath": "PYTHONPATH" not in dockerfile_text and "pip_prebundle" not in low,
+    }
+
+
 def dockerfile_bake_mentions_outer_lateral(dockerfile_text: str) -> bool:
-    """Dockerfile must COPY run_phase3 + controller (hosts of outer_lateral_patrol)."""
     return (
         "COPY scripts/run_phase3.py" in dockerfile_text
         and "COPY g1_disturbance_controller.py" in dockerfile_text
     )
 
 
-
-def host_bake_sources_include_outer_lateral(repo_root: Path | str) -> dict[str, bool]:
+def host_bake_sources_include_outer_lateral(
+    repo_root: Path | str,
+    *,
+    bake_files: tuple[str, ...] | None = None,
+) -> dict[str, bool]:
     root = Path(repo_root)
+    files = bake_files if bake_files is not None else M1V_BAKE_FILES
     out: dict[str, bool] = {}
-    for rel in M1U2_BAKE_FILES:
+    for rel in files:
         text = (root / rel).read_text(encoding="utf-8", errors="replace")
         out[rel] = ("outer_lateral_patrol" in text) or ("scripted_g1_outer_lateral_patrol" in text)
     return out

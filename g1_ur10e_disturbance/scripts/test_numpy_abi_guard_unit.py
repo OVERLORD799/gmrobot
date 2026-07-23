@@ -15,6 +15,7 @@ from numpy_abi_guard import (  # noqa: E402
     _normalize_numpy_package_root,
     inspect_numpy_conflicting_paths,
     verify_numpy_single_root,
+    verify_typing_extensions_paramspec,
 )
 
 
@@ -55,10 +56,20 @@ def test_verify_numpy_single_root_emits_json_and_respects_expected_root():
         assert post["ok"] is True
 
 
+def test_verify_typing_extensions_paramspec_emits_json():
+    with tempfile.TemporaryDirectory() as td:
+        out = Path(td) / "te.json"
+        payload = verify_typing_extensions_paramspec(stage="unit", json_out=str(out))
+        assert payload["ok"] is True
+        assert payload["ParamSpec_available"] is True
+        assert out.is_file()
+
+
 def main() -> None:
     test_normalize_numpy_package_root_from_init()
     test_inspect_conflicting_paths_reports_pip_prebundle_without_mutation()
     test_verify_numpy_single_root_emits_json_and_respects_expected_root()
+    test_verify_typing_extensions_paramspec_emits_json()
     print("PASS test_numpy_abi_guard_unit")
 
 

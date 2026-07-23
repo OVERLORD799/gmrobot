@@ -40,7 +40,7 @@ def test_dockerfile_exists_and_copies_dyn_b_sources():
 
 
 def test_build_context_sources_contain_outer_lateral_patrol():
-    flags = host_bake_sources_include_outer_lateral(ROOT)
+    flags = host_bake_sources_include_outer_lateral(ROOT, bake_files=M1U2_BAKE_FILES)
     assert flags["scripts/run_phase3.py"] is True
     assert flags["g1_disturbance_controller.py"] is True
     assert flags["configs/e01_dyn_b_capture.yaml"] is True
