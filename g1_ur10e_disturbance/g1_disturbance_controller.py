@@ -108,6 +108,17 @@ ARM_WAVE_PHASES: list[ScriptedPhase] = [
     ScriptedPhase("idle",         9999, vx=0.0, vy=0.0),
 ]
 
+# E01-Dyn-B: deterministic outer-lane lateral patrol. This is scripted
+# locomotion only (not learned whole-body control, not human arm gesture).
+OUTER_LATERAL_PATROL_PHASES: list[ScriptedPhase] = [
+    ScriptedPhase("approach_outer_lane", 140, vx=0.34, vy=0.00),
+    ScriptedPhase("settle_heading", 20, vx=0.04, vy=0.00),
+    ScriptedPhase("lateral_positive_sweep", 90, vx=0.02, vy=0.22),
+    ScriptedPhase("lateral_negative_sweep", 90, vx=-0.02, vy=-0.22),
+    ScriptedPhase("retreat_outer_lane", 80, vx=-0.32, vy=0.00),
+    ScriptedPhase("idle", 9999, vx=0.0, vy=0.0),
+]
+
 # M5 fix: TABLE_BUMP_PHASES, OBJECT_PUSH_PHASES, CIRCULATE_PHASES, COMBINED_PHASES
 # removed — phases were defined but no CLI execution path existed and physical arm
 # control is not supported by the current walk policy (0121_walk.pt).
@@ -121,6 +132,7 @@ ARM_WAVE_PHASES: list[ScriptedPhase] = [
 SCENARIOS: dict[str, list[ScriptedPhase] | None] = {
     "arm_collision":      ARM_COLLISION_PHASES,
     "arm_wave":           ARM_WAVE_PHASES,
+    "outer_lateral_patrol": OUTER_LATERAL_PATROL_PHASES,
     "constrained_wander": None,   # same as default (no phases, random wander)
     "vlm_explore":        None,   # placeholder (VLM guides behaviour, no fixed script)
 }

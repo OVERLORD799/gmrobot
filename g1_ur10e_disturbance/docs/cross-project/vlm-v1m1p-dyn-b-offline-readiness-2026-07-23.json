@@ -1,0 +1,114 @@
+{
+  "milestone": "V1-M1P",
+  "date": "2026-07-23",
+  "scene": "E01-Dyn-B",
+  "goal": "offline implementation/readiness for deterministic dynamic positive capture",
+  "verdict": "GO_PRECHECK_ONLY",
+  "go_no_go_scope": "single_0_post_preflight_capture_only",
+  "do_not_execute_now": true,
+  "constraints_frozen": {
+    "no_docker": true,
+    "no_isaac": true,
+    "no_network": true,
+    "no_vlm": true,
+    "no_sam2": true,
+    "no_post": true,
+    "no_safety_threshold_edit": true,
+    "no_b0_b4_mutation": true,
+    "no_historical_capture_mutation": true
+  },
+  "provenance": {
+    "motion_source": "scripted_g1_outer_lateral_patrol",
+    "evidence_type": "synthetic_scripted_motion_evidence",
+    "not_human_hand_or_ppe": true,
+    "not_vlm_output": true,
+    "red_ball_proxy": false
+  },
+  "scenario": {
+    "name": "outer_lateral_patrol",
+    "seed": 43,
+    "capture_steps": [
+      220,
+      330
+    ],
+    "capture_phases": [
+      "lateral_positive_sweep",
+      "lateral_negative_sweep"
+    ],
+    "capture_phase_velocity_xy_mps": [
+      [
+        0.02,
+        0.22
+      ],
+      [
+        -0.02,
+        -0.22
+      ]
+    ],
+    "inside_moving_phase": true,
+    "predicted_displacement_px": 51.29377515255175,
+    "min_required_displacement_px": 20.0
+  },
+  "camera": {
+    "override_default_off": true,
+    "pose": {
+      "pos": [
+        0.2,
+        0.0,
+        3.2
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "visibility_assumption_ok": true
+  },
+  "geometry_precheck": {
+    "status": "PASS",
+    "window_steps": [
+      190,
+      340
+    ],
+    "min_step": 314,
+    "min_separation_margin_m": 0.27673565000747113,
+    "required_margin_m": 0.1,
+    "envelope_model": {
+      "ur10e_center_xy": [
+        0.75,
+        0.0
+      ],
+      "ur10e_radius_m": 0.55,
+      "g1_body_radius_m": 0.35,
+      "trajectory_uncertainty_m": 0.1
+    }
+  },
+  "default_off_guard": {
+    "enable_capture": false,
+    "execute_capture": false,
+    "guard_ok": true
+  },
+  "single_preflight_proposal": {
+    "command": "GMDISTURB_SCENE_CAMERA_OVERRIDE=1 GMDISTURB_SCENE_CAMERA_POS=0.2,0.0,3.2 GMDISTURB_SCENE_CAMERA_ROT=0.7071,0.0,0.7071,0.0 /isaac-sim/python.sh scripts/run_phase3.py --headless --seed 43 --scenario outer_lateral_patrol --max_steps 420 --progress_interval 1 --motion_source_label scripted_g1_outer_lateral_patrol --save_camera --camera_output_dir results/paper_demo/v1e01_dyn_b_preflight_20260723/scene --camera_save_steps 220,330 --camera_pose_json results/paper_demo/v1e01_dyn_b_preflight_20260723/meta/camera_pose.json --body_pose_jsonl results/paper_demo/v1e01_dyn_b_preflight_20260723/meta/body_poses.jsonl --output_csv results/paper_demo/v1e01_dyn_b_preflight_20260723/safety_logs/phase3.csv",
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_20260723",
+    "image_strategy": {
+      "frames": [
+        "scene/frame_000220_env0.png",
+        "scene/frame_000330_env0.png"
+      ],
+      "selection_rule": "both steps are strictly inside moving phases, with expected centroid displacement >=20 px",
+      "reject_if": [
+        "either step not ALLOW",
+        "window contains STOP/SLOW/replan",
+        "predicted/observed displacement below threshold",
+        "red-ball proxy appears in evidence chain"
+      ]
+    }
+  },
+  "tests": [
+    "python3 g1_ur10e_disturbance/scripts/test_e01_dyn_b_offline_readiness_unit.py",
+    "python3 g1_ur10e_disturbance/scripts/test_e01_dyn_a_capture_unit.py"
+  ]
+}

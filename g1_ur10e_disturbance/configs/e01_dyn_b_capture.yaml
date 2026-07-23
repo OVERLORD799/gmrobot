@@ -1,0 +1,20 @@
+# E01-Dyn-B offline readiness profile (default OFF).
+scene: E01-Dyn-B
+scenario: outer_lateral_patrol
+motion_source: scripted_g1_outer_lateral_patrol
+seed: 43
+enable_capture: false
+execute_capture: false
+virtual_hand: false
+vlm: false
+perception: false
+five_stage: false
+post_count_expected: 0
+camera:
+  override: true
+  pos: [0.2, 0.0, 3.2]
+  rot: [0.7071, 0.0, 0.7071, 0.0]
+capture_steps: [220, 330]
+geometry_window: [190, 340]
+min_centroid_displacement_px: 20
+results_dir: results/paper_demo/v1e01_dyn_b_preflight_20260723
