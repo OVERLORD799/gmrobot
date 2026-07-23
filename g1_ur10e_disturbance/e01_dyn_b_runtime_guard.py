@@ -99,6 +99,62 @@ def canonical_dyn_b_smoke_shell(
     return "set -euo pipefail; " + phase3
 
 
+def assert_canonical_run_sh_payload(argv: list[str] | tuple[str, ...]) -> None:
+    """Require run.sh payload to be `bash -lc INNER`, never direct python.sh."""
+    tokens = list(argv)
+    if len(tokens) < 2:
+        raise AssertionError("run.sh payload missing")
+    if tokens[0] == "/isaac-sim/python.sh":
+        raise AssertionError("forbidden payload: direct /isaac-sim/python.sh")
+    if tokens[0] != "bash" or tokens[1] != "-lc":
+        raise AssertionError("run.sh payload must begin with: bash -lc")
+
+
+def build_m1v1_dyn_b_preflight_inner_command(*, result_root_in_container: str) -> str:
+    """Build the proven M1V1 one-shot inner shell for Dyn-B preflight capture."""
+    rr = result_root_in_container.rstrip("/")
+    return (
+        "set -euo pipefail; "
+        "/isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py "
+        "--headless --seed 43 --scenario outer_lateral_patrol "
+        "--motion_source_label scripted_g1_outer_lateral_patrol "
+        "--max_steps 341 --progress_interval 50 "
+        f"--output_csv {rr}/safety_logs/phase3.csv "
+        "--save_camera "
+        f"--camera_output_dir {rr}/scene "
+        "--camera_save_steps 219,220,221,329,330,331 "
+        f"--camera_pose_json {rr}/meta/camera_pose.json "
+        f"--body_pose_jsonl {rr}/meta/body_poses.jsonl "
+        f"--numpy-origin-pre-json {rr}/meta/numpy_origin_pre.json "
+        f"--numpy-origin-post-json {rr}/meta/numpy_origin_post.json "
+        f"--typing-extensions-pre-json {rr}/meta/typing_extensions_pre.json "
+        f"--typing-extensions-post-json {rr}/meta/typing_extensions_post.json"
+    )
+
+
+def build_m1v1_dyn_b_preflight_outer_argv(
+    *,
+    run_sh_path: str,
+    image_tag: str,
+    host_results_dir: str,
+    result_root_in_container: str,
+) -> list[str]:
+    """Build canonical outer command: run.sh --tag IMAGE --results RESULTS bash -lc INNER."""
+    inner = build_m1v1_dyn_b_preflight_inner_command(
+        result_root_in_container=result_root_in_container
+    )
+    payload = ["bash", "-lc", inner]
+    assert_canonical_run_sh_payload(payload)
+    return [
+        run_sh_path,
+        "--tag",
+        image_tag,
+        "--results",
+        host_results_dir,
+        *payload,
+    ]
+
+
 def assert_no_host_code_bind_mount(docker_argv: list[str] | tuple[str, ...]) -> None:
     """Fail if argv mounts host project source over the baked image tree."""
     argv = list(docker_argv)

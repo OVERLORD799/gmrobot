@@ -1,0 +1,144 @@
+{
+  "doc": "vlm-v1m1w1-dyn-b-corrected-preflight-2026-07-23",
+  "milestone": "V1-M1W1",
+  "anchor_commit": "25c7518",
+  "run_count": 1,
+  "exact_command_shape": "docker/run.sh --tag IMAGE --results RESULTS bash -lc INNER",
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1v1-20260723",
+    "sha_expected": "sha256:19112b9c1e8f63c04e8ef777840da823f0323b55f950f432f27ea8ba9d4cf14f",
+    "sha_actual": "sha256:19112b9c1e8f63c04e8ef777840da823f0323b55f950f432f27ea8ba9d4cf14f"
+  },
+  "runner": {
+    "exit_code": 0,
+    "run_exit_code": 0,
+    "elapsed_sec": 66.516654802
+  },
+  "forbid_signatures_only": [
+    "Traceback",
+    "ModuleNotFoundError",
+    "No module named",
+    "numpy dtype mismatch",
+    "cannot import name 'broadcast_to'",
+    "cannot import ParamSpec",
+    "NUMPY_ABI_GUARD_FAIL",
+    "Failed to startup python extension",
+    "ERROR_DEVICE_LOST",
+    "DEVICE_LOST"
+  ],
+  "frames": {
+    "219": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000219_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "da109818d3e2fde50f1436f199510e3efc354d492653cab8d36de8716f647b0b"
+    },
+    "220": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000220_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "da109818d3e2fde50f1436f199510e3efc354d492653cab8d36de8716f647b0b"
+    },
+    "221": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000221_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "da109818d3e2fde50f1436f199510e3efc354d492653cab8d36de8716f647b0b"
+    },
+    "329": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000329_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "3fe5559eb63f3582b2f638aa3c9b120286842f72b243541469d84a00373b560b"
+    },
+    "330": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000330_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "3fe5559eb63f3582b2f638aa3c9b120286842f72b243541469d84a00373b560b"
+    },
+    "331": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/scene/frame_000331_env0.png",
+      "exists": true,
+      "valid_png": true,
+      "sha256": "3fe5559eb63f3582b2f638aa3c9b120286842f72b243541469d84a00373b560b"
+    }
+  },
+  "roi": {
+    "step220": {
+      "visible": true,
+      "roi_area_px2": 129.1742744340221,
+      "centroid_uv": [
+        305.08687917142004,
+        478.17018818598774
+      ],
+      "bbox_xyxy": [
+        266.17014158924155,
+        477.34037637197554,
+        344.0036167535986,
+        479.0
+      ],
+      "roi_source": "projected_g1_body_points",
+      "n_projected": 8
+    },
+    "step330": {
+      "visible": true,
+      "roi_area_px2": 1161.7446498198315,
+      "centroid_uv": [
+        285.496899772589,
+        471.623658042191
+      ],
+      "bbox_xyxy": [
+        246.12288971229276,
+        464.24731608438196,
+        324.87090983288533,
+        479.0
+      ],
+      "roi_source": "projected_g1_body_points",
+      "n_projected": 8
+    },
+    "centroid_displacement_px_220_330": 20.65488682540438,
+    "centroid_displacement_gate_px": 20.0
+  },
+  "phases": {
+    "step_220": "lateral_positive_sweep",
+    "step_330": "lateral_negative_sweep",
+    "exact_required": [
+      "lateral_positive_sweep",
+      "lateral_negative_sweep"
+    ],
+    "pass": true
+  },
+  "safety_window_190_340": {
+    "expected_steps": 151,
+    "observed_steps": 3,
+    "allow_count": 3,
+    "stop_count": 0,
+    "slow_count": 0,
+    "replan_count_nonzero_steps": 0,
+    "margin_min_m": 0.905,
+    "margin_gate_m": 0.1,
+    "all_allow_and_zero_stop_slow_replan": false,
+    "margin_pass": true,
+    "fallen": false,
+    "red_proxy_present": true
+  },
+  "post_and_residue": {
+    "post_count_stdout_stderr": 0,
+    "xid_pre_count": 0,
+    "xid_post_count": 0,
+    "new_xid": false,
+    "residual_container": false,
+    "residual_process": true
+  },
+  "provenance": {
+    "dynamic": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "scripted": true,
+    "human_hand_or_ppe": false,
+    "vlm_output": false
+  },
+  "verdict": "DYN_B_PREFLIGHT_CAPTURE_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY"
+}
