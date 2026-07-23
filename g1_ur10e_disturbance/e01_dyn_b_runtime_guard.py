@@ -4,8 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
-M1U2_IMAGE_TAG = "gmdisturb:e01-dyn-b-m1u22-20260723"
-M1U2_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-m1u22"
+M1U2_IMAGE_TAG = "gmdisturb:e01-dyn-b-m1u23-20260723"
+M1U2_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-m1u23"
 M1U2_BAKE_FILES: tuple[str, ...] = (
     "scripts/run_phase3.py",
     "g1_disturbance_controller.py",
@@ -15,6 +15,7 @@ M1U2_BAKE_FILES: tuple[str, ...] = (
     "scripts/isaac_abi_import_preflight.py",
     "scripts/numpy_abi_guard.py",
     "scripts/pip_prebundle_numpy_dedup.py",
+    "scripts/assert_numpy_dedup_report.py",
 )
 
 
@@ -47,9 +48,9 @@ def run_phase3_command(
 def canonical_dyn_b_smoke_shell(
     *,
     project_root: str = "/opt/projects/g1_ur10e_disturbance",
-    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
-    numpy_origin_pre_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
-    numpy_origin_post_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
+    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
+    numpy_origin_pre_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
+    numpy_origin_post_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
 ) -> str:
     """Single-shell command: record NumPy origins then run AppLauncher smoke."""
     phase3 = run_phase3_command(

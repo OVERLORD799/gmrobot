@@ -1,0 +1,118 @@
+{
+  "doc": "vlm-v1m1u23-dyn-b-numpy-dedup-final-recovery-2026-07-23",
+  "task": "V1-M1U2.3",
+  "base_commit": "672097c",
+  "scope": {
+    "authorized_recovery_only": true,
+    "forbidden": [
+      "formal capture",
+      "network models",
+      "POST",
+      "safety/USD/B0-B4 changes"
+    ]
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u23-20260723",
+    "sha": "sha256:8b70b0b16f973c0a3297c960d12492300af6b3f9f90fe709cfc14687f11c1c84",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u23"
+  },
+  "budget": {
+    "max_build": 1,
+    "max_smoke": 1,
+    "build_count": 1,
+    "smoke_count": 1,
+    "no_retry": true,
+    "sequential_only": true
+  },
+  "offline_tests": [
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_pip_prebundle_numpy_dedup_unit.py",
+      "result": "PASS",
+      "notes": [
+        "covers numpy-1.26.0 and synthetic numpy-9.9.9 dist-info",
+        "statically parses Dockerfile RUN command and executes assertion script against temp fixture"
+      ]
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "PASS"
+    }
+  ],
+  "build": {
+    "attempted": true,
+    "succeeded": true,
+    "exit_code": 0,
+    "elapsed_sec": 4,
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/docker_build_stdout.log",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/docker_build_stderr.log"
+  },
+  "quarantine_report": {
+    "copied_in_image_path": "/opt/projects/g1_ur10e_disturbance/numpy_prebundle_quarantine_report.json",
+    "retrieved_host_copy": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_prebundle_quarantine_report.from_image.json",
+    "dist_info_target": "numpy-1.26.0.dist-info",
+    "quarantined_paths_and_digests": [
+      {
+        "source": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy",
+        "digest": "f4e470860b22a5a45fcfcf922f5c2adeb04321b17dd4da244ec001fb261ed543"
+      },
+      {
+        "source": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy-1.26.0.dist-info",
+        "digest": "4dcfbe476e7bffb59837b1700126b90eedf94718fea07c9542ab06eff27b8a45"
+      },
+      {
+        "source": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy.libs",
+        "digest": "720dcf1b94745d0647880c3d063e750244987f59a5bc6a03ec66e105214d240c"
+      }
+    ],
+    "remaining_importable_numpy_prebundle": [],
+    "non_numpy_sentinel_present": true
+  },
+  "smoke": {
+    "attempted": true,
+    "runner": "GMRobot/scripts/capture_one_shot_runner.py",
+    "invocation": "g1_ur10e_disturbance/docker/run.sh",
+    "scenario": "outer_lateral_patrol",
+    "seed": 43,
+    "max_steps": 1,
+    "exit_code": 86,
+    "elapsed_sec": 16.101766124,
+    "required_paths": {
+      "csv": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
+      "numpy_origin_pre_json": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
+      "numpy_origin_post_json": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json"
+    },
+    "required_csv_nonempty": false,
+    "forbid_hits": [
+      {
+        "pattern": "Traceback",
+        "stream": "stderr"
+      }
+    ],
+    "forbidden_tokens_observed": [
+      "Traceback",
+      "extension startup failure"
+    ],
+    "xid_detected": false,
+    "post0_observed": false
+  },
+  "numpy_origins": {
+    "pre_json": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
+    "post_json": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
+    "post_normalized_roots": [
+      "/isaac-sim/kit/python/lib/python3.11/site-packages"
+    ],
+    "loaded_prebundle_numpy_modules": []
+  },
+  "verdict": "NUMPY_DEDUP_FAIL_FINAL_STOP",
+  "next_gate": "STOP_NO_CAPTURE",
+  "formal_capture_executed": false,
+  "artifacts_root": "g1_ur10e_disturbance/results/paper_demo/v1m1u23_dyn_b_numpy_dedup_smoke_20260723"
+}

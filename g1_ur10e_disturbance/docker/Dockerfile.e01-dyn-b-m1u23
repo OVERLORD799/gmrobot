@@ -1,0 +1,22 @@
+# V1-M1U2.3: final NumPy de-dup recovery with dynamic dist-info assertion.
+FROM gmdisturb:e01-func-c-m1j-20260723
+
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/numpy_abi_guard.py /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py
+COPY scripts/pip_prebundle_numpy_dedup.py /opt/projects/g1_ur10e_disturbance/scripts/pip_prebundle_numpy_dedup.py
+COPY scripts/assert_numpy_dedup_report.py /opt/projects/g1_ur10e_disturbance/scripts/assert_numpy_dedup_report.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_b_offline_readiness.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_offline_readiness.py
+COPY configs/e01_dyn_b_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml
+COPY scripts/isaac_abi_import_preflight.py /opt/projects/g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py
+COPY scripts/test_e01_dyn_b_runtime_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py
+COPY scripts/test_e01_dyn_b_m1u0_image_bake_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py
+COPY scripts/test_numpy_abi_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py
+COPY scripts/test_pip_prebundle_numpy_dedup_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_pip_prebundle_numpy_dedup_unit.py
+
+RUN ["/bin/bash","-lc","set -euo pipefail; REPORT_DIR='/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u23_image_build_20260723/meta'; mkdir -p \"${REPORT_DIR}\"; PIP_ROOT=\"$(find /isaac-sim/extscache -maxdepth 3 -type d -path '*/omni.kit.pip_archive-*/pip_prebundle' | head -n 1)\"; if [[ -n \"${PIP_ROOT}\" ]]; then mkdir -p \"${PIP_ROOT}/typing_extensions\"; printf '# sentinel\\n' > \"${PIP_ROOT}/typing_extensions/__init__.py\"; fi; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/pip_prebundle_numpy_dedup.py --report-json \"${REPORT_DIR}/numpy_prebundle_quarantine_report.json\" --inventory-txt \"${REPORT_DIR}/numpy_prebundle_inventory.txt\" --hashes-txt \"${REPORT_DIR}/numpy_prebundle_hashes.txt\"; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/assert_numpy_dedup_report.py --report-json \"${REPORT_DIR}/numpy_prebundle_quarantine_report.json\" --kit-site-root /isaac-sim/kit/python/lib/python3.11/site-packages --require-sentinel \"${PIP_ROOT}/typing_extensions/__init__.py\" > \"${REPORT_DIR}/numpy_dist_info_target.txt\"; cp -f \"${REPORT_DIR}/numpy_prebundle_quarantine_report.json\" /opt/projects/g1_ur10e_disturbance/numpy_prebundle_quarantine_report.json"]
+
+LABEL gmdisturb.e01_dyn_b_m1u23="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1j-20260723" \
+      gmdisturb.milestone="V1-M1U2.3"
