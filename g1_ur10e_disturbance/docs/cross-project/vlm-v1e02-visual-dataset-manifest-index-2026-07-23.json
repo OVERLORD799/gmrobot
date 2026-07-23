@@ -1,6 +1,6 @@
 {
   "index_id": "vlm-v1e02-visual-dataset-review-packet-index",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "date": "2026-07-23",
   "artifacts": [
     {
@@ -46,6 +46,22 @@
     {
       "kind": "review_doc_json_v1e2a",
       "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2a-dyn-c-mirrored-patrol-design-2026-07-23.json"
+    },
+    {
+      "kind": "review_doc_md_v1e2b",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.md"
+    },
+    {
+      "kind": "review_doc_json_v1e2b",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.json"
+    },
+    {
+      "kind": "dyn_c_formal_capture_artifact_manifest_jsonl_v1e2b",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.artifact-manifest.jsonl"
+    },
+    {
+      "kind": "dyn_c_formal_capture_artifact_summary_json_v1e2b",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.artifact-summary.json"
     }
   ],
   "results_large_files_included": false

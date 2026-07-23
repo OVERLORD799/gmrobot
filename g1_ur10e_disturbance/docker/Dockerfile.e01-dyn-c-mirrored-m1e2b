@@ -1,0 +1,21 @@
+FROM gmdisturb:b4-p010-20260721
+
+WORKDIR /opt/projects/g1_ur10e_disturbance
+
+# Copy-only policy: include only E2A/E2B required runtime/config/guard files.
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/numpy_abi_guard.py /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY scene_camera_override.py /opt/projects/g1_ur10e_disturbance/scene_camera_override.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_c_offline_prebuild.py /opt/projects/g1_ur10e_disturbance/e01_dyn_c_offline_prebuild.py
+COPY configs/e01_dyn_c_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_c_capture.yaml
+COPY scripts/v1e2a_dyn_c_mirrored_patrol_prebuild.py /opt/projects/g1_ur10e_disturbance/scripts/v1e2a_dyn_c_mirrored_patrol_prebuild.py
+COPY scripts/test_v1e2a_dyn_c_offline_prebuild_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_v1e2a_dyn_c_offline_prebuild_unit.py
+COPY scripts/test_v1e2a_dyn_c_command_construction_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_v1e2a_dyn_c_command_construction_unit.py
+COPY scripts/test_v1e2a_dyn_c_config_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_v1e2a_dyn_c_config_unit.py
+
+LABEL gmdisturb.e01_dyn_c_mirrored_m1e2b="20260723" \
+  gmdisturb.base_tag="gmdisturb:b4-p010-20260721" \
+  gmdisturb.base_policy="copy_only" \
+  gmdisturb.package_mutation="none"

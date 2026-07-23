@@ -1,0 +1,151 @@
+{
+  "task": "V1-E2B Dyn-C mirrored outer patrol formal visual capture",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "44f2e1b1f76a84a41bd4bb7c04b161216a19a625",
+    "actual_head": "44f2e1b1f76a84a41bd4bb7c04b161216a19a625",
+    "origin_main": "44f2e1b1f76a84a41bd4bb7c04b161216a19a625",
+    "worktree_clean_at_start": true,
+    "e2a_prebuild_verdict": "PREBUILD_READY"
+  },
+  "policy": {
+    "build_count": 1,
+    "run_count": 1,
+    "retry_used": false,
+    "stop_policy": "STOP_NO_RETRY"
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "dockerfile_sha256": "f6430b28f66131fc2a35597f2fc71d7738e053f5282bb748e6290826a218413e",
+    "tag": "gmdisturb:e01-dyn-c-mirrored-m1e2b-20260723",
+    "image_sha": "sha256:bf17f8437d5987f95fc25aabb9136257695a5e6429e004e3df3c3913d81318dd",
+    "image_digest": "gmdisturb@sha256:bf17f8437d5987f95fc25aabb9136257695a5e6429e004e3df3c3913d81318dd",
+    "copy_only": true,
+    "pip_or_dependency_mutation": false
+  },
+  "run": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723",
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "motion_source": "scripted_g1_mirrored_outer_lateral_patrol",
+    "task_execution": false,
+    "visual_dataset_only": true,
+    "camera_enabled": true,
+    "camera_reference_pose": {
+      "pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "max_steps": 312,
+    "capture_steps_primary": [
+      240,
+      310
+    ],
+    "capture_steps_stability": [
+      239,
+      241,
+      309,
+      311
+    ],
+    "exit_code": 1,
+    "elapsed_seconds": 0.506145
+  },
+  "runtime_evidence": {
+    "meta_files_present": [
+      "capture_stderr.txt",
+      "capture_stdout.txt",
+      "command.txt",
+      "elapsed_seconds.txt",
+      "git_head.txt",
+      "gpu_post.txt",
+      "gpu_pre.txt",
+      "outer_command.json",
+      "run_exit_code.txt",
+      "xid_post.log",
+      "xid_pre.log"
+    ],
+    "scene_frames": [
+      {
+        "step": 239,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000239_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 240,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000240_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 241,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000241_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 309,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000309_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 310,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000310_env0.png",
+        "exists": false,
+        "sha256": null
+      },
+      {
+        "step": 311,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723/scene/frame_000311_env0.png",
+        "exists": false,
+        "sha256": null
+      }
+    ],
+    "post_count": 0,
+    "traceback_found": true,
+    "device_lost_found": false,
+    "new_xid": false,
+    "trajectory_id_dyn_c": "7beb111400ccc2f8cd5d9ed1ab19192705714ff3d6cbc7dc3ccb16154c74683c",
+    "trajectory_id_dyn_b_seed43": "759e778529465b118250e90b84d9cfafade6dca9c7011603794f05724d9d164e",
+    "trajectory_hash_distinct_from_dyn_b": true
+  },
+  "gates": {
+    "exit0": false,
+    "all_6_frames_valid": false,
+    "links_ge_4": false,
+    "roi_ge_1pct": false,
+    "clipping_le_0_5": false,
+    "centroid_240_310_ge_30px": false,
+    "adjacent_triplet_stability": false,
+    "cross_frame_motion_attribution": false,
+    "no_full_image_hash_motion_shortcut": true,
+    "geometry_gate_enabled": false,
+    "control_gate_enabled": false,
+    "safety_nonallow_not_used_as_fail_gate": true
+  },
+  "forbidden_checks": {
+    "vlm_disabled": true,
+    "perception_disabled": true,
+    "gdino_disabled": true,
+    "sam2_disabled": true,
+    "five_stage_disabled": true,
+    "inference_post_zero": true,
+    "credentials_used": false
+  },
+  "status": {
+    "requested_initial_verdict": "REVIEW_REQUIRED",
+    "reviewer_approved": false,
+    "verdict": "FAIL_FINAL",
+    "next_gate": "STOP_NO_RETRY",
+    "failure_reason": "ModuleNotFoundError: dyn_b_per_step_audit_writer missing in copy-only image; single run consumed"
+  }
+}
