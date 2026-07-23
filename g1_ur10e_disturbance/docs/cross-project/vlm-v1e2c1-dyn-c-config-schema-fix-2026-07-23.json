@@ -1,0 +1,98 @@
+{
+  "task": "V1-E2C.1 Dyn-C full config schema fix (offline)",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "b7487781bdbac956b5913781c28edc7bd34e7b83",
+    "actual_head": "b7487781bdbac956b5913781c28edc7bd34e7b83",
+    "worktree_clean_at_start": true,
+    "offline_only": true
+  },
+  "changes": {
+    "config_yaml": "g1_ur10e_disturbance/configs/e01_dyn_c_capture.yaml",
+    "loader": "g1_ur10e_disturbance/config_loader.py",
+    "tests_updated": [
+      "g1_ur10e_disturbance/scripts/test_v1e2a_dyn_c_config_unit.py"
+    ],
+    "tests_added": [
+      "g1_ur10e_disturbance/scripts/test_v1e2c1_dyn_c_config_schema_validator_unit.py"
+    ]
+  },
+  "schema_fix": {
+    "removed_bool_sections_from_dyn_c_yaml": [
+      "virtual_hand",
+      "vlm",
+      "perception",
+      "five_stage"
+    ],
+    "mapping_sections_validated_fail_fast": [
+      "disturbance",
+      "virtual_hand",
+      "vlm",
+      "safety",
+      "ee_track",
+      "dynamic_sweep",
+      "batch",
+      "arm",
+      "vlm.actions",
+      "vlm.ssh",
+      "safety.replan"
+    ],
+    "failure_mode": "ValueError(config schema invalid: section ... must be a mapping/object)"
+  },
+  "full_config_load_contract": {
+    "scenario": "mirrored_outer_lateral_patrol",
+    "seed": 44,
+    "camera_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "camera_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "capture_steps": [
+      240,
+      310
+    ],
+    "adjacent_groups": {
+      "A": [
+        239,
+        240,
+        241
+      ],
+      "B": [
+        309,
+        310,
+        311
+      ]
+    },
+    "disable_inference_boundary": "enforced by runtime command/CLI (no --virtual-hand/--vlm in Dyn-C prebuild command)"
+  },
+  "invariants": {
+    "trajectory_hash_dyn_c": "7beb111400ccc2f8cd5d9ed1ab19192705714ff3d6cbc7dc3ccb16154c74683c",
+    "trajectory_hash_dyn_b_seed43": "759e778529465b118250e90b84d9cfafade6dca9c7011603794f05724d9d164e",
+    "trajectory_hash_distinct_from_dyn_b": true,
+    "frames_and_capture_identity_unchanged": true
+  },
+  "retained_failures": {
+    "e2c_raw_failure_status": "retained",
+    "reference_failure_reason": "AttributeError: 'bool' object has no attribute 'get' (config virtual_hand schema)"
+  },
+  "checks": {
+    "pycompile": "pass",
+    "unit": "pass",
+    "full_config_load": "pass",
+    "prebuild": "pass",
+    "import_closure": "pass",
+    "manifest_validation": "pass",
+    "sensitive_scan": "pass_with_known_nonsecret_fields_only",
+    "diffcheck": "pass"
+  },
+  "automation_guardrail": {
+    "next_step_budget": "only allow 1 rebuild + 1 final capture",
+    "stop_condition": "AUTOMATION_LOOP_STOP if any pre-AppLauncher config/import error recurs"
+  }
+}

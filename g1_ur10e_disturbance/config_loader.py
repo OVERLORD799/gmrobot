@@ -9,6 +9,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from pathlib import Path
+from collections.abc import Mapping
 from typing import Optional, Tuple, Dict
 
 import numpy as np
@@ -218,11 +219,61 @@ def _deep_update(base: dict, override: dict) -> dict:
     return merged
 
 
+def _ensure_mapping_section(raw: dict, key: str) -> dict:
+    """Return a mapping section or fail-fast on invalid top-level types."""
+    section = raw.get(key, {})
+    if section is None:
+        return {}
+    if not isinstance(section, Mapping):
+        raise ValueError(
+            f"config schema invalid: section '{key}' must be a mapping/object, got {type(section).__name__}"
+        )
+    return dict(section)
+
+
+def _validate_prebuild_schema(raw: dict) -> None:
+    """Fail-fast validation for sections consumed as mappings by _build_config."""
+    if not isinstance(raw, Mapping):
+        raise ValueError(f"config schema invalid: root must be a mapping/object, got {type(raw).__name__}")
+    mapping_sections = (
+        "disturbance",
+        "virtual_hand",
+        "vlm",
+        "safety",
+        "ee_track",
+        "dynamic_sweep",
+        "batch",
+        "arm",
+    )
+    for key in mapping_sections:
+        _ensure_mapping_section(dict(raw), key)
+
+    # Nested mapping sections consumed as dicts.
+    vlm_raw = _ensure_mapping_section(dict(raw), "vlm")
+    if "actions" in vlm_raw and vlm_raw["actions"] is not None and not isinstance(vlm_raw["actions"], Mapping):
+        raise ValueError(
+            f"config schema invalid: section 'vlm.actions' must be a mapping/object, got {type(vlm_raw['actions']).__name__}"
+        )
+    if "ssh" in vlm_raw and vlm_raw["ssh"] is not None and not isinstance(vlm_raw["ssh"], Mapping):
+        raise ValueError(
+            f"config schema invalid: section 'vlm.ssh' must be a mapping/object, got {type(vlm_raw['ssh']).__name__}"
+        )
+
+    safety_raw = _ensure_mapping_section(dict(raw), "safety")
+    if "replan" in safety_raw and safety_raw["replan"] is not None and not isinstance(safety_raw["replan"], Mapping):
+        raise ValueError(
+            f"config schema invalid: section 'safety.replan' must be a mapping/object, got {type(safety_raw['replan']).__name__}"
+        )
+
+
 def _build_config(raw: dict) -> Phase3Config:
     """Construct a Phase3Config from a raw (possibly partial) YAML dict."""
 
     # --- disturbance ---
-    d_raw = raw.get("disturbance", {})
+    _validate_prebuild_schema(raw)
+
+    # --- disturbance ---
+    d_raw = _ensure_mapping_section(raw, "disturbance")
     disturbance = DisturbanceConfig(
         cautious_threshold=float(d_raw.get("cautious_threshold", 0.15)),
         moderate_threshold=float(d_raw.get("moderate_threshold", 0.55)),
@@ -243,7 +294,7 @@ def _build_config(raw: dict) -> Phase3Config:
     )
 
     # --- virtual_hand (only fields consumed by run_phase3.py / G1VirtualHand) ---
-    vh_raw = raw.get("virtual_hand", {})
+    vh_raw = _ensure_mapping_section(raw, "virtual_hand")
     _reach = float(
         vh_raw.get(
             "reach_radius",
@@ -277,12 +328,12 @@ def _build_config(raw: dict) -> Phase3Config:
     )
 
     # --- vlm ---
-    vlm_raw = raw.get("vlm", {})
+    vlm_raw = _ensure_mapping_section(raw, "vlm")
     vlm_actions = {}
-    for name, vec in vlm_raw.get("actions", {}).items():
+    for name, vec in _ensure_mapping_section({"actions": vlm_raw.get("actions", {})}, "actions").items():
         vlm_actions[str(name)] = (float(vec[0]), float(vec[1]), float(vec[2]))
     # SSH sub-config
-    ssh_raw = vlm_raw.get("ssh", {})
+    ssh_raw = _ensure_mapping_section({"ssh": vlm_raw.get("ssh", {})}, "ssh")
     vlm_ssh = VLMSSHConfig(
         host=str(ssh_raw.get("host", "")),
         port=int(ssh_raw.get("port", 30481)),
@@ -308,14 +359,14 @@ def _build_config(raw: dict) -> Phase3Config:
     )
 
     # --- safety ---
-    s_raw = raw.get("safety", {})
+    s_raw = _ensure_mapping_section(raw, "safety")
     # --- ee_track ---
-    et_raw = raw.get("ee_track", {})
+    et_raw = _ensure_mapping_section(raw, "ee_track")
     ee_track = EETrackConfig(
         body=str(et_raw.get("ee_track_body", "wrist_3_link")),
         offset=tuple(et_raw.get("ee_track_offset", (0.0, 0.0, 0.02))),
     )
-    r_raw = s_raw.get("replan", {})
+    r_raw = _ensure_mapping_section({"replan": s_raw.get("replan", {})}, "replan")
     replan = ReplanConfig(
         trigger_threshold=int(r_raw.get("trigger_threshold", 5)),
         detour_lateral_m=float(r_raw.get("detour_lateral_m", 0.10)),
@@ -334,7 +385,7 @@ def _build_config(raw: dict) -> Phase3Config:
     )
 
     # --- dynamic_sweep (B2) ---
-    ds_raw = raw.get("dynamic_sweep", {})
+    ds_raw = _ensure_mapping_section(raw, "dynamic_sweep")
     _start = ds_raw.get("start_xyz", [0.55, -0.35, 0.45])
     _end = ds_raw.get("end_xyz", [0.55, 0.35, 0.45])
     dynamic_sweep = DynamicSweepConfig(
@@ -349,7 +400,7 @@ def _build_config(raw: dict) -> Phase3Config:
     per_part_protocol = bool(raw.get("per_part_protocol", False))
 
     # --- batch ---
-    b_raw = raw.get("batch", {})
+    b_raw = _ensure_mapping_section(raw, "batch")
     batch = BatchConfig(
         max_steps=int(b_raw.get("max_steps", 10000)),
         progress_interval=int(b_raw.get("progress_interval", 200)),
@@ -359,7 +410,7 @@ def _build_config(raw: dict) -> Phase3Config:
     )
 
     # --- arm ---
-    a_raw = raw.get("arm", {})
+    a_raw = _ensure_mapping_section(raw, "arm")
     arm = ArmConfig(
         length=float(a_raw.get("arm_length", 0.8)),
         length_fixed=bool(a_raw.get("arm_length_fixed", True)),

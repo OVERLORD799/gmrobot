@@ -7,10 +7,6 @@ enable_capture: false
 execute_capture: false
 task_execution: false
 visual_dataset_only: true
-virtual_hand: false
-vlm: false
-perception: false
-five_stage: false
 camera:
   override: true
   pos: [0.45, 0.0, 2.7]
