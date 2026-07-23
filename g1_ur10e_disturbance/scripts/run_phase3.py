@@ -423,12 +423,13 @@ from ur10e_controller import UR10eController
 from safety_adapter import G1EnvelopeAdapter
 from seed_utils import apply_episode_seeds, seed_manifest, write_seed_sidecar
 from motion_isolation import (
-    build_ur10_hold_action,
+    compose_ur10_hold_action,
     hold_action_hash,
     compute_ur10_freeze_metrics,
     resolve_ur10_hold_target_from_articulation,
     resolve_ur10e_ee_action_term,
-    compute_ur10e_ee_world_pose_from_action_term,
+    resolve_ur10e_ee_hold_pose7_from_action_term,
+    resolve_ur10e_gripper_hold_raw_from_articulation,
 )
 from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
@@ -1345,42 +1346,66 @@ def main():
 
     ur10e.reset(obs["ur10e_policy"])
     disturb.reset()
-    ur10e_ee_term, ur10e_ee_term_audit = resolve_ur10e_ee_action_term(
-        env,
-        term_name="ur10e_ee",
-        expected_action_dim=7,
-        expected_command_type="pose",
-        expected_use_relative_mode=False,
-        expected_scale=1.0,
-    )
-    print(
-        "[phase3] UR10 ee term audit="
-        f"{json.dumps(ur10e_ee_term_audit, ensure_ascii=True, sort_keys=True)}"
-    )
-    _ur10_hold_target7, _ur10_hold_joint_provenance, _ur10_hold_gripper0 = resolve_ur10_hold_target_from_articulation(
+    _ur10_hold_joint_now, _ur10_joint_baseline_provenance, _ = resolve_ur10_hold_target_from_articulation(
         env.unwrapped.scene["robot_ur10e"]
     )
-    _ur10_joint0 = _ur10_hold_target7.copy()
-    _ur10_hold_seed_provenance = "env.unwrapped.scene.robot_ur10e.data.joint_pos[ARM_JOINT_NAMES+gripper]"
-    _ur10_hold_action = build_ur10_hold_action(_ur10_hold_target7, _ur10_hold_gripper0)
+    _ur10_joint0 = _ur10_hold_joint_now.copy()
+    _ur10_hold_action_provenance: dict[str, object] = {
+        "source": "disabled_without_freeze",
+    }
+    _ur10_hold_action = np.zeros((8,), dtype=np.float32)
+    ur10e_ee_term = None
+    ur10e_ee_term_audit: dict[str, object] = {}
+    ur10e_gripper_term_audit: dict[str, object] = {}
+    if args_cli.freeze_ur10e:
+        ur10e_ee_term, ur10e_ee_term_audit = resolve_ur10e_ee_action_term(
+            env,
+            term_name="ur10e_ee",
+            expected_action_dim=7,
+            expected_command_type="pose",
+            expected_use_relative_mode=False,
+            expected_scale=1.0,
+        )
+        _ur10_hold_pose7, _ur10_hold_pose_audit = resolve_ur10e_ee_hold_pose7_from_action_term(ur10e_ee_term, env_index=0)
+        _ur10_hold_gripper_raw, ur10e_gripper_term_audit = resolve_ur10e_gripper_hold_raw_from_articulation(
+            env, env.unwrapped.scene["robot_ur10e"], term_name="ur10e_gripper"
+        )
+        _ur10_hold_action = compose_ur10_hold_action(_ur10_hold_pose7, _ur10_hold_gripper_raw)
+        _ur10_hold_action_provenance = {
+            "source": "freeze_only",
+            "pose": _ur10_hold_pose_audit,
+            "gripper": ur10e_gripper_term_audit,
+        }
+        print(
+            "[phase3] UR10 ee term audit="
+            f"{json.dumps(ur10e_ee_term_audit, ensure_ascii=True, sort_keys=True)}"
+        )
+        print(
+            "[phase3] UR10 gripper term audit="
+            f"{json.dumps(ur10e_gripper_term_audit, ensure_ascii=True, sort_keys=True)}"
+        )
     _ur10_hold_hash = hold_action_hash(_ur10_hold_action)
     _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
         effective_action=_ur10_hold_action,
-        current_joint_pose=_ur10_hold_target7,
+        current_joint_pose=_ur10_hold_joint_now,
         initial_joint_pose=_ur10_joint0,
     )
     _UR10_SETTLING_STEPS = 5
     _ur10_joint_delta_max_abs_settled = 0.0
     if args_cli.freeze_ur10e:
         print(
-            f"[phase3] UR10 freeze enabled: initial_joint_pose="
+            f"[phase3] UR10 freeze enabled: initial_joint_baseline7="
             f"{[round(float(v), 6) for v in _ur10_joint0.tolist()]} "
             f"hold_hash={_ur10_hold_hash[:16]}… "
-            f"seed={_ur10_hold_seed_provenance}"
+            f"hold_action_source={_ur10_hold_action_provenance.get('source', '?')}"
         )
         print(
-            "[phase3] UR10 hold provenance="
-            f"{json.dumps(_ur10_hold_joint_provenance, ensure_ascii=True, sort_keys=True)}"
+            "[phase3] UR10 joint baseline provenance="
+            f"{json.dumps(_ur10_joint_baseline_provenance, ensure_ascii=True, sort_keys=True)}"
+        )
+        print(
+            "[phase3] UR10 hold action provenance="
+            f"{json.dumps(_ur10_hold_action_provenance, ensure_ascii=True, sort_keys=True)}"
         )
 
     # Inject initial zero-velocity command so the first env.step() starts
@@ -1578,6 +1603,11 @@ def main():
     if args_cli.mode != "auto":
         mode_override = DisturbanceMode(args_cli.mode)
 
+    # Resolve EE tracking body index once (configurable via ee_track).
+    _ee_body_ids, _ = ur10e_robot.find_bodies(cfg.safety.ee_track.body)
+    _ee_body_idx = _ee_body_ids[0]
+    _ee_offset = np.array(cfg.safety.ee_track.offset, dtype=np.float32)
+
     # mid360_link = LiDAR body, mounted at the very top of G1's head.
     _head_body_idx = g1.find_bodies("mid360_link")[0][0]
     _HEAD_Z_OFFSET = 0.14  # above LiDAR body (visible clearance from head)
@@ -1607,7 +1637,7 @@ def main():
         redeploy_event_this_step = False
         # ── 1. Read robot state ───────────────────────────────────────
         g1_root = g1.data.root_pos_w[0].cpu().numpy()
-        ur10e_ee, _ = compute_ur10e_ee_world_pose_from_action_term(ur10e_ee_term, env_index=0)
+        ur10e_ee = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
 
         # ── 2. G1 walking (reads obs with injected velocity) ──────────
         walker_obs = obs["g1_walker"][0].cpu().numpy().astype(np.float32)
@@ -2892,7 +2922,8 @@ def main():
                     "key_body_links_json": json.dumps(_rt_links, sort_keys=True, ensure_ascii=True),
                     "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
                     "ur10_hold_hash": _ur10_hold_hash,
-                    "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                     "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                     "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
@@ -2938,7 +2969,7 @@ def main():
                     except Exception:
                         continue
                 _root_now = g1.data.root_pos_w[0].cpu().numpy()
-                _ee_now, _ = compute_ur10e_ee_world_pose_from_action_term(ur10e_ee_term, env_index=0)
+                _ee_now = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
                 _rec = {
                     "step": int(step),
                     "sim_step": int(step),
@@ -2957,7 +2988,8 @@ def main():
                     "ur10_freeze_enabled": bool(args_cli.freeze_ur10e),
                     "ur10_initial_joint_pose": [float(v) for v in _ur10_joint0.tolist()],
                     "ur10_hold_hash": _ur10_hold_hash,
-                    "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_action_norm": _ur10_freeze_last_metrics["ur10_action_norm"],
                     "ur10_joint_delta_norm": _ur10_freeze_last_metrics["ur10_joint_delta_norm"],
                     "ur10_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_joint_delta_max_abs"],
@@ -2999,7 +3031,8 @@ def main():
                         "key_body_links_json": json.dumps(_key_links, sort_keys=True, ensure_ascii=True),
                         "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
                         "ur10_hold_hash": _ur10_hold_hash,
-                        "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
+                        "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
+                        "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
                         "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                         "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                         "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",

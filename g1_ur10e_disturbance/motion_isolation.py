@@ -10,6 +10,8 @@ import numpy as np
 
 try:
     from dual_env_cfg import ARM_JOINT_NAMES as _CFG_ARM_JOINT_NAMES
+    from dual_env_cfg import GRIPPER_CLOSED as _CFG_GRIPPER_CLOSED
+    from dual_env_cfg import GRIPPER_OPEN as _CFG_GRIPPER_OPEN
     from dual_env_cfg import GRIPPER_JOINT_NAMES as _CFG_GRIPPER_JOINT_NAMES
 except Exception:
     _CFG_ARM_JOINT_NAMES = (
@@ -28,9 +30,13 @@ except Exception:
         "left_inner_finger_knuckle_joint",
         "left_inner_finger_joint",
     )
+    _CFG_GRIPPER_CLOSED = float(np.pi / 4.0)
+    _CFG_GRIPPER_OPEN = float(0.4 * _CFG_GRIPPER_CLOSED)
 
 ARM_JOINT_NAMES = tuple(str(x) for x in _CFG_ARM_JOINT_NAMES)
 GRIPPER_JOINT_NAMES = tuple(str(x) for x in _CFG_GRIPPER_JOINT_NAMES)
+GRIPPER_CLOSED = float(_CFG_GRIPPER_CLOSED)
+GRIPPER_OPEN = float(_CFG_GRIPPER_OPEN)
 
 
 def _quat_multiply_wxyz(q1: np.ndarray, q2: np.ndarray) -> np.ndarray:
@@ -153,12 +159,96 @@ def compute_ur10e_ee_world_pose_from_action_term(term: Any, *, env_index: int = 
     return ee_pos_w.astype(np.float32), ee_quat_w.astype(np.float32)
 
 
-def build_ur10_hold_action(initial_joint_pose: np.ndarray, initial_gripper: float) -> np.ndarray:
-    """Build explicit hold action from initial joints + gripper."""
-    joints = np.asarray(initial_joint_pose, dtype=np.float32).reshape(-1)
-    if joints.shape[0] != 7:
-        raise ValueError(f"expected 7 UR10 joints, got {joints.shape[0]}")
-    return np.concatenate([joints, np.array([float(initial_gripper)], dtype=np.float32)])
+def resolve_ur10e_ee_hold_pose7_from_action_term(
+    term: Any, *, env_index: int = 0, quat_norm_tol: float = 1e-3
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Resolve freeze raw pose7 from audited ur10e_ee term (fail-closed)."""
+    pos_w, quat_w = compute_ur10e_ee_world_pose_from_action_term(term, env_index=env_index)
+    pose7 = np.concatenate([pos_w.reshape(3), quat_w.reshape(4)]).astype(np.float32)
+    if pose7.shape[0] != 7:
+        raise ValueError(f"ur10e_ee hold pose7 shape invalid: expected 7, got {pose7.shape[0]}")
+    if not np.all(np.isfinite(pose7)):
+        raise ValueError("ur10e_ee hold pose7 contains non-finite values")
+    quat_norm_raw = float(np.linalg.norm(pose7[3:7]))
+    if not np.isfinite(quat_norm_raw):
+        raise ValueError("ur10e_ee hold quaternion norm is non-finite")
+    if abs(quat_norm_raw - 1.0) > float(quat_norm_tol):
+        raise ValueError(
+            f"ur10e_ee hold quaternion norm={quat_norm_raw:.6f} outside tolerance "
+            f"{float(quat_norm_tol):.6f}"
+        )
+    pose7[3:7] = pose7[3:7] / max(quat_norm_raw, 1e-12)
+    return pose7, {
+        "pose_source": "ur10e_ee_term._compute_frame_pose+asset_root_world",
+        "pose_env_index": int(env_index),
+        "quat_norm_raw": quat_norm_raw,
+        "quat_norm_tol": float(quat_norm_tol),
+        "raw_pose7": [float(v) for v in pose7.tolist()],
+    }
+
+
+def resolve_ur10e_gripper_hold_raw_from_articulation(
+    env: Any,
+    articulation: Any,
+    *,
+    term_name: str = "ur10e_gripper",
+) -> tuple[float, dict[str, Any]]:
+    """Map articulation finger joint to BinaryJointPositionAction raw sign."""
+    unwrapped = getattr(env, "unwrapped", env)
+    action_manager = getattr(unwrapped, "action_manager", None)
+    if action_manager is None or not hasattr(action_manager, "get_term"):
+        raise ValueError("env.unwrapped.action_manager.get_term is required")
+    gripper_term = action_manager.get_term(term_name)
+    if gripper_term is None:
+        raise ValueError(f"action term '{term_name}' not found")
+    action_dim = int(getattr(gripper_term, "action_dim", -1))
+    if action_dim != 1:
+        raise ValueError(f"{term_name}.action_dim={action_dim} != expected 1")
+    if articulation is None or not hasattr(articulation, "joint_names"):
+        raise ValueError("articulation with joint_names is required")
+    if not hasattr(articulation, "data") or not hasattr(articulation.data, "joint_pos"):
+        raise ValueError("articulation missing data.joint_pos")
+    name_to_idx = _first_name_to_index([str(n) for n in articulation.joint_names])
+    if "finger_joint" not in name_to_idx:
+        raise KeyError("articulation missing required finger_joint for gripper mapping")
+    finger_idx = int(name_to_idx["finger_joint"])
+    joint_pos_full = _to_float32_1d(articulation.data.joint_pos[0], context="articulation.data.joint_pos[0]")
+    if finger_idx >= joint_pos_full.shape[0]:
+        raise ValueError(
+            f"finger_joint index {finger_idx} out of range for joint_pos length {joint_pos_full.shape[0]}"
+        )
+    actual = float(joint_pos_full[finger_idx])
+    d_open = abs(actual - float(GRIPPER_OPEN))
+    d_closed = abs(actual - float(GRIPPER_CLOSED))
+    selected = "open" if d_open <= d_closed else "close"
+    raw_sign = float(+1.0 if selected == "open" else -1.0)
+    return raw_sign, {
+        "term_name": term_name,
+        "term_action_dim": action_dim,
+        "gripper_joint_name": "finger_joint",
+        "gripper_joint_id": finger_idx,
+        "actual": actual,
+        "selected": selected,
+        "distance_to_open": float(d_open),
+        "distance_to_closed": float(d_closed),
+        "raw_sign": raw_sign,
+        "open_ref": float(GRIPPER_OPEN),
+        "closed_ref": float(GRIPPER_CLOSED),
+    }
+
+
+def compose_ur10_hold_action(hold_pose7: np.ndarray, gripper_raw_sign: float) -> np.ndarray:
+    """Compose hold action from pose7 + binary gripper raw sign."""
+    pose = np.asarray(hold_pose7, dtype=np.float32).reshape(-1)
+    if pose.shape[0] != 7:
+        raise ValueError(f"expected hold_pose7 shape (7,), got {pose.shape[0]}")
+    raw = float(gripper_raw_sign)
+    if raw not in (-1.0, 1.0):
+        raise ValueError(f"gripper_raw_sign must be -1.0 or +1.0, got {raw}")
+    out = np.concatenate([pose, np.array([raw], dtype=np.float32)])
+    if not np.all(np.isfinite(out)):
+        raise ValueError("hold action contains non-finite values")
+    return out
 
 
 def hold_action_hash(hold_action: np.ndarray) -> str:

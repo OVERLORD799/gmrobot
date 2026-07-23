@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from motion_isolation import (  # noqa: E402
-    build_ur10_hold_action,
+    compose_ur10_hold_action,
     compute_ur10_freeze_metrics,
     hold_action_hash,
     resolve_ur10_freeze_action_seed,
@@ -33,7 +33,7 @@ def test_freeze_overrides_fake_controller_proposed_action() -> None:
         ur10_state_action=proposed,
         ur10_policy_obs={"ee_pos": np.zeros((1, 7), dtype=np.float32)},
     )
-    hold = build_ur10_hold_action(initial_joint, initial_gripper=gripper)
+    hold = compose_ur10_hold_action(initial_joint, gripper_raw_sign=1.0 if gripper >= 0.0 else -1.0)
     assert source == "ur10_state_action.pose7+gripper"
     assert np.allclose(proposed[:7], hold[:7])
     effective = hold.copy()  # mirrors run_phase3 freeze override before env.step(action)

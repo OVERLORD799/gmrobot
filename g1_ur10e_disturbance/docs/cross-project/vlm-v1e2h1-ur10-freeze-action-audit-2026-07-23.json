@@ -1,0 +1,40 @@
+{
+  "artifact": "vlm-v1e2h1-ur10-freeze-action-audit",
+  "date": "2026-07-23",
+  "corrective_for_commit": "89b3376",
+  "history_policy": {
+    "rewrite_or_force_push": false
+  },
+  "review_incomplete_findings": [
+    "89b3376 audited ur10e_ee term contract but still built hold action from articulation joint angles.",
+    "89b3376 replaced runtime ur10e_ee tracking path from body_link_pos_w+cfg offset to action-term world pose outside freeze scope.",
+    "89b3376 resolved term audits unconditionally even when --freeze-ur10e was disabled."
+  ],
+  "correction_summary": {
+    "freeze_only_term_resolution": true,
+    "hold_action_source": "audited ur10e_ee term pose7 + binary gripper sign",
+    "joint_baseline_only_for_metrics": true,
+    "runtime_ee_tracking_restored": "body_link_pos_w + cfg.safety.ee_track.offset",
+    "provenance_fields": [
+      "ur10_joint_baseline_provenance_json",
+      "ur10_hold_action_provenance_json"
+    ]
+  },
+  "fail_closed_checks": {
+    "pose7_finite": true,
+    "pose7_shape": 7,
+    "quat_norm_near_1": true,
+    "ik_term_absolute_pose_required": true,
+    "ik_term_scale_all_ones_required": true,
+    "gripper_term_action_dim_equals_1": true
+  },
+  "tests_updated": [
+    "scripts/test_motion_isolation_unit.py",
+    "scripts/test_v1e2e_fake_controller_pipeline_unit.py"
+  ],
+  "execution_constraints": {
+    "docker_run": false,
+    "isaac_run": false,
+    "network_calls": false
+  }
+}

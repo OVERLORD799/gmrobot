@@ -12,14 +12,15 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
 from motion_isolation import (  # noqa: E402
-    build_ur10_hold_action,
+    compose_ur10_hold_action,
     hold_action_hash,
     compute_ur10_freeze_metrics,
     resolve_ur10_freeze_action_seed,
     extract_ur10_pose7_from_policy_obs,
     resolve_ur10_hold_target_from_articulation,
     resolve_ur10e_ee_action_term,
-    compute_ur10e_ee_world_pose_from_action_term,
+    resolve_ur10e_ee_hold_pose7_from_action_term,
+    resolve_ur10e_gripper_hold_raw_from_articulation,
 )
 
 
@@ -123,17 +124,22 @@ class _FakeIkTerm:
         return self._ee_pos_b.copy(), self._ee_quat_b.copy()
 
 
+class _FakeBinaryTerm:
+    def __init__(self, action_dim: int = 1) -> None:
+        self.action_dim = int(action_dim)
+
+
 def _load_obs_fixture() -> dict:
     fixture = ROOT / "scripts" / "fixtures" / "ur10_observation_manager_snapshot.json"
     return json.loads(fixture.read_text(encoding="utf-8"))
 
 
-def test_build_hold_action_and_hash_stable() -> None:
-    joint0 = np.array([0.1, -0.2, 0.3, -1.0, 1.1, -0.7, 0.05], dtype=np.float32)
-    hold = build_ur10_hold_action(joint0, initial_gripper=0.2)
+def test_compose_hold_action_and_hash_stable() -> None:
+    pose7 = np.array([0.1, -0.2, 0.3, -1.0, 1.1, -0.7, 0.05], dtype=np.float32)
+    hold = compose_ur10_hold_action(pose7, gripper_raw_sign=1.0)
     assert hold.shape == (8,)
-    assert np.allclose(hold[:7], joint0)
-    assert abs(float(hold[7]) - 0.2) < 1e-6
+    assert np.allclose(hold[:7], pose7)
+    assert abs(float(hold[7]) - 1.0) < 1e-6
     assert hold_action_hash(hold) == hold_action_hash(hold.copy())
 
 
@@ -307,7 +313,7 @@ def test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale() -> None
         assert "scale" in str(exc)
 
 
-def test_compute_ur10e_ee_world_pose_from_action_term_uses_root_transform() -> None:
+def test_resolve_ur10e_ee_hold_pose7_from_action_term_uses_root_transform() -> None:
     # root rotation = +90 deg around Z in wxyz
     s = np.float32(np.sqrt(0.5))
     term = _FakeIkTerm(
@@ -316,13 +322,70 @@ def test_compute_ur10e_ee_world_pose_from_action_term_uses_root_transform() -> N
         ee_pos_b=np.array([[1.0, 0.0, 0.0]], dtype=np.float32),
         ee_quat_b=np.array([[1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
     )
-    pos_w, quat_w = compute_ur10e_ee_world_pose_from_action_term(term)
-    assert np.allclose(pos_w, np.array([1.0, 3.0, 3.0], dtype=np.float32), atol=1e-6)
-    assert np.allclose(quat_w, np.array([s, 0.0, 0.0, s], dtype=np.float32), atol=1e-6)
+    pose7, audit = resolve_ur10e_ee_hold_pose7_from_action_term(term)
+    assert np.allclose(pose7[:3], np.array([1.0, 3.0, 3.0], dtype=np.float32), atol=1e-6)
+    assert np.allclose(pose7[3:], np.array([s, 0.0, 0.0, s], dtype=np.float32), atol=1e-6)
+    assert abs(float(audit["quat_norm_raw"]) - 1.0) < 1e-6
+
+
+def test_hold_pose7_fails_closed_on_nan_and_bad_quat_norm() -> None:
+    bad_nan = _FakeIkTerm(ee_pos_b=np.array([[np.nan, 0.0, 0.0]], dtype=np.float32))
+    try:
+        resolve_ur10e_ee_hold_pose7_from_action_term(bad_nan)
+        raise AssertionError("expected ValueError for non-finite pose")
+    except ValueError as exc:
+        assert "non-finite" in str(exc)
+    bad_q = _FakeIkTerm(ee_quat_b=np.array([[2.0, 0.0, 0.0, 0.0]], dtype=np.float32))
+    try:
+        resolve_ur10e_ee_hold_pose7_from_action_term(bad_q)
+        raise AssertionError("expected ValueError for bad quat norm")
+    except ValueError as exc:
+        assert "quaternion norm" in str(exc)
+
+
+def test_gripper_raw_sign_selects_open_close_and_validates_term_dim() -> None:
+    joint_names = [
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint",
+        "finger_joint",
+    ]
+    open_like = _FakeArticulation(joint_names, np.array([[0, 0, 0, 0, 0, 0, 0.32]], dtype=np.float32))
+    env = _FakeEnv({"ur10e_ee": _FakeIkTerm(), "ur10e_gripper": _FakeBinaryTerm(1)})
+    raw_open, audit_open = resolve_ur10e_gripper_hold_raw_from_articulation(env, open_like)
+    assert raw_open == 1.0
+    assert audit_open["selected"] == "open"
+    close_like = _FakeArticulation(joint_names, np.array([[0, 0, 0, 0, 0, 0, 0.76]], dtype=np.float32))
+    raw_close, audit_close = resolve_ur10e_gripper_hold_raw_from_articulation(env, close_like)
+    assert raw_close == -1.0
+    assert audit_close["selected"] == "close"
+    bad_env = _FakeEnv({"ur10e_ee": _FakeIkTerm(), "ur10e_gripper": _FakeBinaryTerm(2)})
+    try:
+        resolve_ur10e_gripper_hold_raw_from_articulation(bad_env, close_like)
+        raise AssertionError("expected ValueError for gripper action_dim")
+    except ValueError as exc:
+        assert "action_dim" in str(exc)
+
+
+def test_joint_baseline_never_enters_hold_action() -> None:
+    env = _FakeEnv({"ur10e_ee": _FakeIkTerm(), "ur10e_gripper": _FakeBinaryTerm(1)})
+    pose7, _ = resolve_ur10e_ee_hold_pose7_from_action_term(env.action_manager.get_term("ur10e_ee"))
+    art = _FakeArticulation(
+        ["shoulder_pan_joint", "shoulder_lift_joint", "elbow_joint", "wrist_1_joint", "wrist_2_joint", "wrist_3_joint", "finger_joint"],
+        np.array([[99.0, 99.0, 99.0, 99.0, 99.0, 99.0, 0.32]], dtype=np.float32),
+    )
+    joint_baseline7, _, _ = resolve_ur10_hold_target_from_articulation(art)
+    raw_grip, _ = resolve_ur10e_gripper_hold_raw_from_articulation(env, art)
+    hold = compose_ur10_hold_action(pose7, raw_grip)
+    assert np.allclose(hold[:7], pose7)
+    assert not np.allclose(hold[:7], joint_baseline7)
 
 
 if __name__ == "__main__":
-    test_build_hold_action_and_hash_stable()
+    test_compose_hold_action_and_hash_stable()
     test_extract_pose7_from_real_obs_fixture()
     test_resolve_freeze_seed_prefers_runtime_state_8d_action()
     test_resolve_freeze_seed_missing_schema_fails_closed()
@@ -334,5 +397,8 @@ if __name__ == "__main__":
     test_resolve_ur10e_ee_action_term_passes_expected_contract()
     test_resolve_ur10e_ee_action_term_fails_closed_on_bad_controller_cfg()
     test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale()
-    test_compute_ur10e_ee_world_pose_from_action_term_uses_root_transform()
+    test_resolve_ur10e_ee_hold_pose7_from_action_term_uses_root_transform()
+    test_hold_pose7_fails_closed_on_nan_and_bad_quat_norm()
+    test_gripper_raw_sign_selects_open_close_and_validates_term_dim()
+    test_joint_baseline_never_enters_hold_action()
     print("PASS test_motion_isolation_unit")
