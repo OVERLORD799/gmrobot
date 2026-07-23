@@ -1,0 +1,81 @@
+{
+  "doc": "vlm-v1m1u0-dyn-b-image-app-launcher-smoke-2026-07-23",
+  "verdict": "FULL_APP_LAUNCHER_SMOKE_FAIL",
+  "next_gate": "STOP_NO_CAPTURE",
+  "allow_formal_dyn_b_preflight_request": false,
+  "formal_dyn_b_capture_run": false,
+  "build_count": 1,
+  "smoke_count": 1,
+  "rerun_forbidden": true,
+  "head_at_start": "fb28e37c98e72a44f607211b1dc8becef7ab4088",
+  "m1t_verdict": "STOP_DYN_B_RUNTIME_LOOP",
+  "historical_fail_dirs_preserved": [
+    "results/paper_demo/v1m1t_smoke_20260723",
+    "results/paper_demo/v1m1t_smoke2_20260723"
+  ],
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u0-20260723",
+    "id": "sha256:19196c23cbaf754865e77936198e432c69fffad3f783c81e79471d45b9e3a96c",
+    "created": "2026-07-23T13:21:28.738344282+08:00",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u0",
+    "base_tag": "gmdisturb:e01-func-c-m1j-20260723",
+    "base_id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "build_exit": 0,
+    "build_elapsed_seconds": 1
+  },
+  "protected_images_unchanged": {
+    "b4-p010": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "semantic-shadow-v1c0p1": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+    "e01-func-c-m1j": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248"
+  },
+  "baked_source_sha256": {
+    "scripts/run_phase3.py": "c1bea236d1f5cdcc100f94452df78ba81e9522ba8eb5235a497635e230f31be9",
+    "g1_disturbance_controller.py": "4415fa7f5938c7f9c35db8cef61e7d87f3926efa0521847d20401b9023a19695",
+    "e01_dyn_b_runtime_guard.py": "3947554a996d0273a4f5f73284cd00c84a4ae17d8f3aa3127965ea1ebc113b81",
+    "configs/e01_dyn_b_capture.yaml": "3bc416dfd795e8f80dc27755620587248307d7ecff3bddd98d791dcdd9aaf729"
+  },
+  "static_verify": {
+    "outer_lateral_patrol_in_argparse": true,
+    "scripted_g1_outer_lateral_patrol_in_config": true,
+    "no_pip_prebundle_injection_in_guard": true,
+    "verdict": "IMAGE_CODE_OK"
+  },
+  "smoke": {
+    "exit_code": 86,
+    "returncode_raw": 0,
+    "elapsed_monotonic_sec": 15.954307112,
+    "app_launcher_started": true,
+    "simulation_steps_completed": 0,
+    "outer_lateral_patrol_accepted_by_parser": true,
+    "csv_path": "results/paper_demo/v1m1u0_dyn_b_image_smoke_20260723/safety_logs/phase3.csv",
+    "csv_exists": false,
+    "csv_rows": 0,
+    "post_count": 0,
+    "host_code_bind_mounted": false,
+    "pip_prebundle_pythonpath_injected": false,
+    "failure_class": "NUMPY_ABI_MIXED_DURING_APPLAUNCHER_EXTENSION_LOAD"
+  },
+  "numpy_origin_pre_phase3": {
+    "numpy_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/__init__.py",
+    "numpy_random_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/random/__init__.py",
+    "numpy_version": "2.4.6"
+  },
+  "numpy_failure_observed": {
+    "numpy_random_loaded_from": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy/random/",
+    "error": "ValueError: numpy.dtype size changed, may indicate binary incompatibility. Expected 96 from C header, got 88 from PyObject"
+  },
+  "xid": {
+    "before_count": 0,
+    "after_count": 0,
+    "new_xid": false
+  },
+  "tests": {
+    "test_e01_dyn_b_runtime_guard_unit": "PASS",
+    "test_e01_dyn_b_offline_readiness_unit": "PASS",
+    "test_e01_dyn_b_m1u0_image_bake_unit": "PASS",
+    "test_capture_one_shot_runner_unit": "PASS"
+  },
+  "results_dir": "g1_ur10e_disturbance/results/paper_demo/v1m1u0_dyn_b_image_smoke_20260723",
+  "results_committed": false,
+  "note": "Image bake succeeded and outer_lateral_patrol is present; full AppLauncher smoke failed on NumPy ABI mix during Kit extension load. No formal Dyn-B capture."
+}

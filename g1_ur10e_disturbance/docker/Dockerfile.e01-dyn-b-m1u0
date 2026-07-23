@@ -1,0 +1,18 @@
+# V1-M1U0: bake Dyn-B runtime (outer_lateral_patrol) into a new independent image.
+# Base: proven AppLauncher path from Func-C M1J. Does NOT retag/overwrite
+# defe95e7 / f81e59ce / c3fd8087 images.
+FROM gmdisturb:e01-func-c-m1j-20260723
+
+# Dyn-B scenario + controller (must include outer_lateral_patrol / scripted phases)
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_b_offline_readiness.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_offline_readiness.py
+COPY configs/e01_dyn_b_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml
+COPY scripts/isaac_abi_import_preflight.py /opt/projects/g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py
+COPY scripts/test_e01_dyn_b_runtime_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py
+COPY scripts/test_e01_dyn_b_offline_readiness_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_offline_readiness_unit.py
+
+LABEL gmdisturb.e01_dyn_b_m1u0="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1j-20260723" \
+      gmdisturb.milestone="V1-M1U0"
