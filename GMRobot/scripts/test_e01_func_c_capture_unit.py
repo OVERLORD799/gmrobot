@@ -29,6 +29,8 @@ from shadow.v1e01_func_c_capture import (  # noqa: E402
     filled_content_roi,
     paper_scenario_sha_map,
     precheck_container_full_asset,
+    source_box_a_roi,
+    target_identity_evidence,
     target_box_b_roi,
     validate_func_c_flags,
 )
@@ -107,12 +109,44 @@ def test_asset_precheck_and_roi():
     assert pre["ok"] is True, pre
     assert pre["filled_part_mesh_count"] >= 8
     tgt = target_box_b_roi()
+    src = source_box_a_roi()
     filled = filled_content_roi()
     assert tgt["pixel_area"] >= 2500
+    assert src["pixel_area"] >= 2500
+    assert tgt["centroid_uv"][0] > src["centroid_uv"][0]
     assert filled["pixel_area"] > 0
     assert filled["containment"]["filled_inside_target"] is True
     assert tgt["roi_source"] == "projected_box_b_aabb"
     assert "projected" in filled["roi_source"]
+
+
+def test_roi_identity_evidence_on_m1m_frames_if_present():
+    """Regression: target ROI must align with box_B distinctive pixels, not source A."""
+    # Optional fixture: do not fail local/unit runs without archived results.
+    frames = [
+        ROOT.parent
+        / "g1_ur10e_disturbance"
+        / "results"
+        / "paper_demo"
+        / "v1e01_func_c_final_m1m_20260723"
+        / "scene"
+        / "frame_000100_env0.png",
+        ROOT.parent
+        / "g1_ur10e_disturbance"
+        / "results"
+        / "paper_demo"
+        / "v1e01_func_c_final_m1m_20260723"
+        / "scene"
+        / "frame_000200_env0.png",
+    ]
+    if not all(p.is_file() for p in frames):
+        return
+    tgt = target_box_b_roi()
+    for p in frames:
+        ev = target_identity_evidence(p, tgt)
+        assert ev["ok"] is True, f"{p.name}: {ev}"
+        assert ev["checks"]["source_greener_than_target"] is True, f"{p.name}: {ev}"
+        assert ev["checks"]["target_right_of_source"] is True, f"{p.name}: {ev}"
 
 
 def test_geometry_manifest_roundtrip_and_b0b4():

@@ -1,0 +1,110 @@
+{
+  "milestone": "V1-M1N",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "base_commit": "82d09c0",
+  "scope": {
+    "offline_only": true,
+    "forbidden_actions": [
+      "docker",
+      "isaac",
+      "network",
+      "vlm",
+      "sam2",
+      "post"
+    ],
+    "raw_frames_rewritten": false,
+    "safety_logs_rewritten": false
+  },
+  "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723",
+  "object_mapping": {
+    "source_A": {
+      "world_center_xyz": [
+        0.75,
+        -0.25,
+        0.0
+      ],
+      "asset_runtime": "container_fixed.usd",
+      "semantic_source": "container.usd",
+      "projected_roi_xyxy": [
+        224,
+        80,
+        298,
+        211
+      ]
+    },
+    "target_B": {
+      "world_center_xyz": [
+        0.75,
+        0.25,
+        0.0
+      ],
+      "asset_runtime": "container_full_visual.usd",
+      "semantic_source": "container_full.usd",
+      "projected_roi_xyxy": [
+        341,
+        80,
+        415,
+        211
+      ]
+    },
+    "filled_contents": {
+      "source": "Part_* meshes inside container_full geometry",
+      "projected_roi_xyxy": [
+        350,
+        97,
+        407,
+        192
+      ]
+    }
+  },
+  "roi_audit": {
+    "old_target_roi_xyxy": [
+      266,
+      203,
+      364,
+      232
+    ],
+    "new_target_roi_xyxy": [
+      341,
+      80,
+      415,
+      211
+    ],
+    "old_new_iou": 0.017069701280226248,
+    "projection_root_cause": "legacy D1B empirical linear projection reused for Func-C target ROI",
+    "projection_fix": "deterministic pinhole projection with scene_camera intrinsics and down-looking convention"
+  },
+  "pixel_identity_evidence": {
+    "frame_000100_env0": {
+      "target_identity_ok": true,
+      "source_green_ratio": 0.48717171717171714,
+      "target_green_ratio": 0.01202020202020202,
+      "target_dark_ratio": 0.6173737373737374
+    },
+    "frame_000200_env0": {
+      "target_identity_ok": true,
+      "source_green_ratio": 0.48727272727272725,
+      "target_green_ratio": 0.008383838383838384,
+      "target_dark_ratio": 0.6087878787878788
+    }
+  },
+  "label_gate": {
+    "label_status": "provisional",
+    "reviewer_approved": false,
+    "blocked": true,
+    "blocker": "full/unavailable semantics still provisional without independent human semantic adjudication record",
+    "not_vlm_positive": true,
+    "ready_for_vlm_screen": false
+  },
+  "regression": {
+    "added_target_identity_evidence_gate": true,
+    "added_offline_test": "test_roi_identity_evidence_on_m1m_frames_if_present"
+  },
+  "tests": [
+    {
+      "cmd": "python g1_ur10e_disturbance/docker/context/GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "pass": true
+    }
+  ]
+}

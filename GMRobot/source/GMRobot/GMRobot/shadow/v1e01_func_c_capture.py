@@ -31,10 +31,11 @@ from shadow.target_full_override import (
 
 # Reuse D1B empirical overhead projection (same default camera).
 from shadow.v1d1b_capture import (
+    CAMERA_H_APERTURE,
+    CAMERA_FOCAL_LENGTH,
     CAMERA_HEIGHT,
     CAMERA_WIDTH,
     TARGET_CONTAINER_POSE,
-    project_world_to_uv,
     roi_from_world_point,
     sha256_file,
 )
@@ -359,7 +360,7 @@ def target_box_b_roi() -> dict[str, Any]:
         (cx + half_x, cy + half_y, 0.15),
         (cx, cy, 0.25),
     ]
-    uvs = [project_world_to_uv(c) for c in corners]
+    uvs = [_project_world_to_uv_pinhole(c) for c in corners]
     uvs = [uv for uv in uvs if uv is not None]
     if not uvs:
         return {"visible": False, "pixel_area": 0, "roi_source": "projected_box_b_aabb"}
@@ -387,7 +388,7 @@ def filled_content_roi() -> dict[str, Any]:
         (cx + half_x, cy - half_y, 0.18),
         (cx + half_x, cy + half_y, 0.18),
     ]
-    uvs = [project_world_to_uv(c) for c in corners]
+    uvs = [_project_world_to_uv_pinhole(c) for c in corners]
     uvs = [uv for uv in uvs if uv is not None]
     us = [u for u, _ in uvs]
     vs = [v for _, v in uvs]
@@ -410,6 +411,117 @@ def filled_content_roi() -> dict[str, Any]:
         "roi_source": "projected_filled_parts_aabb",
         "containment": containment,
     }
+
+
+def source_box_a_roi() -> dict[str, Any]:
+    """Projected AABB ROI for source box_A (identity audit reference)."""
+    cx, cy, _ = (TARGET_CONTAINER_POSE[0], -TARGET_CONTAINER_POSE[1], TARGET_CONTAINER_POSE[2])
+    half_x, half_y = 0.28, 0.16
+    corners = [
+        (cx - half_x, cy - half_y, 0.15),
+        (cx - half_x, cy + half_y, 0.15),
+        (cx + half_x, cy - half_y, 0.15),
+        (cx + half_x, cy + half_y, 0.15),
+        (cx, cy, 0.25),
+    ]
+    uvs = [_project_world_to_uv_pinhole(c) for c in corners]
+    uvs = [uv for uv in uvs if uv is not None]
+    if not uvs:
+        return {"visible": False, "pixel_area": 0, "roi_source": "projected_box_a_aabb"}
+    us = [u for u, _ in uvs]
+    vs = [v for _, v in uvs]
+    x0, x1 = max(0, int(min(us))), min(CAMERA_WIDTH - 1, int(max(us)))
+    y0, y1 = max(0, int(min(vs))), min(CAMERA_HEIGHT - 1, int(max(vs)))
+    area = max(0, (x1 - x0 + 1) * (y1 - y0 + 1))
+    return {
+        "visible": area > 0,
+        "bbox_xyxy": [x0, y0, x1, y1],
+        "centroid_uv": [0.5 * (x0 + x1), 0.5 * (y0 + y1)],
+        "pixel_area": int(area),
+        "roi_source": "projected_box_a_aabb",
+    }
+
+
+def _project_world_to_uv_pinhole(pos: Sequence[float]) -> tuple[float, float] | None:
+    """Deterministic projection for the world-convention down-looking scene camera."""
+    px, py, pz = [float(v) for v in pos]
+    cx, cy, cz = [float(v) for v in CAMERA_POS]
+    rel_x, rel_y, rel_z = (px - cx, py - cy, pz - cz)
+    # For camera quat ~= (0.7071, 0, 0.7071, 0) with convention="world":
+    # +u aligns with +world_y, +v aligns with -world_x, looking down (-world_z).
+    depth = -rel_z
+    if depth <= 1e-6:
+        return None
+    fx = (float(CAMERA_FOCAL_LENGTH) / float(CAMERA_H_APERTURE)) * float(CAMERA_WIDTH)
+    fy = fx
+    u = 0.5 * float(CAMERA_WIDTH) + fx * (rel_y / depth)
+    v = 0.5 * float(CAMERA_HEIGHT) - fy * (rel_x / depth)
+    return (float(u), float(v))
+
+
+def _roi_crop_stats(arr: Any, roi: Mapping[str, Any]) -> dict[str, Any]:
+    bbox = roi.get("bbox_xyxy")
+    if not bbox:
+        return {"ok": False, "reason": "missing_bbox"}
+    x0, y0, x1, y1 = [int(v) for v in bbox]
+    crop = arr[y0 : y1 + 1, x0 : x1 + 1]
+    if getattr(crop, "size", 0) == 0:
+        return {"ok": False, "reason": "empty_crop"}
+    r = crop[..., 0].astype("int16")
+    g = crop[..., 1].astype("int16")
+    b = crop[..., 2].astype("int16")
+    green = (g > r + 25) & (g > b + 20) & (g > 85)
+    dark = ((r.astype("int32") + g + b) / 3.0) < 105
+    return {
+        "ok": True,
+        "area": int(crop.shape[0] * crop.shape[1]),
+        "green_px": int(green.sum()),
+        "dark_px": int(dark.sum()),
+        "green_ratio": float(green.sum()) / float(max(1, crop.shape[0] * crop.shape[1])),
+        "dark_ratio": float(dark.sum()) / float(max(1, crop.shape[0] * crop.shape[1])),
+    }
+
+
+def target_identity_evidence(rgb_path: Path | str, target_roi: Mapping[str, Any]) -> dict[str, Any]:
+    """Cross-check that target ROI behaves like box_B (less green than source A)."""
+    path = Path(rgb_path)
+    out: dict[str, Any] = {"ok": False, "path": str(path), "method": "target_vs_source_roi_rgb_contrast"}
+    if not path.is_file():
+        out["reason"] = "missing_rgb"
+        return out
+    try:
+        from PIL import Image
+        import numpy as np
+    except Exception as exc:  # pragma: no cover
+        out["reason"] = f"pillow_unavailable:{exc}"
+        return out
+    arr = np.asarray(Image.open(path).convert("RGB"))
+    source = source_box_a_roi()
+    t = _roi_crop_stats(arr, target_roi)
+    s = _roi_crop_stats(arr, source)
+    if not t.get("ok") or not s.get("ok"):
+        out["reason"] = "missing_roi_stats"
+        out["target_stats"] = t
+        out["source_stats"] = s
+        return out
+    # Box_A should be distinctly greener than full target box_B.
+    greener_source = float(s["green_ratio"]) > float(t["green_ratio"]) + 0.15
+    darker_target = float(t["dark_ratio"]) > 0.35
+    right_of_source = float(target_roi.get("centroid_uv", [0.0, 0.0])[0]) > float(source.get("centroid_uv", [1e9, 0.0])[0])
+    out.update(
+        {
+            "ok": bool(greener_source and darker_target and right_of_source),
+            "target_stats": t,
+            "source_stats": s,
+            "source_roi": source,
+            "checks": {
+                "source_greener_than_target": bool(greener_source),
+                "target_contains_dark_content": bool(darker_target),
+                "target_right_of_source": bool(right_of_source),
+            },
+        }
+    )
+    return out
 
 
 def rgb_filled_content_evidence(rgb_path: Path | str, filled_roi: Mapping[str, Any]) -> dict[str, Any]:
@@ -470,8 +582,10 @@ def build_frame_record(
         hand_roi = roi_from_world_point(hand_pos, half_extent_m=0.05)
     if path.is_file() and path.stat().st_size >= 1024:
         rgb_ev = rgb_filled_content_evidence(path, filled)
+        id_ev = target_identity_evidence(path, target)
     else:
         rgb_ev = {"ok": True, "reason": "synthetic_or_missing_skipped"}
+        id_ev = {"ok": True, "reason": "synthetic_or_missing_skipped"}
     return {
         "sim_step": int(step),
         "path": str(path),
@@ -480,6 +594,7 @@ def build_frame_record(
         "target_roi": target,
         "filled_content_roi": filled,
         "filled_content_rgb_evidence": rgb_ev,
+        "target_identity_evidence": id_ev,
         "hand_proxy": {
             "pos": list(hand_pos) if hand_pos is not None else None,
             "roi": hand_roi,
@@ -510,6 +625,7 @@ def build_capture_manifest(
         and float((fr.get("filled_content_roi") or {}).get("pixel_area") or 0) > 0
         and bool((fr.get("filled_content_roi") or {}).get("containment", {}).get("filled_inside_target", False))
         and bool((fr.get("filled_content_rgb_evidence") or {}).get("ok"))
+        and bool((fr.get("target_identity_evidence") or {}).get("ok"))
         and bool(fr.get("sha256"))
         for fr in frames
     )
