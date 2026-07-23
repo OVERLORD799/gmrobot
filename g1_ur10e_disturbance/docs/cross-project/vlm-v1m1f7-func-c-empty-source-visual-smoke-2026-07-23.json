@@ -1,0 +1,97 @@
+{
+  "task": "V1-M1F7 Func-C visual-only去遮挡修复 source-only build + visual smoke",
+  "date": "2026-07-23",
+  "status": "STOP_NO_RETRY",
+  "preflight": {
+    "head_expected_short": "86b07d0",
+    "head_actual_full": "86b07d07012c6b3035e11cd45c5503c372aee18b",
+    "origin_main_match": true,
+    "worktree_clean_at_preflight": true,
+    "m1f6_tests_manifest_pass": true
+  },
+  "budget": {
+    "build": 1,
+    "isaac_applauncher_smoke": 1,
+    "retry": 0
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/GMRobot/docker/Dockerfile.e01-func-c-empty-source-m1f7",
+    "dockerfile_copy_only": true,
+    "tag": "gmdisturb:e01-func-c-empty-source-m1f7-20260723",
+    "image_sha": "sha256:9465a5115ab3c416c6a0481ff12945c222092ed31c248df1387561db2f6b9731",
+    "exit_code": 0
+  },
+  "smoke": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_empty_source_smoke_m1f7_20260723",
+    "env_explicit": {
+      "GMROBOT_V1E01_TARGET_FULL": "1",
+      "GMROBOT_V1E01_VISUAL_ONLY": "1"
+    },
+    "exit_code": 1,
+    "frame_path": "",
+    "frame_sha256": "",
+    "failure_stage": "pre-isaac-runtime-assert",
+    "failure_reason": "ModuleNotFoundError: No module named 'pxr'"
+  },
+  "mode_flags_required": {
+    "task_execution": false,
+    "visual_dataset_only": true,
+    "spawn_task_parts": false
+  },
+  "runtime_prim_assert": {
+    "part_count": null,
+    "containerA_exists": null,
+    "gridA_exists": null,
+    "containerB_exists": null,
+    "available": false,
+    "reason": "smoke aborted before runtime prim audit writeout"
+  },
+  "hashes": {
+    "source_container_asset_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+    "source_container_asset_sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "reference_frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+    "reference_frame_sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "m1f5_rejected_frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png",
+    "m1f5_rejected_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5"
+  },
+  "camera": {
+    "pos": [
+      0.35,
+      0.0,
+      2.5
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ]
+  },
+  "gpu_xid": {
+    "gpu_info": "GPU 0: NVIDIA GeForce RTX 5090 Laptop GPU (UUID: GPU-6b6f962a-ac86-00b4-e732-e8caafeca73d)",
+    "xid_pre": "unavailable: nvidia-smi -q -d XID not supported in current driver CLI",
+    "xid_post": "unavailable: nvidia-smi -q -d XID not supported in current driver CLI",
+    "dmesg_xid_pre_lines": 0,
+    "dmesg_xid_post_lines": 0,
+    "new_xid": false
+  },
+  "gate_results": {
+    "exit_0": false,
+    "png_non_black": false,
+    "dual_box_roi": false,
+    "right_full_content": false,
+    "part_count_0": false,
+    "post_0": false,
+    "no_traceback": false,
+    "no_device_lost": true,
+    "no_new_xid": true,
+    "no_residual": true
+  },
+  "forbidden_ops": {
+    "formal_task_recapture": false,
+    "network_post": false,
+    "model_call": false,
+    "retries_performed": 0
+  },
+  "visual_verdict": "VISUAL_REVIEW_REQUIRED"
+}
