@@ -1,0 +1,120 @@
+{
+  "task": "E01-Func-C Recovery formal single recapture",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "head": "7764e300170e2ba898c3aa6e2b7fadaa71c88ead",
+  "image": {
+    "name": "gmdisturb:e01-func-c-m1j-20260723",
+    "id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "created": "2026-07-23T11:58:01.198543397+08:00",
+    "expected_sha": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "matches_expected": true
+  },
+  "precheck": {
+    "runtime_safety_config": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/meta/runtime_safety_config.yaml",
+    "runtime_safety_diff": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/meta/runtime_safety_config.diff",
+    "runtime_change_assertion": "only log_dir changed; threshold/trajectory/e01 fields invariant",
+    "sha256": {
+      "safety_config_tracked": "b30f728b32deb528621ef6e552f2306133eba123f946681b0d1aca5a8731fee8",
+      "usd_container": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+      "usd_container_full": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+      "usd_container_full_visual": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+      "generator_script": "63226bb47b544e33f2bc5396c200513de0a3ef5df674b6e8cd0ed2bfffaa8fa0"
+    },
+    "xid_pre_note": "dmesg read not permitted"
+  },
+  "run": {
+    "single_docker_run_only": true,
+    "command_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/meta/command.txt",
+    "stdout_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/meta/capture_stdout_stderr.txt",
+    "docker_exit_code_real_captured": false,
+    "elapsed_real_captured": false,
+    "wrapper_command_exit": 0,
+    "note": "initial wrapper failed to export shell vars for docker exit/elapsed persistence; rerun forbidden"
+  },
+  "frames": {
+    "0": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/scene/frame_000000_env0.png",
+      "sha256": "76c164f86f325e8c894a273ed354bf80db347a6563276dbb1b863beaa16c023d",
+      "format": "PNG",
+      "shape_hwc": [
+        480,
+        640,
+        3
+      ],
+      "dtype": "uint8"
+    },
+    "100": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/scene/frame_000100_env0.png",
+      "sha256": "de9249150255bc43013a7d062cae6b4150dc13ef4b45392bbae3afbab25fc048",
+      "format": "PNG",
+      "shape_hwc": [
+        480,
+        640,
+        3
+      ],
+      "dtype": "uint8"
+    },
+    "200": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/scene/frame_000200_env0.png",
+      "sha256": "903e6f4e1874bd0b66ae33457bd67e9625b2985130dee94a4956ce2902ad79e0",
+      "format": "PNG",
+      "shape_hwc": [
+        480,
+        640,
+        3
+      ],
+      "dtype": "uint8"
+    }
+  },
+  "visual": {
+    "frame_100_200_manual_review": {
+      "white_sector_absent": true,
+      "containerA_and_20_source_parts_orderly": true,
+      "containerB_scale_normal_and_complete": true,
+      "filled_contents_clear_in_both_frames": true
+    }
+  },
+  "geometry": {
+    "csv_path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/safety_logs/20260723_040407/episode_0000.csv",
+    "window_step_range": [
+      100,
+      200
+    ],
+    "window_rows": 101,
+    "window_allow_rows": 101,
+    "window_slow_rows": 0,
+    "window_stop_rows": 0,
+    "window_replan_rows": 0,
+    "outside_counts_by_g_rule": {
+      "0": 173,
+      "2": 24,
+      "1": 2
+    }
+  },
+  "safety_logs_from_new_dir": true,
+  "error_scan": {
+    "traceback": false,
+    "filenotfound": false,
+    "device_lost": false,
+    "nestedRB": false,
+    "post_keyword": false,
+    "new_xid_detectable": false,
+    "xid_note": "dmesg unreadable (permission denied); pre/post nvidia-smi snapshots captured"
+  },
+  "analyzer": {
+    "cmd": "python3 GMRobot/scripts/analyze_e01_func_c_capture.py --results-dir g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723 --assets-dir GMRobot/source/GMRobot/GMRobot/assets",
+    "exit_code": 0,
+    "stdout_rel": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723/meta/analyzer_stdout.txt"
+  },
+  "labels": {
+    "functional": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "vlm_recognition_success_claimed": false
+  },
+  "legacy_overwrite": false,
+  "verdict": "CAPTURE_FAIL",
+  "verdict_reason": "real docker exit/elapsed not reliably persisted as required; no rerun allowed",
+  "manual_label_approval_ready": false
+}
