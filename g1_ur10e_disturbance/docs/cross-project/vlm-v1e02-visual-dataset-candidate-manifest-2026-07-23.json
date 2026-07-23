@@ -48,7 +48,7 @@
       ],
       "temporal_pair_required": false,
       "reviewer_approved": false,
-      "technical_review_status": "visual_rework_parts_occlusion_fix_pending",
+      "technical_review_status": "dual_reference_scene_rework_pending",
       "formal_recapture_allowed": false,
       "semantic_clarity": "user_review_required",
       "m1f5_user_rejected": true,
@@ -105,7 +105,11 @@
           "stream": "primary",
           "stability_only": false
         }
-      ]
+      ],
+      "status": "dual_reference_scene_rework_pending",
+      "formal": false,
+      "m1f10_user_rejected": true,
+      "m1f10_route_status": "ABANDONED_WASTEFUL_LOOP"
     },
     {
       "id": "E02-DYN-B-M1Z9-STEP220-330",

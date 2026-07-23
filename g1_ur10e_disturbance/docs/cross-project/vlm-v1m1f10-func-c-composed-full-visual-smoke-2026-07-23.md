@@ -34,3 +34,9 @@
 
 ## STOP_NO_RETRY
 - `runtime_scene_assertions.json` 未生成且 stderr 存在 `[Error]`，按规则失败即停、无重试。
+
+## M1F10 人工结论（后置）
+- decision: `rejected_manual`
+- status: `ABANDONED_WASTEFUL_LOOP`
+- reason: `frame场景结构缺失/仅1绿框+5散件，非reference；stderr存在nested RigidBody/CCD errors。`
+- route: `停止旧路线（container_full/content overlay），转向DualEnvCfg同源reference scene重构（M1F11）。`

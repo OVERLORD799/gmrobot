@@ -1,0 +1,12 @@
+scene_group: e01_func_c_dual_reference_m1f11
+reference_scene_group: e01_dyn_b_formal_m1z9_20260723
+reference_frame: frame_000330_env0.png
+opt_in_env: GMDISTURB_V1E01_FUNC_C_VISUAL
+opt_in_default: 0
+task_execution: false
+visual_dataset_only: true
+controller_enabled: false
+camera_pos: [0.45, 0.0, 2.7]
+camera_rot: [0.7071, 0.0, 0.7071, 0.0]
+capture_steps: [330]
+runtime_assertions_json: results/paper_demo/v1e01_func_c_dual_reference_m1f11/meta/runtime_scene_assertions.json

@@ -13,7 +13,7 @@
   "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/scene/frame_000000_env0.png",
   "reference_frame330_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
   "visual_verdict": "REVIEW_REQUIRED",
-  "overall_status": "STOP_NO_RETRY",
+  "overall_status": "ABANDONED_WASTEFUL_LOOP",
   "smoke_exit_code": 0,
   "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/runtime_scene_assertions.json",
   "runtime_scene_assertions_present": false,
@@ -101,5 +101,14 @@
     "stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/smoke_stderr.txt",
     "build_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/build_stdout.txt",
     "build_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/build_stderr.txt"
-  }
+  },
+  "user_review": {
+    "decision": "rejected_manual",
+    "reason": "frame场景结构缺失，仅1绿框+5散件，非reference；stderr nested RigidBody/CCD errors",
+    "status": "ABANDONED_WASTEFUL_LOOP",
+    "old_route": "container_full/content overlay",
+    "old_route_action": "stopped"
+  },
+  "next_gate": "STOP_NO_RETRY",
+  "m1f11_pivot_required": true
 }

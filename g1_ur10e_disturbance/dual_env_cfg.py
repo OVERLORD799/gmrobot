@@ -47,6 +47,11 @@ if _PROJECT_ROOT not in sys.path:
     sys.path.insert(0, _PROJECT_ROOT)
 
 from scene_camera_override import resolve_scene_camera_pose
+from func_c_dual_reference_contract import (
+    REFERENCE_CONTENT_SOURCE,
+    resolve_part_locations,
+    visual_opt_in_enabled,
+)
 
 _SCENE_CAMERA_POS, _SCENE_CAMERA_ROT = resolve_scene_camera_pose()
 
@@ -122,8 +127,14 @@ GRID_OFFSET = (-0.27305, -0.16637, 0.10)
 PART_HEIGHT = 0.17
 PART_DEFAULT_ROT = (0.7071068, 0.0, -0.7071068, 0.0)
 PART_SLOT_COUNT = CONTAINER_X_SLOTS * CONTAINER_Y_SLOTS  # 20
-# All 20 parts start in Container A (matching GMRobot: PART_LOCATIONS)
-PART_LOCATIONS = [f"A@{i}" for i in range(1, PART_SLOT_COUNT + 1)]
+# Default: all 20 parts start in Container A (Dual baseline).
+# Opt-in GMDISTURB_V1E01_FUNC_C_VISUAL=1: deterministic B@1..B@20 for
+# Func-C capture-only reference framing, while preserving Dual defaults.
+PART_LOCATIONS = resolve_part_locations()
+if visual_opt_in_enabled() and REFERENCE_CONTENT_SOURCE != "part_assets_20_slots":
+    raise RuntimeError(
+        "Func-C Dual reference scene BLOCKED: reference content source is not part-assets slots."
+    )
 
 # =============================================================================
 # Container/Part builder functions (inlined from GMRobot gmrobot_env_cfg.py)

@@ -1,0 +1,66 @@
+{
+  "milestone": "V1-M1F11",
+  "date": "2026-07-23",
+  "preflight": {
+    "head": "00544a3",
+    "worktree_clean": true
+  },
+  "inherits_rejection": {
+    "from": "V1-M1F10",
+    "decision": "user_rejected",
+    "status": "ABANDONED_WASTEFUL_LOOP",
+    "reason": "frame结构缺失/仅1绿框+5散件，非reference；stderr nested RigidBody/CCD errors"
+  },
+  "route": {
+    "old": "GMRobot Func-C composed/overlay route",
+    "old_status": "ABANDONED_WASTEFUL_LOOP",
+    "new": "DualEnvCfg same-origin reference scene",
+    "uses_gm_state_machine": false
+  },
+  "opt_in": {
+    "env": "GMDISTURB_V1E01_FUNC_C_VISUAL",
+    "default": 0,
+    "task_execution_when_opt_in": false,
+    "visual_dataset_only_when_opt_in": true,
+    "controller_enabled_when_opt_in": false
+  },
+  "reference_lock": {
+    "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+    "frame": "frame_000330_env0.png",
+    "camera_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "camera_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "container_divider_ur10e_table_pose": "dual_env_cfg_locked"
+  },
+  "content_source": {
+    "type": "part_assets_20_slots",
+    "part_count": 20,
+    "slot_assignment": "B@1..B@20",
+    "other_box_empty": true,
+    "blocked_if_not_parts": true
+  },
+  "assertions": {
+    "dual_scene_identity": true,
+    "containerA_B_gridA_B": true,
+    "part_count_20_slot_assignment": true,
+    "task_execution_false": true
+  },
+  "constraints": {
+    "no_new_usd_material_shell_overlay": true,
+    "no_part_geometry_change": true,
+    "no_b0_b4_yaml_diff": true,
+    "offline_only": true,
+    "docker_isaac_build_capture_network_post_forbidden_in_this_step": true
+  },
+  "status": "dual_reference_scene_rework_pending",
+  "formal": false,
+  "next_step_allowed": "copy-only build + one visual smoke"
+}
