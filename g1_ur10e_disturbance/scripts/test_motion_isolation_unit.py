@@ -18,6 +18,8 @@ from motion_isolation import (  # noqa: E402
     resolve_ur10_freeze_action_seed,
     extract_ur10_pose7_from_policy_obs,
     resolve_ur10_hold_target_from_articulation,
+    resolve_ur10e_ee_action_term,
+    compute_ur10e_ee_world_pose_from_action_term,
 )
 
 
@@ -44,6 +46,81 @@ class _FakeArticulation:
     def __init__(self, joint_names: list[str], joint_pos_1xN: np.ndarray) -> None:
         self.joint_names = list(joint_names)
         self.data = _FakeArticulationData(np.asarray(joint_pos_1xN, dtype=np.float32))
+
+
+class _FakeActionManager:
+    def __init__(self, terms: dict[str, object]) -> None:
+        self._terms = dict(terms)
+
+    def get_term(self, name: str) -> object:
+        return self._terms[name]
+
+
+class _FakeEnv:
+    def __init__(self, terms: dict[str, object]) -> None:
+        self.unwrapped = self
+        self.action_manager = _FakeActionManager(terms)
+
+
+class _FakeControllerCfg:
+    def __init__(self, *, command_type: str = "pose", use_relative_mode: bool = False) -> None:
+        self.command_type = command_type
+        self.use_relative_mode = use_relative_mode
+
+
+class _FakeTermCfg:
+    def __init__(self, *, scale: object = 1.0, controller: _FakeControllerCfg | None = None) -> None:
+        self.scale = scale
+        self.controller = controller or _FakeControllerCfg()
+
+
+class _FakeAssetData:
+    def __init__(self, root_pos_w: np.ndarray, root_quat_w: np.ndarray) -> None:
+        self.root_pos_w = np.asarray(root_pos_w, dtype=np.float32)
+        self.root_quat_w = np.asarray(root_quat_w, dtype=np.float32)
+
+
+class _FakeAsset:
+    def __init__(self, root_pos_w: np.ndarray, root_quat_w: np.ndarray) -> None:
+        self.data = _FakeAssetData(root_pos_w, root_quat_w)
+
+
+class _FakeIkTerm:
+    def __init__(
+        self,
+        *,
+        action_dim: int = 7,
+        scale: object = 1.0,
+        command_type: str = "pose",
+        use_relative_mode: bool = False,
+        root_pos_w: np.ndarray | None = None,
+        root_quat_w: np.ndarray | None = None,
+        ee_pos_b: np.ndarray | None = None,
+        ee_quat_b: np.ndarray | None = None,
+    ) -> None:
+        self.action_dim = int(action_dim)
+        self.cfg = _FakeTermCfg(
+            scale=scale,
+            controller=_FakeControllerCfg(
+                command_type=command_type,
+                use_relative_mode=use_relative_mode,
+            ),
+        )
+        self._asset = _FakeAsset(
+            root_pos_w if root_pos_w is not None else np.array([[1.0, 2.0, 3.0]], dtype=np.float32),
+            root_quat_w if root_quat_w is not None else np.array([[1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
+        )
+        self._ee_pos_b = np.asarray(
+            ee_pos_b if ee_pos_b is not None else np.array([[0.1, -0.2, 0.3]], dtype=np.float32),
+            dtype=np.float32,
+        )
+        self._ee_quat_b = np.asarray(
+            ee_quat_b if ee_quat_b is not None else np.array([[1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
+            dtype=np.float32,
+        )
+
+    def _compute_frame_pose(self) -> tuple[np.ndarray, np.ndarray]:
+        return self._ee_pos_b.copy(), self._ee_quat_b.copy()
 
 
 def _load_obs_fixture() -> dict:
@@ -189,6 +266,61 @@ def test_controller_action_differs_but_hold_uses_actual_articulation() -> None:
     assert abs(grip - 0.0) < 1e-6
 
 
+def test_resolve_ur10e_ee_action_term_passes_expected_contract() -> None:
+    term = _FakeIkTerm(action_dim=7, scale=1.0, command_type="pose", use_relative_mode=False)
+    env = _FakeEnv({"ur10e_ee": term})
+    resolved, audit = resolve_ur10e_ee_action_term(env)
+    assert resolved is term
+    assert audit["action_dim"] == 7
+    assert audit["command_type"] == "pose"
+    assert audit["use_relative_mode"] is False
+    assert audit["scale"] == [1.0] * 7
+
+
+def test_resolve_ur10e_ee_action_term_fails_closed_on_bad_controller_cfg() -> None:
+    env = _FakeEnv({"ur10e_ee": _FakeIkTerm(command_type="twist")})
+    try:
+        resolve_ur10e_ee_action_term(env)
+        raise AssertionError("expected ValueError for command_type mismatch")
+    except ValueError as exc:
+        assert "command_type" in str(exc)
+    env2 = _FakeEnv({"ur10e_ee": _FakeIkTerm(use_relative_mode=True)})
+    try:
+        resolve_ur10e_ee_action_term(env2)
+        raise AssertionError("expected ValueError for use_relative_mode mismatch")
+    except ValueError as exc:
+        assert "use_relative_mode" in str(exc)
+
+
+def test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale() -> None:
+    env = _FakeEnv({"ur10e_ee": _FakeIkTerm(action_dim=6)})
+    try:
+        resolve_ur10e_ee_action_term(env)
+        raise AssertionError("expected ValueError for action_dim mismatch")
+    except ValueError as exc:
+        assert "action_dim" in str(exc)
+    env2 = _FakeEnv({"ur10e_ee": _FakeIkTerm(scale=[1, 1, 1, 1, 1, 1, 0.5])})
+    try:
+        resolve_ur10e_ee_action_term(env2)
+        raise AssertionError("expected ValueError for scale mismatch")
+    except ValueError as exc:
+        assert "scale" in str(exc)
+
+
+def test_compute_ur10e_ee_world_pose_from_action_term_uses_root_transform() -> None:
+    # root rotation = +90 deg around Z in wxyz
+    s = np.float32(np.sqrt(0.5))
+    term = _FakeIkTerm(
+        root_pos_w=np.array([[1.0, 2.0, 3.0]], dtype=np.float32),
+        root_quat_w=np.array([[s, 0.0, 0.0, s]], dtype=np.float32),
+        ee_pos_b=np.array([[1.0, 0.0, 0.0]], dtype=np.float32),
+        ee_quat_b=np.array([[1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
+    )
+    pos_w, quat_w = compute_ur10e_ee_world_pose_from_action_term(term)
+    assert np.allclose(pos_w, np.array([1.0, 3.0, 3.0], dtype=np.float32), atol=1e-6)
+    assert np.allclose(quat_w, np.array([s, 0.0, 0.0, s], dtype=np.float32), atol=1e-6)
+
+
 if __name__ == "__main__":
     test_build_hold_action_and_hash_stable()
     test_extract_pose7_from_real_obs_fixture()
@@ -199,4 +331,8 @@ if __name__ == "__main__":
     test_articulation_hold_missing_arm_joint_fails_closed()
     test_articulation_hold_gripper_mapping_prefers_first_available_gripper_joint()
     test_controller_action_differs_but_hold_uses_actual_articulation()
+    test_resolve_ur10e_ee_action_term_passes_expected_contract()
+    test_resolve_ur10e_ee_action_term_fails_closed_on_bad_controller_cfg()
+    test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale()
+    test_compute_ur10e_ee_world_pose_from_action_term_uses_root_transform()
     print("PASS test_motion_isolation_unit")

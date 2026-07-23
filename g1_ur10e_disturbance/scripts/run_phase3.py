@@ -427,6 +427,8 @@ from motion_isolation import (
     hold_action_hash,
     compute_ur10_freeze_metrics,
     resolve_ur10_hold_target_from_articulation,
+    resolve_ur10e_ee_action_term,
+    compute_ur10e_ee_world_pose_from_action_term,
 )
 from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
@@ -1343,6 +1345,18 @@ def main():
 
     ur10e.reset(obs["ur10e_policy"])
     disturb.reset()
+    ur10e_ee_term, ur10e_ee_term_audit = resolve_ur10e_ee_action_term(
+        env,
+        term_name="ur10e_ee",
+        expected_action_dim=7,
+        expected_command_type="pose",
+        expected_use_relative_mode=False,
+        expected_scale=1.0,
+    )
+    print(
+        "[phase3] UR10 ee term audit="
+        f"{json.dumps(ur10e_ee_term_audit, ensure_ascii=True, sort_keys=True)}"
+    )
     _ur10_hold_target7, _ur10_hold_joint_provenance, _ur10_hold_gripper0 = resolve_ur10_hold_target_from_articulation(
         env.unwrapped.scene["robot_ur10e"]
     )
@@ -1564,11 +1578,6 @@ def main():
     if args_cli.mode != "auto":
         mode_override = DisturbanceMode(args_cli.mode)
 
-    # Resolve EE tracking body index once (configurable via ee_track).
-    _ee_body_ids, _ = ur10e_robot.find_bodies(cfg.safety.ee_track.body)
-    _ee_body_idx = _ee_body_ids[0]
-    _ee_offset = np.array(cfg.safety.ee_track.offset, dtype=np.float32)
-
     # mid360_link = LiDAR body, mounted at the very top of G1's head.
     _head_body_idx = g1.find_bodies("mid360_link")[0][0]
     _HEAD_Z_OFFSET = 0.14  # above LiDAR body (visible clearance from head)
@@ -1598,7 +1607,7 @@ def main():
         redeploy_event_this_step = False
         # ── 1. Read robot state ───────────────────────────────────────
         g1_root = g1.data.root_pos_w[0].cpu().numpy()
-        ur10e_ee = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
+        ur10e_ee, _ = compute_ur10e_ee_world_pose_from_action_term(ur10e_ee_term, env_index=0)
 
         # ── 2. G1 walking (reads obs with injected velocity) ──────────
         walker_obs = obs["g1_walker"][0].cpu().numpy().astype(np.float32)
@@ -2929,7 +2938,7 @@ def main():
                     except Exception:
                         continue
                 _root_now = g1.data.root_pos_w[0].cpu().numpy()
-                _ee_now = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
+                _ee_now, _ = compute_ur10e_ee_world_pose_from_action_term(ur10e_ee_term, env_index=0)
                 _rec = {
                     "step": int(step),
                     "sim_step": int(step),

@@ -33,6 +33,126 @@ ARM_JOINT_NAMES = tuple(str(x) for x in _CFG_ARM_JOINT_NAMES)
 GRIPPER_JOINT_NAMES = tuple(str(x) for x in _CFG_GRIPPER_JOINT_NAMES)
 
 
+def _quat_multiply_wxyz(q1: np.ndarray, q2: np.ndarray) -> np.ndarray:
+    """Hamilton product for quaternions in (w, x, y, z)."""
+    w1, x1, y1, z1 = [float(v) for v in np.asarray(q1, dtype=np.float64).reshape(4)]
+    w2, x2, y2, z2 = [float(v) for v in np.asarray(q2, dtype=np.float64).reshape(4)]
+    return np.asarray(
+        [
+            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
+            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
+            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
+            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
+        ],
+        dtype=np.float32,
+    )
+
+
+def _quat_apply_wxyz(quat_wxyz: np.ndarray, vec3: np.ndarray) -> np.ndarray:
+    """Rotate a 3D vector by quaternion (wxyz)."""
+    q = np.asarray(quat_wxyz, dtype=np.float64).reshape(4)
+    vq = np.asarray([0.0, *np.asarray(vec3, dtype=np.float64).reshape(3)], dtype=np.float64)
+    q_conj = np.asarray([q[0], -q[1], -q[2], -q[3]], dtype=np.float64)
+    out = _quat_multiply_wxyz(_quat_multiply_wxyz(q, vq), q_conj)
+    return np.asarray(out[1:], dtype=np.float32)
+
+
+def _scale_vector(cfg_scale: Any, *, action_dim: int) -> np.ndarray:
+    """Normalize action cfg.scale into a per-dimension float vector."""
+    if isinstance(cfg_scale, (int, float)):
+        return np.full((action_dim,), float(cfg_scale), dtype=np.float32)
+    vec = _to_float32_1d(cfg_scale, context="term.cfg.scale")
+    if vec.shape[0] == 1:
+        return np.full((action_dim,), float(vec[0]), dtype=np.float32)
+    if vec.shape[0] != action_dim:
+        raise ValueError(
+            f"term.cfg.scale length mismatch: expected 1 or {action_dim}, got {vec.shape[0]}"
+        )
+    return vec.astype(np.float32, copy=True)
+
+
+def resolve_ur10e_ee_action_term(
+    env: Any,
+    *,
+    term_name: str = "ur10e_ee",
+    expected_action_dim: int = 7,
+    expected_command_type: str = "pose",
+    expected_use_relative_mode: bool = False,
+    expected_scale: float = 1.0,
+) -> tuple[Any, dict[str, Any]]:
+    """Resolve and validate UR10e IK action term via action manager (fail-closed)."""
+    unwrapped = getattr(env, "unwrapped", env)
+    action_manager = getattr(unwrapped, "action_manager", None)
+    if action_manager is None or not hasattr(action_manager, "get_term"):
+        raise ValueError("env.unwrapped.action_manager.get_term is required")
+    term = action_manager.get_term(term_name)
+    if term is None:
+        raise ValueError(f"action term '{term_name}' not found")
+    if not hasattr(term, "_compute_frame_pose"):
+        raise ValueError(f"action term '{term_name}' missing required _compute_frame_pose()")
+    if not hasattr(term, "cfg"):
+        raise ValueError(f"action term '{term_name}' missing cfg")
+    cfg = term.cfg
+    controller = getattr(cfg, "controller", None)
+    if controller is None:
+        raise ValueError(f"action term '{term_name}' cfg missing controller")
+    use_relative_mode = bool(getattr(controller, "use_relative_mode", None))
+    command_type = str(getattr(controller, "command_type", ""))
+    if use_relative_mode != bool(expected_use_relative_mode):
+        raise ValueError(
+            f"{term_name}.cfg.controller.use_relative_mode={use_relative_mode} "
+            f"!= expected {bool(expected_use_relative_mode)}"
+        )
+    if command_type != str(expected_command_type):
+        raise ValueError(
+            f"{term_name}.cfg.controller.command_type={command_type!r} "
+            f"!= expected {str(expected_command_type)!r}"
+        )
+    action_dim = int(getattr(term, "action_dim", -1))
+    if action_dim != int(expected_action_dim):
+        raise ValueError(f"{term_name}.action_dim={action_dim} != expected {int(expected_action_dim)}")
+    scale_vec = _scale_vector(getattr(cfg, "scale", 1.0), action_dim=action_dim)
+    if not np.allclose(scale_vec, float(expected_scale), atol=1e-6, rtol=0.0):
+        raise ValueError(
+            f"{term_name}.cfg.scale={scale_vec.tolist()} not all {float(expected_scale)}"
+        )
+    return term, {
+        "term_name": term_name,
+        "action_dim": action_dim,
+        "command_type": command_type,
+        "use_relative_mode": use_relative_mode,
+        "scale": [float(v) for v in scale_vec.tolist()],
+        "source": "env.unwrapped.action_manager.get_term",
+    }
+
+
+def compute_ur10e_ee_world_pose_from_action_term(term: Any, *, env_index: int = 0) -> tuple[np.ndarray, np.ndarray]:
+    """Compute world-frame EE pose from audited action term _compute_frame_pose()."""
+    if not hasattr(term, "_compute_frame_pose"):
+        raise ValueError("term missing _compute_frame_pose()")
+    if not hasattr(term, "_asset") or not hasattr(term._asset, "data"):
+        raise ValueError("term missing _asset.data required for root pose")
+    ee_pos_b, ee_quat_b = term._compute_frame_pose()
+    pos_b = _to_float32_1d(ee_pos_b[int(env_index)], context="term._compute_frame_pose.pos_b[env_idx]")
+    quat_b = _to_float32_1d(ee_quat_b[int(env_index)], context="term._compute_frame_pose.quat_b[env_idx]")
+    if pos_b.shape[0] != 3:
+        raise ValueError(f"_compute_frame_pose position must be 3D, got {pos_b.shape[0]}")
+    if quat_b.shape[0] != 4:
+        raise ValueError(f"_compute_frame_pose quaternion must be 4D, got {quat_b.shape[0]}")
+    root_pos_w = _to_float32_1d(term._asset.data.root_pos_w[int(env_index)], context="term._asset.data.root_pos_w[env_idx]")
+    root_quat_w = _to_float32_1d(
+        term._asset.data.root_quat_w[int(env_index)],
+        context="term._asset.data.root_quat_w[env_idx]",
+    )
+    if root_pos_w.shape[0] != 3:
+        raise ValueError(f"root_pos_w must be 3D, got {root_pos_w.shape[0]}")
+    if root_quat_w.shape[0] != 4:
+        raise ValueError(f"root_quat_w must be 4D, got {root_quat_w.shape[0]}")
+    ee_pos_w = root_pos_w + _quat_apply_wxyz(root_quat_w, pos_b)
+    ee_quat_w = _quat_multiply_wxyz(root_quat_w.astype(np.float32), quat_b.astype(np.float32))
+    return ee_pos_w.astype(np.float32), ee_quat_w.astype(np.float32)
+
+
 def build_ur10_hold_action(initial_joint_pose: np.ndarray, initial_gripper: float) -> np.ndarray:
     """Build explicit hold action from initial joints + gripper."""
     joints = np.asarray(initial_joint_pose, dtype=np.float32).reshape(-1)
