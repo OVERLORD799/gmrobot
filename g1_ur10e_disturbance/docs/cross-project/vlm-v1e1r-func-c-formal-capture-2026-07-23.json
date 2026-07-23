@@ -1,0 +1,90 @@
+{
+  "task": "V1-E1R Func-C formal replacement capture",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head": "5b688458dbba29329fe13bf40555377afc5563fc",
+    "actual_head": "5b688458dbba29329fe13bf40555377afc5563fc",
+    "origin_main_match": true,
+    "worktree_clean": true
+  },
+  "fixed_image": {
+    "tag": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723",
+    "sha_actual": "sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68",
+    "sha_reported_in_m1f13": "sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68",
+    "sha_match": true,
+    "inspect_line": "gmdisturb@sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68 sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68"
+  },
+  "e1_failure_audit": {
+    "historical_e1_failure_root_cause": "host_bind_/home/czz/GMrobot:/opt/projects/GMRobot_overrode_baked_source",
+    "historical_e1_failure_not_root_cause": "script_missing_inside_image",
+    "policy": "forbid_gmrobot_source_bind_mount_for_formal_capture",
+    "historical_quota_consumption_corrected": true
+  },
+  "approval_provenance": {
+    "reviewer_approved": true,
+    "approval_source": "user_explicit_2026-07-23",
+    "approval_scope": "reference_bin_visual_contract_and_formal_capture_go"
+  },
+  "run_policy": {
+    "build_or_rebuild": false,
+    "formal_isaac_applauncher_runs_allowed": 1,
+    "formal_isaac_applauncher_runs_used": 1,
+    "retried": false,
+    "network_mode": "none",
+    "forbidden_features_enabled": {
+      "POST": false,
+      "models": false,
+      "credentials": false
+    }
+  },
+  "evidence_pre_run": {
+    "command_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723/meta/command.txt",
+    "stdout_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723/meta/capture_stdout.txt",
+    "stderr_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723/meta/capture_stderr.txt",
+    "head_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723/meta/head.txt",
+    "image_sha_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723/meta/image_sha.txt"
+  },
+  "run_result": {
+    "raw_exit_code": 0,
+    "elapsed_seconds": 88,
+    "runtime_assertions_present": false,
+    "runtime_assertions_ok": false,
+    "runtime_assertions": null,
+    "frames": {
+      "frame_000100_env0_png_exists": false,
+      "frame_000200_env0_png_exists": false
+    },
+    "error_summary": "FileNotFoundError: Unable to open the usd file at path: https://omniverse-content-production.s3-us-west-2.amazonaws.com/Assets/Isaac/5.1/Isaac/Environments/Grid/default_environment.usd",
+    "root_cause": "network_none_blocks_remote_usd_fetch_default_environment"
+  },
+  "gate_evaluation": {
+    "raw_exit0": true,
+    "main_frames_exist_100_200": false,
+    "runtime_assertions_pass": false,
+    "dual_identity": false,
+    "A_empty_B20": false,
+    "two_green_bins_and_grids": false,
+    "no_artifact_errors_xid_residual": false,
+    "POST0": true
+  },
+  "artifact_manifest": {
+    "jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl",
+    "summary": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r-func-c-formal-capture-2026-07-23.artifact-summary.json",
+    "group_count": 1,
+    "split_frames_into_groups": false
+  },
+  "candidate_manifest_update": {
+    "status": "func_c_formal_capture_fail_final",
+    "reviewer_approved": false,
+    "formal_recapture_allowed": false,
+    "consumed": true,
+    "historical_e1_consumed_corrected": true
+  },
+  "dataset_sufficiency": {
+    "verdict": "FAIL_FINAL",
+    "overall_sufficiency_claimed": false
+  },
+  "verdict": "FAIL_FINAL",
+  "rerun": false
+}

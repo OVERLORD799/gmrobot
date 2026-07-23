@@ -82,7 +82,8 @@
         "reference_locked_to_dyn_b_frame_000330_env0_left_green_empty_box",
         "func_c_left_source_visual_rework_required",
         "semantic_clarity_user_confirmation_pending",
-        "v1e1_formal_capture_single_run_consumed_fail_final_no_rerun"
+        "v1e1_formal_capture_single_run_consumed_fail_final_no_rerun",
+        "v1e1r_formal_capture_fail_final_network_none_remote_usd_unreachable_no_rerun"
       ],
       "provenance": {
         "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/manifest/capture_manifest.json",
@@ -125,14 +126,17 @@
       "m1f10_route_status": "ABANDONED_WASTEFUL_LOOP",
       "consumed": true,
       "formal_capture_attempt": {
-        "run_id": "v1e1_func_c_formal_capture_20260723",
-        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723",
-        "raw_exit_code": 1,
-        "elapsed_seconds": 0,
+        "run_id": "v1e1r_func_c_formal_capture_20260723",
+        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r_func_c_formal_capture_20260723",
+        "raw_exit_code": 0,
+        "elapsed_seconds": 88,
         "runtime_assertions_pass": false,
         "main_frames_ready": false,
         "final_status": "FAIL_FINAL",
-        "retriable": false
+        "retriable": false,
+        "root_cause": "network_none_blocks_remote_usd_fetch_default_environment",
+        "historical_e1_failure_root_cause": "host_bind_override_baked_source",
+        "historical_e1_consumption_corrected": true
       },
       "provenance_approval": {
         "reviewer_approved": true,
@@ -154,7 +158,14 @@
           "provisional",
           "reviewer_approved_visual_ground_truth"
         ]
-      }
+      },
+      "formal_capture_history": [
+        {
+          "run_id": "v1e1_func_c_formal_capture_20260723",
+          "status": "FAIL_FINAL",
+          "note": "invalid_quota_consumption_corrected; root_cause_bind_mount_override_not_script_missing"
+        }
+      ]
     },
     {
       "id": "E02-DYN-B-M1Z9-STEP220-330",

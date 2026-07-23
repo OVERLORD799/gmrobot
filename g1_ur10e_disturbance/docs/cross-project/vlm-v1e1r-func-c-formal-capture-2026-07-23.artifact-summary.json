@@ -1,0 +1,13 @@
+{
+  "artifact_manifest_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl",
+  "group_count": 1,
+  "primary_group_ids": [
+    "V1E1R_FUNC_C_FORMAL_CAPTURE_20260723_G1"
+  ],
+  "status": "FAIL_FINAL",
+  "notes": [
+    "single formal run consumed",
+    "no rerun executed",
+    "historical_e1_root_cause_audited_bind_mount_override"
+  ]
+}
