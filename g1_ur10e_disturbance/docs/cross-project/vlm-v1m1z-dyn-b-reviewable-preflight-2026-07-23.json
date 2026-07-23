@@ -1,0 +1,60 @@
+{
+  "doc": "vlm-v1m1z-dyn-b-reviewable-preflight-2026-07-23",
+  "milestone": "V1-M1Z",
+  "anchor_commit": "2f3df8d",
+  "build_count": 1,
+  "run_count": 0,
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1z-20260723",
+    "sha": null
+  },
+  "camera": {
+    "expected_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "expected_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "actual_pos": null,
+    "actual_rot": null
+  },
+  "offline_tests": {
+    "passed": [
+      "test_run_sh_camera_env_forwarding_unit",
+      "test_e01_dyn_b_m1w1_command_construction_unit",
+      "test_e01_dyn_b_m1y_camera_framing_unit",
+      "test_dyn_b_per_step_audit_analyzer_unit",
+      "test_e01_dyn_b_m1v1_source_closure_unit",
+      "test_e01_dyn_b_m1v1_docker_copy_coverage_unit",
+      "test_e01_dyn_b_m1z_image_policy_unit"
+    ]
+  },
+  "build_failure": {
+    "stage": "docker build",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-clean-m1z",
+    "signature": "FileNotFoundError: /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/meta/body_poses.jsonl",
+    "reason": "Static check in image invoked test_e01_dyn_b_m1y_camera_framing_unit.py requiring historical runtime artifact unavailable in clean build context."
+  },
+  "per_step_window_190_340": null,
+  "visual_audit": null,
+  "post_and_xid": {
+    "post_count_stdout_stderr": null,
+    "new_xid": null,
+    "residual_process": null
+  },
+  "provenance": {
+    "dynamic": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "scripted_locomotion": true,
+    "human_hand_or_ppe": false,
+    "vlm_output": false
+  },
+  "verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY"
+}

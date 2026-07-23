@@ -1,0 +1,14 @@
+# V1-M1Z: clean-base reviewable Dyn-B preflight image.
+# No VLM/perception/GDINO/SAM2/five-stage/POST changes; no package mutation.
+FROM gmdisturb:b4-p010-20260721
+
+COPY . /opt/projects/g1_ur10e_disturbance
+
+# Static closure + command-shape + camera framing checks only.
+RUN ["/bin/bash","-lc","set -euo pipefail; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/dyn_b_source_closure.py --entry-file /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py --project-root /opt/projects/g1_ur10e_disturbance --json-out /tmp/m1z_source_closure.json; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1v1_source_closure_unit.py; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1v1_docker_copy_coverage_unit.py; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1y_camera_framing_unit.py; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1w1_command_construction_unit.py; grep -q outer_lateral_patrol /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py; grep -q scripted_g1_outer_lateral_patrol /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py; grep -q scene_camera_override.py /tmp/m1z_source_closure.json; grep -q phase3_dyn_b_per_step_audit_m1z.csv /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py"]
+
+LABEL gmdisturb.e01_dyn_b_clean_m1z="20260723" \
+      gmdisturb.base_tag="gmdisturb:b4-p010-20260721" \
+      gmdisturb.base_id="sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68" \
+      gmdisturb.milestone="V1-M1Z" \
+      gmdisturb.package_mutation="none"

@@ -63,6 +63,18 @@ if [[ -t 0 && -t 1 ]]; then
   DOCKER_TTY_ARGS+=(-it)
 fi
 
+FORWARD_ENV_VARS=(
+  GMDISTURB_SCENE_CAMERA_OVERRIDE
+  GMDISTURB_SCENE_CAMERA_POS
+  GMDISTURB_SCENE_CAMERA_ROT
+)
+FORWARD_ENV_ARGS=()
+for _var in "${FORWARD_ENV_VARS[@]}"; do
+  if [[ -n "${!_var-}" ]]; then
+    FORWARD_ENV_ARGS+=(-e "${_var}=${!_var}")
+  fi
+done
+
 # shellcheck disable=SC2086
 exec docker run --gpus all --rm \
   "${DOCKER_TTY_ARGS[@]}" \
@@ -78,6 +90,7 @@ exec docker run --gpus all --rm \
   -v "${CACHE_ROOT}/logs:/root/.nvidia-omniverse/logs" \
   -v "${CACHE_ROOT}/data:/root/.local/share/ov/data" \
   -v "${CACHE_ROOT}/documents:/root/Documents" \
+  "${FORWARD_ENV_ARGS[@]}" \
   ${DOCKER_EXTRA_ARGS:-} \
   "${TAG}" \
   "$@"

@@ -47,6 +47,11 @@ M1V1_RESULT_ROOT = (
 M1Y_RESULT_ROOT = (
     "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1y_20260723"
 )
+M1Z_IMAGE_TAG = "gmdisturb:e01-dyn-b-clean-m1z-20260723"
+M1Z_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-clean-m1z"
+M1Z_RESULT_ROOT = (
+    "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z_20260723"
+)
 
 
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
@@ -203,6 +208,66 @@ def build_m1y_dyn_b_preflight_outer_argv(
 ) -> list[str]:
     """Build canonical M1Y outer command with explicit camera override env."""
     inner = build_m1y_dyn_b_preflight_inner_command(
+        result_root_in_container=result_root_in_container,
+        camera_pos=camera_pos,
+        camera_rot=camera_rot,
+    )
+    payload = ["bash", "-lc", inner]
+    assert_canonical_run_sh_payload(payload)
+    return [
+        run_sh_path,
+        "--tag",
+        image_tag,
+        "--results",
+        host_results_dir,
+        *payload,
+    ]
+
+
+def build_m1z_dyn_b_preflight_inner_command(
+    *,
+    result_root_in_container: str,
+    camera_pos: tuple[float, float, float] = (0.45, 0.0, 2.7),
+    camera_rot: tuple[float, float, float, float] = (0.7071, 0.0, 0.7071, 0.0),
+) -> str:
+    """Build M1Z preflight inner shell using M1Y framing and dedicated audit CSV."""
+    rr = result_root_in_container.rstrip("/")
+    cpos = ",".join(str(float(x)) for x in camera_pos)
+    crot = ",".join(str(float(x)) for x in camera_rot)
+    return (
+        "set -euo pipefail; "
+        "export GMDISTURB_SCENE_CAMERA_OVERRIDE=1; "
+        f"export GMDISTURB_SCENE_CAMERA_POS={cpos}; "
+        f"export GMDISTURB_SCENE_CAMERA_ROT={crot}; "
+        "/isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py "
+        "--headless --seed 43 --scenario outer_lateral_patrol "
+        "--motion_source_label scripted_g1_outer_lateral_patrol "
+        "--max_steps 341 --progress_interval 50 "
+        f"--output_csv {rr}/safety_logs/phase3.csv "
+        "--save_camera "
+        f"--camera_output_dir {rr}/scene "
+        "--camera_save_steps 219,220,221,329,330,331 "
+        f"--camera_pose_json {rr}/meta/camera_pose.json "
+        f"--body_pose_jsonl {rr}/meta/body_poses.jsonl "
+        f"--dyn-b-per-step-audit-csv {rr}/safety_logs/phase3_dyn_b_per_step_audit_m1z.csv "
+        f"--numpy-origin-pre-json {rr}/meta/numpy_origin_pre.json "
+        f"--numpy-origin-post-json {rr}/meta/numpy_origin_post.json "
+        f"--typing-extensions-pre-json {rr}/meta/typing_extensions_pre.json "
+        f"--typing-extensions-post-json {rr}/meta/typing_extensions_post.json"
+    )
+
+
+def build_m1z_dyn_b_preflight_outer_argv(
+    *,
+    run_sh_path: str,
+    image_tag: str,
+    host_results_dir: str,
+    result_root_in_container: str,
+    camera_pos: tuple[float, float, float] = (0.45, 0.0, 2.7),
+    camera_rot: tuple[float, float, float, float] = (0.7071, 0.0, 0.7071, 0.0),
+) -> list[str]:
+    """Build canonical M1Z outer command with M1Y framing camera pose."""
+    inner = build_m1z_dyn_b_preflight_inner_command(
         result_root_in_container=result_root_in_container,
         camera_pos=camera_pos,
         camera_rot=camera_rot,
