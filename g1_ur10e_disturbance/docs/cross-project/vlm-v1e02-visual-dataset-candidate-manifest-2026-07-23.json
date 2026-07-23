@@ -325,11 +325,11 @@
     },
     {
       "id": "E02-DYN-C-E2A-STEP240-310",
-      "source_milestone": "V1-E2B",
+      "source_milestone": "V1-E2A",
       "category": "provisional",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
-      "scene_group": "e01_dyn_c_mirrored_capture_m1e2b_20260723",
+      "scene_group": "e01_dyn_c_formal_m1e2a_20260723",
       "camera": "dual_scene_topdown_m1z9",
       "required_steps": [
         240,
@@ -343,7 +343,7 @@
       ],
       "temporal_pair_required": true,
       "reviewer_approved": false,
-      "technical_review_status": "fail",
+      "technical_review_status": "technical_temporal_pass_pending_user",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -354,7 +354,7 @@
       "VLM_output": false,
       "geometry_evidence": false,
       "control_evidence": false,
-      "motion_attribution": "INSUFFICIENT",
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED",
       "prebuild_contract": {
         "trajectory_id": "7beb111400ccc2f8cd5d9ed1ab19192705714ff3d6cbc7dc3ccb16154c74683c",
         "seed": 44,
@@ -376,8 +376,8 @@
         ]
       },
       "historical_verdict_ref": {
-        "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e2b-dyn-c-mirrored-capture-2026-07-23.json",
-        "verdict": "FAIL_FINAL"
+        "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e2a-dyn-c-mirrored-patrol-design-2026-07-23.json",
+        "verdict": "PREBUILD_READY"
       },
       "formal_capture_attempt": {
         "run_id": "v1e2b_dyn_c_mirrored_capture_20260723",
