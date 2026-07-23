@@ -1,0 +1,83 @@
+{
+  "milestone": "V1-M1T",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "image": {
+    "tag": "gmdisturb:e01-func-c-m1j-20260723",
+    "id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "entrypoint": [
+      "/opt/projects/g1_ur10e_disturbance/docker/entrypoint.sh"
+    ],
+    "cmd": [
+      "phase3",
+      "--help"
+    ]
+  },
+  "root_cause": {
+    "static": [
+      "M1M used image canonical launcher path through entrypoint; M1Q/M1S used direct run_phase3 invocation path.",
+      "M1R/M1S attempted custom PYTHONPATH pip_prebundle injection; this creates mixed namespace risk and was removed.",
+      "M1S command showed shell expansion defects for USD_LIBS/PIP_ARCHIVE assignment."
+    ],
+    "runtime_gate_blocker": "image_run_phase3_missing_outer_lateral_patrol_choice"
+  },
+  "smoke_budget": {
+    "max_allowed": 2,
+    "executed": 2,
+    "sequential_only": true
+  },
+  "smokes": [
+    {
+      "index": 1,
+      "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke_20260723",
+      "status_file": "g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke_20260723/meta/run_status.json",
+      "exit_code": 1,
+      "forbid_hit": "Traceback (most recent call last):",
+      "failure": "ModuleNotFoundError: No module named 'numpy'",
+      "exact_command_from_status_argv": "bash -lc \"cd /home/czz/GMrobot/g1_ur10e_disturbance/docker && TAG=gmdisturb:e01-func-c-m1j-20260723 RESULTS_DIR=/home/czz/GMrobot/g1_ur10e_disturbance/results ./run.sh bash -lc \\\"set -euo pipefail; python3 - <<'PY' ... ; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py ...\\\"\""
+    },
+    {
+      "index": 2,
+      "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke2_20260723",
+      "status_file": "g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke2_20260723/meta/run_status.json",
+      "exit_code": 1,
+      "forbid_hit": null,
+      "failure": "run_phase3.py: error: argument --scenario: invalid choice: 'outer_lateral_patrol'",
+      "required_artifacts": {
+        "numpy_origin_json": true,
+        "phase3_csv": false
+      },
+      "exact_command_from_status_argv": "bash -lc \"cd /home/czz/GMrobot/g1_ur10e_disturbance/docker && TAG=gmdisturb:e01-func-c-m1j-20260723 RESULTS_DIR=/home/czz/GMrobot/g1_ur10e_disturbance/results ./run.sh bash -lc \\\"set -euo pipefail; /isaac-sim/python.sh -c ...; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py --headless --seed 43 --scenario outer_lateral_patrol --max_steps 1 --progress_interval 1 --motion_source_label scripted_g1_outer_lateral_patrol --output_csv /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke2_20260723/safety_logs/phase3.csv\\\"\""
+    }
+  ],
+  "numpy_origins": {
+    "source_file": "g1_ur10e_disturbance/results/paper_demo/v1m1t_smoke2_20260723/meta/numpy_origin.json",
+    "numpy_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/__init__.py",
+    "numpy_random_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/random/__init__.py",
+    "numpy_version": "2.4.6",
+    "compatible_single_installation": true
+  },
+  "code_changes": {
+    "removed_m1r_injection_behavior": [
+      "g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py",
+      "g1_ur10e_disturbance/scripts/run_e01_dyn_b_abi_preflight.sh"
+    ],
+    "added_guard_logic": [
+      "g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py"
+    ],
+    "tests": [
+      "g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py"
+    ]
+  },
+  "canonical_future_invocation": {
+    "host_prefix": "cd /home/czz/GMrobot/g1_ur10e_disturbance/docker",
+    "command": "TAG=gmdisturb:e01-func-c-m1j-20260723 RESULTS_DIR=/home/czz/GMrobot/g1_ur10e_disturbance/results ./run.sh bash -lc \"<canonical_dyn_b_smoke_shell output>\"",
+    "rules": [
+      "reuse docker/run.sh and image entrypoint",
+      "no pip_prebundle PYTHONPATH injection",
+      "must instantiate AppLauncher and run one step"
+    ]
+  },
+  "verdict": "STOP_DYN_B_RUNTIME_LOOP",
+  "next_action": "external_environment_rebuild_required_before_any_dyn_b_capture"
+}

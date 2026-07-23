@@ -5,18 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 
-def pythonpath_guard_prologue() -> str:
-    return (
-        "USD_LIBS=$(ls -d /isaac-sim/extscache/omni.usd.libs-* | head -n1); "
-        "test -n \"$USD_LIBS\"; "
-        "export PYTHONPATH=\"$USD_LIBS:${PYTHONPATH:-}\"; "
-        "export LD_LIBRARY_PATH=\"$USD_LIBS/bin:${LD_LIBRARY_PATH:-}\"; "
-        "PIP_ARCHIVE=$(ls -d /isaac-sim/extscache/omni.kit.pip_archive-*.lx64.cp311/pip_prebundle | head -n1); "
-        "test -n \"$PIP_ARCHIVE\"; "
-        "export PYTHONPATH=\"$PIP_ARCHIVE:${PYTHONPATH:-}\""
-    )
-
-
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
     preflight = Path(project_root) / "scripts" / "isaac_abi_import_preflight.py"
     return f"/isaac-sim/python.sh {preflight}"
@@ -33,4 +21,25 @@ def run_phase3_command(
         "--headless --seed 43 --scenario outer_lateral_patrol "
         "--max_steps 1 --progress_interval 1 "
         f"--output_csv {output_csv}"
+    )
+
+
+def canonical_dyn_b_smoke_shell(
+    *,
+    project_root: str = "/opt/projects/g1_ur10e_disturbance",
+    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1t/safety_logs/phase3.csv",
+    numpy_origin_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1t/meta/numpy_origin.json",
+) -> str:
+    """Single-shell command: record NumPy origins then run AppLauncher smoke."""
+    phase3 = run_phase3_command(project_root=project_root, output_csv=output_csv)
+    return (
+        "set -euo pipefail; "
+        "/isaac-sim/python.sh -c "
+        "\"import json,numpy as np; "
+        "payload={'numpy_file':getattr(np,'__file__',''),"
+        "'numpy_version':getattr(np,'__version__',''),"
+        "'numpy_random_file':getattr(np.random,'__file__','')}; "
+        f"open('{numpy_origin_json}','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=True,indent=2)+'\\\\n'); "
+        "print(json.dumps(payload,ensure_ascii=True))\"; "
+        f"{phase3}"
     )

@@ -50,6 +50,29 @@ def main() -> int:
             checks.append({"module": name, "traceback": traceback.format_exc()})
             break
     if not failed:
+        # Guard against mixed NumPy namespaces (e.g. kit + pip_prebundle blend).
+        numpy_file = ""
+        numpy_random_file = ""
+        for item in checks:
+            if item.get("module") == "numpy" and item.get("status") == "ok":
+                numpy_file = str(item.get("file", ""))
+            if item.get("module") == "numpy.random" and item.get("status") == "ok":
+                numpy_random_file = str(item.get("file", ""))
+        if numpy_file and numpy_random_file:
+            np_root = str(Path(numpy_file).resolve().parent)
+            npr_root = str(Path(numpy_random_file).resolve().parent)
+            same_tree = npr_root.startswith(np_root) or np_root.startswith(npr_root)
+            checks.append(
+                {
+                    "module": "numpy_origin_consistency",
+                    "status": "ok" if same_tree else "error",
+                    "numpy_file": numpy_file,
+                    "numpy_random_file": numpy_random_file,
+                }
+            )
+            if not same_tree:
+                failed = True
+    if not failed:
         try:
             from isaaclab.app import AppLauncher  # noqa: F401
 

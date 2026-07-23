@@ -15,13 +15,10 @@ mkdir -p "${META_DIR}"
 PY_GUARD="$(
 python3 - <<'PY' "${DIST_ROOT}"
 import sys
-from pathlib import Path
 sys.path.insert(0, sys.argv[1])
-from e01_dyn_b_runtime_guard import pythonpath_guard_prologue, import_preflight_command
+from e01_dyn_b_runtime_guard import import_preflight_command
 print(
-    pythonpath_guard_prologue()
-    + "; "
-    + import_preflight_command()
+    import_preflight_command()
     + " --json-out /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1r_20260723/meta/import_preflight_report.json"
 )
 PY
