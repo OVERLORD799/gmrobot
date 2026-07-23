@@ -1,0 +1,63 @@
+{
+  "task": "M1I fixed assets and visual validation",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "start_head": "a7d6ba8",
+  "verdict": "M1I_BUILD_FAIL",
+  "allow_formal_func_c_single_recapture": false,
+  "non_formal_sample": true,
+  "stage_a": {
+    "dockerfile": "GMRobot/docker/Dockerfile.e01-func-c-m1i",
+    "base_image": "gmdisturb:e01-func-c-m1e-20260723",
+    "base_resolved_digest": "sha256:3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+    "target_tag": "gmdisturb:e01-func-c-m1i-20260723",
+    "build_command": "docker build -f GMRobot/docker/Dockerfile.e01-func-c-m1i -t gmdisturb:e01-func-c-m1i-20260723 .",
+    "build_executed_times": 1,
+    "static_scan": {
+      "file": "GMRobot/docker/Dockerfile.e01-func-c-m1i",
+      "pattern": "GetDescendants",
+      "count": 0
+    },
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/m1i_visual_validation_20260723/meta/build.stdout.log",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/m1i_visual_validation_20260723/meta/build.stderr.log",
+    "exit_file": "g1_ur10e_disturbance/results/paper_demo/m1i_visual_validation_20260723/meta/build.exit",
+    "real_exit_code": 1,
+    "elapsed_seconds": 1,
+    "image_created": null,
+    "image_sha": null,
+    "gate": {
+      "container_fixed_generated": true,
+      "part_fixed_generated": true,
+      "container_fixed_sha256": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+      "part_fixed_sha256": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
+      "container_nested_rb_gate": "PASS",
+      "part_mass_gate": "FAIL",
+      "failure_reason": "AssertionError: FATAL: /Root mass must be 0.2, got 0.20000000298023224"
+    }
+  },
+  "stage_b": {
+    "executed": false,
+    "run_executed_times": 0,
+    "reason": "Blocked by stage A failure; docker run forbidden by gate.",
+    "runtime": null,
+    "xid": null,
+    "nvidia_smi": null,
+    "frame": {
+      "path": null,
+      "sha256": null,
+      "shape": null
+    },
+    "visual_checks": {
+      "png_uint8_480x640x3": "NOT_EXECUTED",
+      "white_fan_disappeared": "NOT_EXECUTED",
+      "two_boxes_scale_normal": "NOT_EXECUTED",
+      "containerA_and_20_source_parts_normal": "NOT_EXECUTED",
+      "containerB_complete_and_filled_contents_clear": "NOT_EXECUTED"
+    }
+  },
+  "policy": {
+    "build_then_run_gate": true,
+    "stop_on_build_fail": true,
+    "no_generated_assets_in_commit": true
+  }
+}
