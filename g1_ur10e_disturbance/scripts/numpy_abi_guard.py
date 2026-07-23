@@ -23,19 +23,14 @@ def _normalize_numpy_package_root(file_path: str) -> str:
     return str(Path(p).parent)
 
 
-def prune_numpy_conflicting_paths() -> list[str]:
-    """Remove known pip_prebundle archive paths from sys.path."""
-    removed: list[str] = []
-    kept: list[str] = []
+def inspect_numpy_conflicting_paths() -> list[str]:
+    """Report known pip_prebundle archive paths currently present in sys.path."""
+    found: list[str] = []
     for entry in list(sys.path):
         low = entry.lower()
         if "pip_prebundle" in low or "omni.kit.pip_archive" in low:
-            removed.append(entry)
-            continue
-        kept.append(entry)
-    if removed:
-        sys.path[:] = kept
-    return removed
+            found.append(entry)
+    return found
 
 
 def _collect_loaded_numpy_module_origins() -> list[dict[str, str]]:
@@ -72,7 +67,7 @@ def verify_numpy_single_root(
     expected_root: str | None = None,
 ) -> dict[str, Any]:
     """Validate that loaded NumPy modules come from a single package root."""
-    removed_paths = prune_numpy_conflicting_paths()
+    conflicting_paths = inspect_numpy_conflicting_paths()
     np_mod = importlib.import_module("numpy")
     eager_modules = ["numpy.random", "numpy.lib.recfunctions", "numpy.ma", "numpy.testing"]
     eager_errors: list[dict[str, str]] = []
@@ -106,7 +101,7 @@ def verify_numpy_single_root(
         "numpy_random_root": numpy_random_root,
         "normalized_roots": roots,
         "expected_root": expected_root or "",
-        "removed_conflicting_sys_path": removed_paths,
+        "conflicting_sys_path": conflicting_paths,
         "loaded_numpy_modules": loaded,
         "eager_errors": eager_errors,
     }

@@ -1,0 +1,28 @@
+# V1-M1U2: keep pip_prebundle, quarantine only alternate NumPy distribution.
+FROM gmdisturb:e01-func-c-m1j-20260723
+
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/numpy_abi_guard.py /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py
+COPY scripts/pip_prebundle_numpy_dedup.py /opt/projects/g1_ur10e_disturbance/scripts/pip_prebundle_numpy_dedup.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_b_offline_readiness.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_offline_readiness.py
+COPY configs/e01_dyn_b_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml
+COPY scripts/isaac_abi_import_preflight.py /opt/projects/g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py
+COPY scripts/test_e01_dyn_b_runtime_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py
+COPY scripts/test_e01_dyn_b_m1u0_image_bake_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py
+COPY scripts/test_numpy_abi_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py
+COPY scripts/test_pip_prebundle_numpy_dedup_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_pip_prebundle_numpy_dedup_unit.py
+
+RUN /bin/bash -lc 'set -euo pipefail; \
+    REPORT_DIR="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u2_image_build_20260723/meta"; \
+    mkdir -p "${REPORT_DIR}"; \
+    /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/pip_prebundle_numpy_dedup.py \
+      --report-json "${REPORT_DIR}/numpy_prebundle_quarantine_report.json" \
+      --inventory-txt "${REPORT_DIR}/numpy_prebundle_inventory.txt" \
+      --hashes-txt "${REPORT_DIR}/numpy_prebundle_hashes.txt"; \
+    /isaac-sim/python.sh -c "import json,pathlib; r=pathlib.Path(\"${REPORT_DIR}\")/\"numpy_prebundle_quarantine_report.json\"; p=json.loads(r.read_text(encoding=\"utf-8\")); root=\"/isaac-sim/kit/python/lib/python3.11/site-packages/\"; kit=p[\"kit_numpy\"]; assert p[\"inventory_count\"]>=1,p; assert p[\"moved_count\"]==p[\"inventory_count\"],p; assert not p[\"remaining_importable_numpy_prebundle\"],p; assert kit[\"numpy_file\"].startswith(root),kit; assert kit[\"numpy_random_generator_file\"].startswith(root),kit; assert kit[\"numpy_random_mt19937_file\"].startswith(root),kit"'
+
+LABEL gmdisturb.e01_dyn_b_m1u2="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1j-20260723" \
+      gmdisturb.milestone="V1-M1U2"

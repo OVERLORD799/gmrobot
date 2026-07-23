@@ -1,0 +1,50 @@
+{
+  "doc": "vlm-v1m1u2-dyn-b-numpy-dedup-2026-07-23",
+  "task": "V1-M1U2",
+  "base_commit": "a30fb0a",
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u2-20260723",
+    "sha": "",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u2"
+  },
+  "constraints": {
+    "max_build": 1,
+    "max_smoke": 1,
+    "no_retry": true,
+    "no_formal_capture": true
+  },
+  "execution": {
+    "build_count": 1,
+    "smoke_count": 0,
+    "build_succeeded": false,
+    "smoke_succeeded": false,
+    "build_error": "/bin/sh: 1: set: Illegal option -o pipefail",
+    "build_elapsed_sec_observed": 0.748
+  },
+  "static_inspection": {
+    "outer_lateral_patrol": true,
+    "guard_prepost_origin_flags": true,
+    "dedup_script_baked_and_invoked": true
+  },
+  "dedup": {
+    "quarantined_paths": [],
+    "inventory_file": "",
+    "hashes_file": "",
+    "report_file": "",
+    "note": "build failed before report artifacts could be materialized"
+  },
+  "origin_reports": {
+    "pre_json": "",
+    "post_json": "",
+    "normalized_roots_post": [],
+    "prebundle_numpy_modules_found_post": null
+  },
+  "gpu_xid": {
+    "gpu": "GPU-6b6f962a-ac86-00b4-e732-e8caafeca73d, NVIDIA GeForce RTX 5090 Laptop GPU, 580.159.03",
+    "xid_detected": null,
+    "xid_note": "dmesg permission denied"
+  },
+  "artifacts_root": "g1_ur10e_disturbance/results/paper_demo/v1m1u2_dyn_b_numpy_dedup_smoke_20260723",
+  "verdict": "NUMPY_DEDUP_FAIL_STOP",
+  "next_gate": "ONE_DYN_B_PREFLIGHT_MAY_BE_REQUESTED"
+}

@@ -13,7 +13,7 @@ sys.path.insert(0, str(ROOT / "scripts"))
 
 from numpy_abi_guard import (  # noqa: E402
     _normalize_numpy_package_root,
-    prune_numpy_conflicting_paths,
+    inspect_numpy_conflicting_paths,
     verify_numpy_single_root,
 )
 
@@ -25,13 +25,13 @@ def test_normalize_numpy_package_root_from_init():
     assert root.endswith("/isaac-sim/kit/python/lib/python3.11/site-packages")
 
 
-def test_prune_conflicting_paths_removes_pip_prebundle():
+def test_inspect_conflicting_paths_reports_pip_prebundle_without_mutation():
     original = list(sys.path)
     try:
         sys.path.insert(0, "/tmp/omni.kit.pip_archive-foo/pip_prebundle")
-        removed = prune_numpy_conflicting_paths()
-        assert any("pip_prebundle" in p for p in removed)
-        assert all("pip_prebundle" not in p for p in sys.path)
+        found = inspect_numpy_conflicting_paths()
+        assert any("pip_prebundle" in p for p in found)
+        assert any("pip_prebundle" in p for p in sys.path)
     finally:
         sys.path[:] = original
 
@@ -57,7 +57,7 @@ def test_verify_numpy_single_root_emits_json_and_respects_expected_root():
 
 def main() -> None:
     test_normalize_numpy_package_root_from_init()
-    test_prune_conflicting_paths_removes_pip_prebundle()
+    test_inspect_conflicting_paths_reports_pip_prebundle_without_mutation()
     test_verify_numpy_single_root_emits_json_and_respects_expected_root()
     print("PASS test_numpy_abi_guard_unit")
 
