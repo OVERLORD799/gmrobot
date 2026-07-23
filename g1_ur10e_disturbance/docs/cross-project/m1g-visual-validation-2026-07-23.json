@@ -1,0 +1,88 @@
+{
+  "milestone": "M1G",
+  "date": "2026-07-23",
+  "verdict": "M1G_VISUAL_GATE_FAIL",
+  "allow_formal_func_c_single_recapture": false,
+  "single_run_only": true,
+  "not_formal_func_c_positive_sample": true,
+  "image": {
+    "tag": "gmdisturb:e01-func-c-m1e-20260723",
+    "sha256": "3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+    "full_id": "sha256:3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+    "config_entrypoint": [
+      "/opt/projects/g1_ur10e_disturbance/docker/entrypoint.sh"
+    ],
+    "config_cmd": [
+      "phase3",
+      "--help"
+    ]
+  },
+  "invocation": {
+    "effective_entrypoint": "/isaac-sim/python.sh",
+    "script_head": "/opt/projects/GMRobot/scripts/gm_state_machine_agent.py",
+    "command": "docker run --rm --gpus all --network host --ipc=host --ulimit memlock=-1 --ulimit stack=67108864 --entrypoint /isaac-sim/python.sh -e GMROBOT_V1E01_TARGET_FULL=1 -e ACCEPT_EULA=Y -e PRIVACY_CONSENT=Y -e OMNI_KIT_ACCEPT_EULA=YES -v /home/czz/GMrobot/g1_ur10e_disturbance/results:/opt/projects/g1_ur10e_disturbance/results -v /home/czz/.cache/gmdisturb-docker/kit:/isaac-sim/kit/cache -v /home/czz/.cache/gmdisturb-docker/ov:/root/.cache/ov -v /home/czz/.cache/gmdisturb-docker/pip:/root/.cache/pip -v /home/czz/.cache/gmdisturb-docker/gl:/root/.cache/nvidia -v /home/czz/.cache/gmdisturb-docker/logs:/root/.nvidia-omniverse/logs -v /home/czz/.cache/gmdisturb-docker/data:/root/.local/share/ov/data -v /home/czz/.cache/gmdisturb-docker/documents:/root/Documents gmdisturb:e01-func-c-m1e-20260723 /opt/projects/GMRobot/scripts/gm_state_machine_agent.py --task gm --headless --enable_cameras --enable_safety --safety_config /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml --save_camera --camera_output_dir /opt/projects/g1_ur10e_disturbance/results/paper_demo/m1g_visual_validation_20260723/scene --camera_save_interval 1 --max_steps 1",
+    "python_sh_occurrences_in_command": 1
+  },
+  "runtime": {
+    "exit_code": 0,
+    "elapsed_seconds": 27,
+    "stdout": "g1_ur10e_disturbance/results/paper_demo/m1g_visual_validation_20260723/meta/stdout.txt",
+    "stderr": "g1_ur10e_disturbance/results/paper_demo/m1g_visual_validation_20260723/meta/stderr.txt"
+  },
+  "log_checks": {
+    "traceback_present": true,
+    "device_lost_present": false,
+    "nested_rigidbodyapi_present": false,
+    "new_xid": [],
+    "warnings_sample": [
+      "2026-07-23T03:51:35Z [253ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:35Z [253ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:35Z [269ms] [Warning] [omni.platforminfo.plugin] failed to open the default display.  Can't verify X Server version.",
+      "2026-07-23T03:51:36Z [809ms] [Warning] [gpu.foundation.plugin] CPU performance profile is set to powersave. This profile sets the CPU to the lowest frequency reducing performance.",
+      "2026-07-23T03:51:36Z [818ms] [Warning] [gpu.foundation.plugin] PCIe link width current (8) and maximum (16) for device 0 don't match.",
+      "2026-07-23T03:51:36Z [818ms] [Warning] [gpu.foundation.plugin] IOMMU is enabled.",
+      "2026-07-23T03:51:36Z [1,364ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,364ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:36Z [1,380ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,380ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:36Z [1,386ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,386ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:36Z [1,390ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,390ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:36Z [1,391ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,391ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "2026-07-23T03:51:36Z [1,392ms] [Warning] [carb.windowing-glfw.plugin] GLFW initialization failed.",
+      "2026-07-23T03:51:36Z [1,392ms] [Warning] [carb] Failed to startup plugin carb.windowing-glfw.plugin (interfaces: [carb::windowing::IGLContext v1.0],[carb::windowing::IWindowing v1.5]) (impl: carb.windowing-glfw.plugin)",
+      "\u001b[33m03:51:52 [simulation_context.py] WARNING: The `enable_external_forces_every_iteration` parameter in the PhysxCfg is set to False. If you are experiencing noisy velocities, consider enabling this flag. You may need to slightly increase the number of velocity iterations (setting it to 1 or 2 rather than 0), together with this flag, to improve the accuracy of velocity updates.\u001b[0m",
+      "2026-07-23T03:51:36Z [1,570ms] [Warning] [omni.log] Source: omni.hydra was already registered.",
+      "2026-07-23T03:51:37Z [2,137ms] [Warning] [carb] Acquiring non optional plugin interface which is not listed as dependency: [omni::physx::IPhysxBenchmarks v1.0] (plugin: <default plugin>), by client: omni.physics.physx.plugin. Add it to CARB_PLUGIN_IMPL_DEPS() macro of a client.",
+      "2026-07-23T03:51:37Z [2,142ms] [Warning] [omni.isaac.dynamic_control] omni.isaac.dynamic_control is deprecated as of Isaac Sim 4.5. No action is needed from end-users.",
+      "2026-07-23T03:51:39Z [4,122ms] [Warning] [pxr.Semantics] pxr.Semantics is deprecated - please use Semantics instead",
+      "2026-07-23T03:51:39Z [4,236ms] [Warning] [omni.graph.core.plugin] Found duplicate of category 'Replicator' - was 'Annotators', adding 'Fabric Reader'",
+      "2026-07-23T03:51:39Z [4,236ms] [Warning] [omni.graph.core.plugin] Category 'Replicator' not accepted on node type 'omni.replicator.core.FabricReader' in extension 'omni.replicator.core'",
+      "2026-07-23T03:51:39Z [4,237ms] [Warning] [omni.replicator.core.scripts.extension] No material configuration file, adding configuration to material settings directly.",
+      "2026-07-23T03:51:46Z [11,391ms] [Warning] [omni.fabric.plugin] Warning: attribute viewportHandle not found for bucket id 7",
+      "2026-07-23T03:51:52Z [17,293ms] [Warning] [isaaclab.envs.manager_based_env] Seed not set for the environment. The environment creation may not be deterministic.",
+      "2026-07-23T03:52:00Z [25,568ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal",
+      "2026-07-23T03:52:00Z [25,568ms] [Warning] [omni.graph.core.plugin] Could not find category 'Replicator:Annotators' for removal"
+    ]
+  },
+  "frame": {
+    "path": "g1_ur10e_disturbance/results/paper_demo/m1g_visual_validation_20260723/scene/frame_000000_env0.png",
+    "exists": false,
+    "sha256": null,
+    "shape": null
+  },
+  "visual_checks": {
+    "png_valid_480x640x3": false,
+    "white_fan_disappeared": "UNVERIFIED_NO_FRAME",
+    "two_boxes_scale_normal": "UNVERIFIED_NO_FRAME",
+    "containerA_and_20_source_parts_normal": "UNVERIFIED_NO_FRAME",
+    "containerB_complete_and_filled_contents_clear": "UNVERIFIED_NO_FRAME"
+  },
+  "reason": "Single run produced FileNotFoundError and no frame PNG; visual gate prerequisites unmet.",
+  "timestamps": {
+    "pre_run": "2026-07-23T11:51:34+08:00",
+    "post_run": "2026-07-23T11:52:01+08:00"
+  }
+}
