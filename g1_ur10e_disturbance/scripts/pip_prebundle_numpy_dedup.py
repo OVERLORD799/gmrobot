@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import os
 import shutil
 from dataclasses import dataclass
 from pathlib import Path
@@ -21,15 +22,88 @@ class TargetEntry:
     link_target: str
 
 
-def _sha256_path(path: Path) -> str:
-    if path.is_symlink():
-        payload = f"SYMLINK->{path.readlink()}".encode("utf-8", errors="replace")
-        return hashlib.sha256(payload).hexdigest()
+def _sha256_bytes(payload: bytes) -> str:
+    return hashlib.sha256(payload).hexdigest()
+
+
+def _sha256_file(path: Path) -> tuple[str, int]:
     h = hashlib.sha256()
+    size = 0
     with path.open("rb") as fh:
         for chunk in iter(lambda: fh.read(1024 * 1024), b""):
+            size += len(chunk)
             h.update(chunk)
-    return h.hexdigest()
+    return h.hexdigest(), size
+
+
+def _rel_join(rel_dir: str, name: str) -> str:
+    if rel_dir == ".":
+        return name
+    return f"{rel_dir}/{name}"
+
+
+def _sha256_directory_tree(path: Path) -> tuple[str, int, int]:
+    """
+    Stable digest for directory trees.
+    Includes sorted relative paths, file types, file content hashes and symlink
+    targets. Symlinks are recorded but never followed.
+    """
+    lines: list[str] = ["D|."]
+    total_size = 0
+    file_count = 0
+    for root, dirnames, filenames in os.walk(path, topdown=True, followlinks=False):
+        root_path = Path(root)
+        rel_dir = root_path.relative_to(path).as_posix()
+        dirnames.sort()
+        filenames.sort()
+        for name in dirnames:
+            child = root_path / name
+            rel = _rel_join(rel_dir, name)
+            if child.is_symlink():
+                lines.append(f"L|{rel}|{os.readlink(child)}")
+            else:
+                lines.append(f"D|{rel}")
+        for name in filenames:
+            child = root_path / name
+            rel = _rel_join(rel_dir, name)
+            if child.is_symlink():
+                lines.append(f"L|{rel}|{os.readlink(child)}")
+                continue
+            digest, size = _sha256_file(child)
+            total_size += size
+            file_count += 1
+            lines.append(f"F|{rel}|{size}|{digest}")
+    payload = ("\n".join(lines) + "\n").encode("utf-8", errors="replace")
+    return _sha256_bytes(payload), total_size, file_count
+
+
+def describe_path(path: Path) -> dict[str, str | int]:
+    if path.is_symlink():
+        target = os.readlink(path)
+        return {
+            "path_kind": "symlink",
+            "size_bytes": int(path.lstat().st_size),
+            "file_count": 0,
+            "digest": _sha256_bytes(f"L|{target}".encode("utf-8", errors="replace")),
+            "symlink_target": target,
+        }
+    if path.is_dir():
+        digest, size_bytes, file_count = _sha256_directory_tree(path)
+        return {
+            "path_kind": "directory",
+            "size_bytes": size_bytes,
+            "file_count": file_count,
+            "digest": digest,
+            "symlink_target": "",
+        }
+    digest, size_bytes = _sha256_file(path)
+    return {
+        "path_kind": "regular_file",
+        "size_bytes": size_bytes,
+        "file_count": 1,
+        "digest": digest,
+        "symlink_target": "",
+    }
 
 
 def _target_kind(name: str) -> str | None:
@@ -69,17 +143,29 @@ def discover_all_targets(extscache_root: Path) -> list[TargetEntry]:
     return out
 
 
-def quarantine_targets(targets: list[TargetEntry], quarantine_root: Path) -> list[dict[str, str]]:
-    moved: list[dict[str, str]] = []
+def quarantine_targets(targets: list[TargetEntry], quarantine_root: Path) -> list[dict[str, str | int]]:
+    moved: list[dict[str, str | int]] = []
     quarantine_root.mkdir(parents=True, exist_ok=True)
     for entry in targets:
         if not entry.path.exists() and not entry.path.is_symlink():
             continue
+        desc = describe_path(entry.path)
         token = str(entry.pip_prebundle_root.parent.name).replace("/", "_")
         dst = quarantine_root / token / entry.rel
         dst.parent.mkdir(parents=True, exist_ok=True)
         shutil.move(str(entry.path), str(dst))
-        moved.append({"source": str(entry.path), "dest": str(dst), "kind": entry.kind})
+        moved.append(
+            {
+                "source": str(entry.path),
+                "dest": str(dst),
+                "kind": entry.kind,
+                "path_kind": str(desc["path_kind"]),
+                "size_bytes": int(desc["size_bytes"]),
+                "file_count": int(desc["file_count"]),
+                "digest": str(desc["digest"]),
+                "symlink_target": str(desc["symlink_target"]),
+            }
+        )
     return moved
 
 
@@ -133,19 +219,25 @@ def main() -> int:
     inventory_lines: list[str] = []
     hashes_lines: list[str] = []
     for t in targets:
-        inventory_lines.append(
-            "|".join(
-                [
-                    str(t.pip_prebundle_root),
-                    t.rel,
-                    t.kind,
-                    "symlink" if t.is_symlink else "regular",
-                    t.link_target,
-                ]
-            )
-        )
         if t.path.exists() or t.path.is_symlink():
-            hashes_lines.append(f"{_sha256_path(t.path)}  {t.path}")
+            desc = describe_path(t.path)
+            inventory_lines.append(
+                "|".join(
+                    [
+                        str(t.pip_prebundle_root),
+                        t.rel,
+                        t.kind,
+                        str(desc["path_kind"]),
+                        str(desc["size_bytes"]),
+                        str(desc["file_count"]),
+                        str(desc["digest"]),
+                        str(desc["symlink_target"]),
+                    ]
+                )
+            )
+            hashes_lines.append(f"{desc['digest']}  {t.path}")
+        else:
+            inventory_lines.append("|".join([str(t.pip_prebundle_root), t.rel, t.kind, "missing", "0", "0", "", ""]))
 
     moved = quarantine_targets(targets, args.quarantine_root)
     remain = _has_importable_numpy_in_prebundle(args.extscache_root)

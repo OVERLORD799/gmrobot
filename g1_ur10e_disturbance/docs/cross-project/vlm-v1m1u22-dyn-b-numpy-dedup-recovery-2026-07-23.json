@@ -1,0 +1,104 @@
+{
+  "doc": "vlm-v1m1u22-dyn-b-numpy-dedup-recovery-2026-07-23",
+  "task": "V1-M1U2.2",
+  "base_commit": "c07e714",
+  "scope": {
+    "authorized_recovery_only": true,
+    "fix_target": "pip_prebundle NumPy de-dup directory hashing",
+    "forbidden_changes": [
+      "formal capture",
+      "VLM/perception/SAM2/POST enablement",
+      "safety/USD/B0-B4 changes"
+    ]
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u22-20260723",
+    "sha": "",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u22"
+  },
+  "budget": {
+    "max_build": 1,
+    "max_smoke": 1,
+    "build_count": 1,
+    "smoke_count": 0,
+    "no_retry": true,
+    "concurrent_container": false
+  },
+  "tests_offline": [
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_pip_prebundle_numpy_dedup_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "PASS"
+    }
+  ],
+  "static_inspection": {
+    "outer_lateral_core_targets_all_true": true,
+    "abi_guard_has_verify_numpy_single_root": true,
+    "abi_guard_records_conflicting_sys_path": true,
+    "abi_guard_raises_fail_token": true,
+    "evidence": "g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/meta/static_inspection.json"
+  },
+  "build": {
+    "attempted": true,
+    "succeeded": false,
+    "exit_code": 1,
+    "elapsed_sec": 1,
+    "error_contains": "AssertionError: ['numpy', 'numpy-1.26.0.dist-info', 'numpy.libs']",
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/meta/docker_build_stdout.log",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723/meta/docker_build_stderr.log"
+  },
+  "smoke": {
+    "attempted": false,
+    "runner": "GMRobot/scripts/capture_one_shot_runner.py",
+    "path": "g1_ur10e_disturbance/docker/run.sh",
+    "reason_not_run": "single allowed build failed; retry/smoke blocked by budget policy"
+  },
+  "dedup_evidence": {
+    "quarantined_numpy_package_paths": [
+      "*/pip_prebundle/numpy"
+    ],
+    "quarantined_numpy_libs_paths": [
+      "*/pip_prebundle/numpy.libs"
+    ],
+    "quarantined_numpy_dist_info_paths": [
+      "*/pip_prebundle/numpy-1.26.0.dist-info"
+    ],
+    "quarantined_exact_names_from_build_assertion": [
+      "numpy",
+      "numpy.libs",
+      "numpy-1.26.0.dist-info"
+    ],
+    "quarantined_digest_exported_to_host": false
+  },
+  "numpy_origins": {
+    "pre_json": "",
+    "post_json": "",
+    "post_normalized_roots": [],
+    "post_loaded_prebundle_numpy_module": null
+  },
+  "policy_forbids": [
+    "Traceback",
+    "NUMPY_ABI_GUARD_FAIL",
+    "dtype mismatch",
+    "broadcast_to",
+    "extension startup failure",
+    "DEVICE_LOST"
+  ],
+  "post_enabled": 0,
+  "xid_detected": null,
+  "verdict": "NUMPY_DEDUP_FAIL_STOP",
+  "next_gate": "STOP_NO_CAPTURE",
+  "formal_capture_executed": false,
+  "artifacts_root": "g1_ur10e_disturbance/results/paper_demo/v1m1u22_dyn_b_numpy_dedup_smoke_20260723"
+}
