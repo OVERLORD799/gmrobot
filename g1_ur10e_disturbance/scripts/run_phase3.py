@@ -240,6 +240,12 @@ parser.add_argument(
     help="Optional JSONL path for G1/UR10e body poses at camera save steps.",
 )
 parser.add_argument(
+    "--dyn-b-per-step-audit-csv",
+    type=str,
+    default="",
+    help="Optional Dyn-B-only per-sim-step audit CSV path (default: off).",
+)
+parser.add_argument(
     "--motion_source_label",
     type=str,
     default="",
@@ -959,6 +965,41 @@ def main():
     _dynamic_audit_fh = (
         open(_dynamic_audit_path, "w") if dynamic_sweep is not None else None
     )
+    _dyn_b_per_step_audit_fh = None
+    _dyn_b_per_step_audit_writer = None
+    if args_cli.dyn_b_per_step_audit_csv:
+        _dyn_b_dir = os.path.dirname(args_cli.dyn_b_per_step_audit_csv)
+        if _dyn_b_dir:
+            os.makedirs(_dyn_b_dir, exist_ok=True)
+        _dyn_b_per_step_audit_fh = open(
+            args_cli.dyn_b_per_step_audit_csv, "w", newline="", encoding="utf-8"
+        )
+        _dyn_b_per_step_audit_writer = csv.DictWriter(
+            _dyn_b_per_step_audit_fh,
+            fieldnames=[
+                "sim_step",
+                "policy_step",
+                "phase",
+                "gate_evaluated",
+                "gate_effective",
+                "trigger_rule",
+                "stop_flag",
+                "slow_flag",
+                "replan_flag",
+                "dist_min_g1_body_m",
+                "margin_to_gate_m",
+                "g1_fell_flag",
+                "g1_root_x",
+                "g1_root_y",
+                "g1_root_z",
+                "g1_tilt_rad",
+                "motion_source_label",
+                "camera_capture_marker",
+                "body_pose_marker",
+            ],
+        )
+        _dyn_b_per_step_audit_writer.writeheader()
+        _dyn_b_per_step_audit_fh.flush()
     if _dynamic_audit_fh is not None:
         _dynamic_audit_fh.write(DYNAMIC_AUDIT_HEADER)
     if _trajectory_fh is not None:
@@ -2920,6 +2961,46 @@ def main():
         )
         _write_dynamic_audit(step)
         metrics.stuck_count = disturb.stuck_count
+        if _dyn_b_per_step_audit_writer is not None and _dyn_b_per_step_audit_fh is not None:
+            _evaluated_gate_name = (
+                gate_decision.name if gate_decision is not None else "NONE"
+            )
+            _effective_gate_name = resolve_effective_gate_name(
+                gate_decision.name if gate_decision is not None else None,
+                _enforcement_mode,
+            )
+            _meta = getattr(gate_result, "metadata", {}) if gate_result is not None else {}
+            if not isinstance(_meta, dict):
+                _meta = {}
+            _trigger_rule = str(_meta.get("trigger_rule", "") or "")
+            _dist_min_g1_body = float(_g1_closest_body_dist)
+            _margin_to_gate = _dist_min_g1_body - 0.10
+            _camera_capture_marker = int(bool(args_cli.save_camera and _do_cam))
+            _body_pose_marker = int(bool(_camera_capture_marker and _body_pose_fh is not None))
+            _dyn_b_per_step_audit_writer.writerow(
+                {
+                    "sim_step": int(step),
+                    "policy_step": int(ur10e.time_step),
+                    "phase": str(disturb.scenario_name),
+                    "gate_evaluated": _evaluated_gate_name,
+                    "gate_effective": _effective_gate_name,
+                    "trigger_rule": _trigger_rule,
+                    "stop_flag": int(_effective_gate_name == "STOP"),
+                    "slow_flag": int(_effective_gate_name == "SLOW_DOWN"),
+                    "replan_flag": int(bool(_replan_applied_this_step)),
+                    "dist_min_g1_body_m": f"{_dist_min_g1_body:.6f}",
+                    "margin_to_gate_m": f"{_margin_to_gate:.6f}",
+                    "g1_fell_flag": int(float(_g1_root_now[2]) < cfg.safety.collapse_z),
+                    "g1_root_x": f"{float(_g1_root_now[0]):.6f}",
+                    "g1_root_y": f"{float(_g1_root_now[1]):.6f}",
+                    "g1_root_z": f"{float(_g1_root_now[2]):.6f}",
+                    "g1_tilt_rad": f"{float(g1_tilt):.6f}",
+                    "motion_source_label": str(args_cli.motion_source_label or ""),
+                    "camera_capture_marker": _camera_capture_marker,
+                    "body_pose_marker": _body_pose_marker,
+                }
+            )
+            _dyn_b_per_step_audit_fh.flush()
 
         # ── 10. Progress ───────────────────────────────────────────────
         if step % ival == 0:
@@ -3082,6 +3163,8 @@ def main():
         _dynamic_audit_fh.close()
     if _trajectory_fh is not None:
         _trajectory_fh.close()
+    if _dyn_b_per_step_audit_fh is not None:
+        _dyn_b_per_step_audit_fh.close()
     _cleanup_sim(env, simulation_app)
 
 

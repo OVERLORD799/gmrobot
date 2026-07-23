@@ -21,6 +21,7 @@ def test_inner_command_has_exact_prefix_and_entrypoint() -> None:
         result_root_in_container="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723"
     )
     assert inner.startswith("set -euo pipefail; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py ")
+    assert "--dyn-b-per-step-audit-csv /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723/safety_logs/phase3_dyn_b_per_step_audit.csv" in inner
 
 
 def test_outer_command_uses_exact_m1v1_shape() -> None:

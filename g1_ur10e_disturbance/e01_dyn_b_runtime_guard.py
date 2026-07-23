@@ -125,6 +125,7 @@ def build_m1v1_dyn_b_preflight_inner_command(*, result_root_in_container: str) -
         "--camera_save_steps 219,220,221,329,330,331 "
         f"--camera_pose_json {rr}/meta/camera_pose.json "
         f"--body_pose_jsonl {rr}/meta/body_poses.jsonl "
+        f"--dyn-b-per-step-audit-csv {rr}/safety_logs/phase3_dyn_b_per_step_audit.csv "
         f"--numpy-origin-pre-json {rr}/meta/numpy_origin_pre.json "
         f"--numpy-origin-post-json {rr}/meta/numpy_origin_post.json "
         f"--typing-extensions-pre-json {rr}/meta/typing_extensions_pre.json "

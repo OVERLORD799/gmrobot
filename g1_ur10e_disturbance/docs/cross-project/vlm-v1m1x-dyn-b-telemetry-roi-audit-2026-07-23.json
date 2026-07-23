@@ -1,0 +1,143 @@
+{
+  "doc": "vlm-v1m1x-dyn-b-telemetry-roi-audit-2026-07-23",
+  "milestone": "V1-M1X",
+  "base_commit": "8d88cd5",
+  "mode": "offline_only",
+  "execution": {
+    "docker_or_isaac_run_executed": false,
+    "network_or_post_or_vlm_or_perception_or_sam2_executed": false,
+    "image_rebuild_executed": false
+  },
+  "historical_m1w1_audit": {
+    "result_root": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w1_20260723",
+    "phase3_csv_episode_rows": 1,
+    "phase3_steps_rows_total": 7,
+    "phase3_steps_rows_in_190_340": 3,
+    "phase3_steps_190_340_steps": [
+      200,
+      250,
+      300
+    ],
+    "phase3_steps_progress_interval": 50,
+    "raw_max_steps": 341,
+    "episode_total_steps": 341,
+    "episode_policy_steps": 335,
+    "root_cause": {
+      "episode_metrics_vs_per_step": "phase3.csv is episode-level aggregate (one row), not per-step telemetry.",
+      "sparse_progress_logging": "phase3_steps.csv writes only inside `if step % progress_interval == 0`; with progress_interval=50, only 0/50/100/150/200/250/300 exist before termination.",
+      "per_step_tracking_absent": "historical run had no dedicated always-on per-sim-step geometry audit stream, so 190..340 completeness cannot be proven from historical files.",
+      "policy_steps_distinction": "policy_steps=335 reflects UR10e policy-clock advances under gate logic, not simulation loop count; simulation loop still executed 341 steps."
+    },
+    "historical_verdict_preserved": true,
+    "m1w1_promotion": "forbidden_not_promoted"
+  },
+  "implementation": {
+    "default_off_cli": "--dyn-b-per-step-audit-csv",
+    "enabled_only_when_explicit_path_is_set": true,
+    "one_row_per_sim_step": true,
+    "flush_each_row": true,
+    "schema": [
+      "sim_step",
+      "policy_step",
+      "phase",
+      "gate_evaluated",
+      "gate_effective",
+      "trigger_rule",
+      "stop_flag",
+      "slow_flag",
+      "replan_flag",
+      "dist_min_g1_body_m",
+      "margin_to_gate_m",
+      "g1_fell_flag",
+      "g1_root_x",
+      "g1_root_y",
+      "g1_root_z",
+      "g1_tilt_rad",
+      "motion_source_label",
+      "camera_capture_marker",
+      "body_pose_marker"
+    ]
+  },
+  "fail_closed_analyzer": {
+    "module": "g1_ur10e_disturbance/scripts/dyn_b_per_step_audit_analyzer.py",
+    "window": "190..340",
+    "requirements": [
+      "every integer step in [190,340] appears exactly once",
+      "all gate_effective == ALLOW",
+      "stop_flag == 0 for all rows",
+      "slow_flag == 0 for all rows",
+      "replan_flag == 0 for all rows",
+      "margin_to_gate_m >= 0.10 for all rows",
+      "phase(220) == lateral_positive_sweep",
+      "phase(330) == lateral_negative_sweep"
+    ]
+  },
+  "offline_tests": {
+    "new_test": "g1_ur10e_disturbance/scripts/test_dyn_b_per_step_audit_analyzer_unit.py",
+    "covered_cases": [
+      "complete pass fixture",
+      "missing rows",
+      "duplicate rows",
+      "sparse historical 3-row shape",
+      "non-ALLOW",
+      "low margin",
+      "wrong phase"
+    ],
+    "result": "pass"
+  },
+  "roi_provenance_audit": {
+    "source_files": [
+      "meta/body_poses.jsonl",
+      "meta/camera_pose.json"
+    ],
+    "camera_pose": {
+      "pos": [
+        1.0,
+        0.0,
+        3.0
+      ]
+    },
+    "step220": {
+      "phase": "lateral_positive_sweep",
+      "projected_links_count": 8,
+      "in_frame_links_count": 0,
+      "in_frame_links": [],
+      "clipped_links_count": 8,
+      "roi_area_px2": 129.1742744340221,
+      "roi_fraction": 0.0004204891745899157
+    },
+    "step330": {
+      "phase": "lateral_negative_sweep",
+      "projected_links_count": 8,
+      "in_frame_links_count": 1,
+      "in_frame_links": [
+        "left_wrist_pitch_link"
+      ],
+      "clipped_links_count": 7,
+      "roi_area_px2": 1161.7446498198315,
+      "roi_fraction": 0.0037817208652989307
+    },
+    "displacement_px": {
+      "g1_roi_centroid_220_330": 20.65488682540438,
+      "g1_root_projected_220_330": 23.766949495337023,
+      "ur10e_ee_projected_220_330": 81.29030379701487
+    },
+    "attribution": "20.65px comes from G1-body projected ROI centroid shift (not UR10e/image diff metric).",
+    "adequate_for_human_dynamic_label_review": false,
+    "adequacy_reason": "Most projected G1 links are clipped outside image at both key steps; visible in-frame support is too weak for robust human dynamic labeling.",
+    "future_stricter_visual_gate_proposal": {
+      "min_in_frame_projected_links_per_key_step": 4,
+      "min_roi_fraction_per_key_step": 0.01,
+      "max_clipped_fraction_per_key_step": 0.5
+    },
+    "camera_or_trajectory_changed_in_this_milestone": false
+  },
+  "future_preflight_command_builder": {
+    "updated": true,
+    "explicit_per_step_audit_path_added": true,
+    "executed_now": false
+  },
+  "status": {
+    "one_new_preflight_technically_ready": true
+  }
+}
