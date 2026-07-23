@@ -26,7 +26,7 @@ def test_dockerfile_exists_and_copies_dyn_b_sources():
     assert df.is_file(), df
     text = df.read_text(encoding="utf-8")
     assert "FROM gmdisturb:e01-func-c-m1j-20260723" in text
-    assert "e01-dyn-b-m1u2" in M1U2_IMAGE_TAG
+    assert "e01-dyn-b-m1u21" in M1U2_IMAGE_TAG
     assert dockerfile_bake_mentions_outer_lateral(text)
     for rel in (
         "scripts/run_phase3.py",
@@ -51,9 +51,9 @@ def test_build_context_sources_contain_outer_lateral_patrol():
 
 def test_canonical_smoke_no_pip_prebundle_and_no_network_models():
     cmd = canonical_dyn_b_smoke_shell(
-        output_csv="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u2_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
-        numpy_origin_pre_json="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u2_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
-        numpy_origin_post_json="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u2_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
+        output_csv="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723/safety_logs/phase3.csv",
+        numpy_origin_pre_json="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_pre.json",
+        numpy_origin_post_json="/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723/meta/numpy_origin_post.json",
     )
     assert "pip_prebundle" not in cmd
     assert "PYTHONPATH" not in cmd

@@ -46,5 +46,5 @@
   },
   "artifacts_root": "g1_ur10e_disturbance/results/paper_demo/v1m1u2_dyn_b_numpy_dedup_smoke_20260723",
   "verdict": "NUMPY_DEDUP_FAIL_STOP",
-  "next_gate": "ONE_DYN_B_PREFLIGHT_MAY_BE_REQUESTED"
+  "next_gate": "BUILD_AND_APP_LAUNCHER_SMOKE_REQUIRED"
 }

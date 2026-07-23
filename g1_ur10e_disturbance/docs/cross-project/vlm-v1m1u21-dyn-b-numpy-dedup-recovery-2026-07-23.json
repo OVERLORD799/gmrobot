@@ -1,0 +1,93 @@
+{
+  "doc": "vlm-v1m1u21-dyn-b-numpy-dedup-recovery-2026-07-23",
+  "task": "V1-M1U2.1",
+  "base_commit": "4ac7354",
+  "scope": {
+    "authorized_recovery_only": true,
+    "fix_target": "Dockerfile shell execution for pipefail compatibility",
+    "forbidden_changes": [
+      "formal capture",
+      "VLM/perception/SAM2/POST enablement",
+      "safety/USD/B0-B4 changes"
+    ]
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u21-20260723",
+    "sha": "",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u21"
+  },
+  "budget": {
+    "max_build": 1,
+    "max_smoke": 1,
+    "build_count": 1,
+    "smoke_count": 0,
+    "no_retry": true,
+    "concurrent_container": false
+  },
+  "tests_offline": [
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_pip_prebundle_numpy_dedup_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py",
+      "result": "PASS"
+    },
+    {
+      "path": "GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "PASS"
+    }
+  ],
+  "static_inspection": {
+    "outer_lateral_targeted_all_true": true,
+    "abi_guard_has_verify_numpy_single_root": true,
+    "abi_guard_records_conflicting_sys_path": true,
+    "abi_guard_raises_fail_token": true,
+    "evidence": "g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723/meta/static_inspection.json"
+  },
+  "build": {
+    "attempted": true,
+    "succeeded": false,
+    "exit_code": 1,
+    "elapsed_sec": 1,
+    "error_contains": "IsADirectoryError: [Errno 21] Is a directory",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723/meta/docker_build_stderr.log"
+  },
+  "smoke": {
+    "attempted": false,
+    "runner": "GMRobot/scripts/capture_one_shot_runner.py",
+    "path": "g1_ur10e_disturbance/docker/run.sh",
+    "reason_not_run": "single allowed build failed; no retry authorized"
+  },
+  "dedup_evidence": {
+    "quarantined_numpy_package_paths": [],
+    "quarantined_numpy_libs_paths": [],
+    "quarantined_numpy_dist_info_paths": [],
+    "non_numpy_prebundle_remains_proven_by_offline_unit": true,
+    "note": "build failed before host-visible quarantine report generation"
+  },
+  "numpy_origins": {
+    "pre_json": "",
+    "post_json": "",
+    "post_normalized_roots": [],
+    "post_loaded_prebundle_numpy_module": null
+  },
+  "policy_forbids": [
+    "Traceback",
+    "NUMPY_ABI_GUARD_FAIL",
+    "dtype size changed",
+    "broadcast_to",
+    "extension startup failure",
+    "DEVICE_LOST"
+  ],
+  "post_enabled": 0,
+  "xid_detected": null,
+  "verdict": "NUMPY_DEDUP_FAIL_STOP",
+  "next_gate": "STOP_NO_CAPTURE",
+  "formal_capture_executed": false,
+  "artifacts_root": "g1_ur10e_disturbance/results/paper_demo/v1m1u21_dyn_b_numpy_dedup_smoke_20260723"
+}
