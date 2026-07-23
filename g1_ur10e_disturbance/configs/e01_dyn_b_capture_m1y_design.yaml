@@ -1,0 +1,26 @@
+# E01-Dyn-B V1-M1Y camera-framing design profile (default OFF; do not execute).
+scene: E01-Dyn-B
+scenario: outer_lateral_patrol
+motion_source: scripted_g1_outer_lateral_patrol
+seed: 43
+enable_capture: false
+execute_capture: false
+virtual_hand: false
+vlm: false
+perception: false
+five_stage: false
+post_count_expected: 0
+camera:
+  override: true
+  pos: [0.45, 0.0, 2.7]
+  rot: [0.7071, 0.0, 0.7071, 0.0]
+capture_steps: [220, 330]
+geometry_window: [190, 340]
+min_links_in_frame: 4
+max_clipping_ratio: 0.5
+min_roi_area_fraction: 0.01
+min_centroid_displacement_px: 20
+uncertainty_margin_px: 12
+anchor_margin_px: 24
+dyn_b_per_step_audit_csv: safety_logs/phase3_dyn_b_per_step_audit_m1y.csv
+results_dir: results/paper_demo/v1e01_dyn_b_preflight_m1y_20260723
