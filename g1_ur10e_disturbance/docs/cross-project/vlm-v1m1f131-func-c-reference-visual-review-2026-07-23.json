@@ -1,0 +1,47 @@
+{
+  "task": "V1-M1F13.1 reference-bin visual contract review",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head_short": "e1f091d",
+    "actual_head_full": "e1f091d66c86ab25910dcdacd8ea6cecea9863e3",
+    "worktree_clean": true
+  },
+  "review_scope": "main_agent_manual_side_by_side_visual_only",
+  "constraints": {
+    "run_code": false,
+    "run_simulation": false,
+    "run_network": false,
+    "modify_source_images_old_verdicts": false
+  },
+  "reference_frame_locked": {
+    "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+    "step": 330,
+    "frame": "frame_000330_env0.png",
+    "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+    "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a"
+  },
+  "m1f13_frame_locked": {
+    "scene_group": "v1e01_func_c_dual_reference_smoke_m1f13_20260723",
+    "step": 0,
+    "frame": "frame_000000_env0.png",
+    "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/scene/frame_000000_env0.png",
+    "sha256": "f8046771b1f23f892ae4c46a9b7fc1a102310283f7bebfc80859342a022a9ae6"
+  },
+  "visual_contract_conclusion": {
+    "left_bin_green_shell": true,
+    "left_bin_white_grid_5x4": true,
+    "left_bin_scale_and_orientation_match_reference": true,
+    "left_bin_no_white_tray_stairs_fan_occlusion": true,
+    "right_bin_same_origin_green_shell": true,
+    "right_bin_has_20_parts_inside_grid": true,
+    "step_delta_robot_ground_difference_not_a_contract_failure": true
+  },
+  "status_updates": {
+    "artifact_removal_technical_pass": true,
+    "reference_bin_visual_contract_pass": true,
+    "technical_review_status": "reference_visual_pass_pending_user_confirmation",
+    "reviewer_approved": false,
+    "formal_recapture_allowed": false
+  }
+}

@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.1.0",
+  "manifest_version": "3.1.1",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -9,6 +9,11 @@
     },
     {
       "version": "2.0.0",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+      "immutable": true
+    },
+    {
+      "version": "3.1.0",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
       "immutable": true
     }
@@ -31,7 +36,7 @@
     "learned_whole_body_control": false,
     "VLM_output": false,
     "reviewer_approved": false,
-    "technical_review_status": "artifact_removed_semantic_clarity_pending_user"
+    "technical_review_status": "reference_visual_pass_pending_user_confirmation"
   },
   "candidates": [
     {
@@ -48,9 +53,11 @@
       ],
       "temporal_pair_required": false,
       "reviewer_approved": false,
-      "technical_review_status": "dual_reference_scene_rework_pending",
+      "technical_review_status": "reference_visual_pass_pending_user_confirmation",
       "formal_recapture_allowed": false,
       "semantic_clarity": "user_review_required",
+      "artifact_removal_technical_pass": true,
+      "reference_bin_visual_contract_pass": true,
       "m1f5_user_rejected": true,
       "m1f5_user_rejected_reason": "new_frame_white_rectangle_not_equal_reference_frame330_left_green_empty_box",
       "reference_locked": {
