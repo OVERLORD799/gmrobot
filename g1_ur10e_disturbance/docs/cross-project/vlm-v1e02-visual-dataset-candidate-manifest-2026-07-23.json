@@ -343,7 +343,10 @@
       ],
       "temporal_pair_required": true,
       "reviewer_approved": false,
-      "technical_review_status": "technical_temporal_pass_pending_user",
+      "user_rejected": true,
+      "technical_review_status": "pending_user_review",
+      "status": "user_rejected_no_visible_g1_motion",
+      "count_as_dynamic_positive_group": false,
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -354,7 +357,7 @@
       "VLM_output": false,
       "geometry_evidence": false,
       "control_evidence": false,
-      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED",
+      "motion_attribution": "INSUFFICIENT",
       "prebuild_contract": {
         "trajectory_id": "7beb111400ccc2f8cd5d9ed1ab19192705714ff3d6cbc7dc3ccb16154c74683c",
         "seed": 44,
@@ -380,22 +383,34 @@
         "verdict": "PREBUILD_READY"
       },
       "formal_capture_attempt": {
-        "run_id": "v1e2b_dyn_c_mirrored_capture_20260723",
-        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2b_dyn_c_mirrored_capture_20260723",
-        "raw_exit_code": 1,
-        "elapsed_seconds": 0.506145,
-        "runtime_assertions_pass": false,
-        "main_frames_ready": false,
-        "final_status": "FAIL_FINAL",
+        "run_id": "v1e2d_dyn_c_mirrored_capture_20260723",
+        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723",
+        "raw_exit_code": 0,
+        "elapsed_seconds": 64.419441,
+        "runtime_assertions_pass": true,
+        "main_frames_ready": true,
+        "final_status": "user_rejected_no_visible_g1_motion",
         "retriable": false,
-        "root_cause": "copy_only_missing_module_dyn_b_per_step_audit_writer"
+        "root_cause": "user_confirmed_no_discriminable_g1_motion_frame240_310",
+        "raw_e2d_metrics": {
+          "body_link_roi_area_fraction": 0.009191,
+          "centroid_240_to_310_px": 27.905,
+          "visibility_links_min": 8,
+          "clipping_ratio_max": 0.0,
+          "local_pixel_motion": {
+            "239_240": 1.467,
+            "240_241": 1.543,
+            "309_310": 0.628,
+            "310_311": 0.757
+          }
+        }
       }
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",
   "dataset_sufficiency": {
     "functional_formal_visual_group_count": 1,
-    "dynamic_technical_candidate_group_count": 2,
+    "dynamic_technical_candidate_group_count": 1,
     "required_minimum": {
       "independent_groups": 2,
       "category_coverage": [

@@ -1,8 +1,9 @@
 # V1-E2D final Dyn-C mirrored capture (2026-07-23)
 
-- verdict: `REVIEW_REQUIRED`
-- next_gate: `HUMAN_REVIEW`
+- verdict: `user_rejected_no_visible_g1_motion`
+- next_gate: `REDESIGN_REQUIRED`
 - reviewer_approved: `false`
+- user_rejected: `true`
 - requested_initial_verdict: `REVIEW_REQUIRED`
 - image: `gmdisturb:e01-dyn-c-mirrored-m1e2d-20260723`
 - image_sha: `sha256:2bde63f2c5450e43828e0e8965ade03f798dcab83a06793d96b7760a69243af5`

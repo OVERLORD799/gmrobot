@@ -1,7 +1,7 @@
 {
   "artifact_manifest_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2d-dyn-c-mirrored-capture-2026-07-23.artifact-manifest.jsonl",
   "group_count": 1,
-  "status": "REVIEW_REQUIRED",
+  "status": "user_rejected_no_visible_g1_motion",
   "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723",
   "doc_json": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2d-dyn-c-mirrored-capture-2026-07-23.json"
 }

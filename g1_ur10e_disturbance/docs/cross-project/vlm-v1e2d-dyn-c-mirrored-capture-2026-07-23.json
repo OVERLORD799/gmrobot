@@ -148,9 +148,10 @@
   },
   "status": {
     "requested_initial_verdict": "REVIEW_REQUIRED",
+    "user_rejected": true,
     "reviewer_approved": false,
-    "verdict": "REVIEW_REQUIRED",
-    "next_gate": "HUMAN_REVIEW",
-    "failure_reason": ""
+    "verdict": "user_rejected_no_visible_g1_motion",
+    "next_gate": "REDESIGN_REQUIRED",
+    "failure_reason": "user_confirmed_no_discriminable_g1_motion_in_frame240_310"
   }
 }

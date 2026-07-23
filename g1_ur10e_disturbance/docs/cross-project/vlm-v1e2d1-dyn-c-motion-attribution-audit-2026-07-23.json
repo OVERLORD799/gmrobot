@@ -1,0 +1,131 @@
+{
+  "milestone": "V1-E2D.1",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723",
+  "user_decision": {
+    "user_rejected": true,
+    "reviewer_approved": false,
+    "reason": "no_visible_discriminable_g1_motion_in_rgb_main_frames"
+  },
+  "raw_e2d_metrics_preserved": {
+    "body_link_roi_area_fraction": 0.009191,
+    "centroid_240_to_310_px": 27.905,
+    "visibility_links_min": 8,
+    "clipping_ratio_max": 0.0,
+    "local_pixel_motion": {
+      "239_240": 1.467,
+      "240_241": 1.543,
+      "309_310": 0.628,
+      "310_311": 0.757
+    },
+    "available": true,
+    "reason": ""
+  },
+  "frame_alignment": {
+    "capture_steps_primary": [
+      240,
+      310
+    ],
+    "stability_steps": [
+      239,
+      241,
+      309,
+      311
+    ],
+    "adjacent_sha_equal": {
+      "239_240_sha_equal": true,
+      "240_241_sha_equal": true,
+      "309_310_sha_equal": true,
+      "310_311_sha_equal": true
+    },
+    "nearest_logged_step_for_capture": {
+      "240": 250,
+      "310": 300
+    },
+    "capture_step_ur10_stage": {
+      "240": "UNKNOWN",
+      "310": "UNKNOWN",
+      "nearest_240_stage": "move_above_box_with_slot_B_1",
+      "nearest_310_stage": "descend_to_box_with_slot_B_1"
+    }
+  },
+  "actual_motion_evidence": {
+    "g1_root_delta_xyz_m_240_to_310": [
+      -0.0006133615970611572,
+      0.14479655027389526,
+      0.004526317119598389
+    ],
+    "g1_root_delta_xy_norm_m_240_to_310": 0.14479784937515278,
+    "g1_link_max_displacement_m_240_to_310": 0.1503681775927898,
+    "ur10e_ee_delta_xyz_m_240_to_310": [
+      0.007500112056732178,
+      0.12246793322265148,
+      -0.26888781785964966
+    ]
+  },
+  "pixel_attribution_audit": {
+    "method": "g1_link_roi + global_alignment + roi_delta_vs_equal_area_ur10_and_control",
+    "global_shift_dxdy_px": [
+      0,
+      0
+    ],
+    "roi_reliability": "OK",
+    "g1_roi_bbox_240_xyxy": [
+      232.42685127456693,
+      370.1976738800689,
+      313.239234908076,
+      441.1123752633521
+    ],
+    "g1_roi_area_fraction": 0.01865490251771359,
+    "change_fraction_threshold": 18.0,
+    "g1_roi_change_fraction": 0.4488482384823848,
+    "ur10_equal_area_change_fraction": 0.3555405633327711,
+    "control_equal_area_change_fraction": 0.0,
+    "visible_g1_local_motion": false,
+    "policy": "projected_centroid_alone_is_not_motion_evidence"
+  },
+  "root_cause_attribution": {
+    "projected_centroid_nonzero_but_no_visible_g1_motion": [
+      "projected body links can move in world while rendered pixels stay visually unchanged",
+      "UR10e motion dominates scene change and can be misattributed as G1 motion",
+      "adjacent frame identity indicates each capture neighborhood is visually static",
+      "possible ROI occlusion/background confound exists without semantic instance mask"
+    ],
+    "unknowns": [
+      "phase3_steps.csv does not log exact capture steps (240/310); UR10 stage/action at capture is UNKNOWN."
+    ],
+    "requires_next_run_segmentation": true
+  },
+  "task_execution_false_but_ur10_moves": {
+    "audit": "task_execution=false disables task reward/completion contract but does not freeze UR10 policy stepping",
+    "next_contract_required": {
+      "freeze_ur10e": true,
+      "runtime_gate": {
+        "ur10_action_hash_constant": true,
+        "ur10_joint_delta_abs_max": 0.0,
+        "ur10_ee_delta_abs_max": 0.0
+      }
+    }
+  },
+  "next_dyn_positive_gate_design": {
+    "must_pass_all": {
+      "g1_actual_root_or_link_displacement": "required",
+      "g1_local_pixel_displacement": "required",
+      "recommended_actual_center_displacement_px": [
+        40,
+        60
+      ],
+      "min_g1_roi_area_fraction": 0.012,
+      "adjacent_stability_required": true,
+      "primary_pair_visible_change_required": true
+    }
+  },
+  "manifest_update": {
+    "dyn_c_status": "user_rejected_no_visible_g1_motion",
+    "count_as_dynamic_positive_group": false
+  },
+  "verdict": "REDESIGN_READY",
+  "unique_next_step_prebuild": {
+    "id": "V1-E2E-prebuild-freeze-ur10e-and-instance-mask-contract",
+    "summary": "\u9884\u6784\u5efa\u4ec5\u9a8c\u8bc1 freeze_ur10e=true\u3001UR10 action/hash/joint-delta=0 \u95e8\u7981\u3001\u5e76\u5f3a\u5236\u8f93\u51fa\u53ef\u9a8c\u8bc1 G1 semantic/instance mask \u540e\u518d\u8fdb\u884c\u4e0b\u4e00\u6b21\u5355\u6b21\u91c7\u96c6\u3002"
+  }
+}
