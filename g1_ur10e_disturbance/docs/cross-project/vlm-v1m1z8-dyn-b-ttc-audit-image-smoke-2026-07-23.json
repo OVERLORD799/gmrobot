@@ -1,0 +1,94 @@
+{
+  "milestone": "V1-M1Z8",
+  "date": "2026-07-23",
+  "verdict": "M1Z8_AUDIT_SMOKE_PASS",
+  "next_gate": "PASS_ONLY_ONE_FORMAL_M1Z9_CAPTURE_REQUEST_ALLOWED",
+  "stop_policy": "STOP_NO_RETRY",
+  "precheck": {
+    "head_expected": "7eac42a76c7518a0f3ed164b48a9a203a35e1cb4",
+    "head_actual": "7eac42a76c7518a0f3ed164b48a9a203a35e1cb4",
+    "worktree_clean": true,
+    "host_m1z7_pycompile_unit_pass": true
+  },
+  "build": {
+    "count": 1,
+    "dockerfile": "docker/Dockerfile.e01-dyn-b-clean-m1z4",
+    "dockerfile_sha256": "3a728249ab63e052469f5cdc05ec5ee97f5ddcb4007df1a075dc4f000635ee51",
+    "tag": "gmdisturb:e01-dyn-b-ttc-audit-m1z8-20260723",
+    "image_sha": "sha256:1707dec1b229b97eb493c433d7ad60f886a0f304a4bc6558e5792c52155dfc1d",
+    "copy_only_policy_pass": true,
+    "package_mutation_in_dockerfile": false
+  },
+  "historical_images_guard": {
+    "defe95e7": {
+      "expected": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+      "actual": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+      "match": true
+    },
+    "f81e59ce": {
+      "expected": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+      "actual": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c",
+      "match": true
+    },
+    "962de1e3": {
+      "expected": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83",
+      "actual": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83",
+      "match": true
+    }
+  },
+  "smoke": {
+    "count": 1,
+    "raw_exit_code": 0,
+    "entrypoint_convention_ok": true,
+    "headless": true,
+    "max_steps": 1,
+    "camera_enabled": false,
+    "phase3_csv_nonempty": true,
+    "dyn_b_per_step_audit_csv_nonempty": true,
+    "progress_step_1": true,
+    "progress_evidence": "phase3.csv policy_steps=1",
+    "forbidden_capture_or_vlm_or_network_or_credential": false
+  },
+  "audit_csv": {
+    "exactly_header_plus_one_row": true,
+    "data_columns_match_header": true,
+    "required_fields_present": [
+      "ttc_observed_s",
+      "ttc_forecast_s",
+      "approach_rate_mps",
+      "relative_velocity_mps",
+      "ttc_observed_source",
+      "ttc_forecast_source",
+      "approach_rate_source",
+      "relative_velocity_source"
+    ],
+    "provenance_nonempty": true,
+    "allow_row_ttc_inf_or_null_allowed": true,
+    "analyzer_readable": true,
+    "analyzer_pass_step_0_0": true
+  },
+  "runtime_guards": {
+    "numpy_single_root_pre": true,
+    "numpy_single_root_post": true,
+    "paramspec_pre": true,
+    "paramspec_post": true,
+    "traceback_found": false,
+    "device_lost_found": false,
+    "post_count": 0,
+    "xid_probe_available": false,
+    "new_xid": null,
+    "residual_container": false,
+    "residual_process": false
+  },
+  "source_config_sha": {
+    "source": {
+      "count": 86,
+      "sha256": "2f436d1b01a9740d2206d2cb14bb7522f633e2045e1f51253d7555dc07e22b16"
+    },
+    "config": {
+      "count": 7,
+      "sha256": "4eb97fd5d133ed6b86a2626e6686a5ed72d5afc7c54357ba5a8a76442ecb51d6"
+    }
+  },
+  "metadata_root": "results/paper_demo/v1e01_dyn_b_ttc_audit_smoke_m1z8_20260723/meta"
+}
