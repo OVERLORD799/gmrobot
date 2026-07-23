@@ -1,0 +1,105 @@
+{
+  "milestone": "V1-M1M",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "head_commit": "cff7bbe96f4f84c16389970ec996285389f0f8f2",
+  "image": {
+    "name": "gmdisturb:e01-func-c-m1j-20260723",
+    "id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "expected_id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "matches_expected": true,
+    "created": "2026-07-23T11:58:01.198543397+08:00",
+    "rebuilt": false
+  },
+  "baseline": {
+    "hardened_runner_commit": "1078cdf",
+    "canonical_asset_baseline_commit": "cff7bbe",
+    "prior_failure_commit_retained": "5fdc79a"
+  },
+  "paths": {
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723",
+    "runtime_safety_yaml": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/runtime_safety_config.yaml",
+    "runtime_safety_diff": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/runtime_safety_config.diff",
+    "run_status": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/run_status.json",
+    "capture_stdout": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/capture_stdout.txt",
+    "capture_stderr": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/capture_stderr.txt",
+    "gpu_xid_pre": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/gpu_xid_pre.txt",
+    "gpu_xid_post": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/gpu_xid_post.txt",
+    "analyzer_stdout": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/analyzer_stdout.txt",
+    "analyzer_stderr": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/analyzer_stderr.txt",
+    "manifest": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/manifest/capture_manifest.json"
+  },
+  "single_command_policy": {
+    "docker_capture_commands_executed": 1,
+    "rerun_performed": false,
+    "invoked_via_capture_one_shot_runner": true,
+    "no_pipe_no_tee": true
+  },
+  "runner": {
+    "phase": "finished",
+    "start_time_utc": "2026-07-23T04:15:25.557+00:00",
+    "end_time_utc": "2026-07-23T04:16:17.517+00:00",
+    "elapsed_monotonic_sec": 51.960305059,
+    "exit_code": 0,
+    "returncode_raw": 0,
+    "timed_out": false,
+    "signal": null
+  },
+  "frames": {
+    "0": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene/frame_000000_env0.png",
+      "sha256": "dc3a5449ce7b65a56e615f20ef54f4717400dd8fae4779ff16bcd37e02e07d41"
+    },
+    "100": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene/frame_000100_env0.png",
+      "sha256": "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80"
+    },
+    "200": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene/frame_000200_env0.png",
+      "sha256": "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051"
+    }
+  },
+  "post_expected": 0,
+  "post_observed": 0,
+  "geometry_window_100_200": {
+    "rows": 101,
+    "allow": 101,
+    "stop": 0,
+    "slow": 0,
+    "replan": 0,
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/safety_logs/20260723_041552/episode_0000.csv",
+    "episode_gate_counts_full_300": {
+      "ALLOW": 274,
+      "SLOW_DOWN": 24,
+      "STOP": 2
+    }
+  },
+  "visual_artifact_checks": {
+    "white_sector_absent_proxy_both_frames": true,
+    "containerB_filled_content_inside_target_100": true,
+    "containerB_filled_content_inside_target_200": true,
+    "filled_content_rgb_evidence_ok_100": true,
+    "filled_content_rgb_evidence_ok_200": true,
+    "containerB_complete_and_filled_contents_clear": true
+  },
+  "xid": {
+    "new_xid_detected": false,
+    "note": "dmesg may be permission-restricted; pre/post nvidia-smi Xid snapshots preserved"
+  },
+  "offline_analyzer": {
+    "exit_code": 0,
+    "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL",
+    "visual_gate_ok": true,
+    "geometry_ok": true
+  },
+  "labels": {
+    "expected_risk_type": "functional",
+    "label_status": "provisional",
+    "reviewer_approved": false,
+    "vlm_claimed_success": false,
+    "ready_for_vlm_screen": false
+  },
+  "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL",
+  "failed_required_gates": [],
+  "generated_at_utc": "2026-07-23T04:17:16.647188+00:00"
+}
