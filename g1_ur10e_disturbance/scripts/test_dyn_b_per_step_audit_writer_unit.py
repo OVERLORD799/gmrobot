@@ -26,14 +26,37 @@ def test_writer_init_header_one_row_flush_close() -> None:
                 "sim_step": 1,
                 "policy_step": 1,
                 "phase": "smoke_step",
+                "protocol_phase": "transit",
+                "ur10e_stage": "approach",
                 "gate_evaluated": "ALLOW",
                 "gate_effective": "ALLOW",
                 "trigger_rule": "",
+                "trigger_reason": "",
                 "stop_flag": 0,
                 "slow_flag": 0,
                 "replan_flag": 0,
                 "dist_min_g1_body_m": "0.200000",
                 "margin_to_gate_m": "0.100000",
+                "dist_min_for_gating_m": "0.200000",
+                "dist_min_proxy_m": "0.200000",
+                "closest_g1_body": "head_link",
+                "safe_dist_warn_active_m": "0.280000",
+                "safe_dist_hard_stop_active_m": "0.250000",
+                "ttc_observed_s": "null",
+                "ttc_forecast_s": "null",
+                "approach_rate_mps": "null",
+                "relative_velocity_mps": "null",
+                "proxy_surface_velocity_mps": "0.000000",
+                "proxy_surface_velocity_x_mps": "0.000000",
+                "proxy_surface_velocity_y_mps": "0.000000",
+                "proxy_surface_velocity_z_mps": "0.000000",
+                "robot_ee_velocity_mps": "0.010000",
+                "robot_ee_velocity_x_mps": "0.010000",
+                "robot_ee_velocity_y_mps": "0.000000",
+                "robot_ee_velocity_z_mps": "0.000000",
+                "disturbance_active": 1,
+                "disturbance_source": "scripted_virtual_hand",
+                "disturbance_attempt_id": 3,
                 "g1_fell_flag": 0,
                 "g1_root_x": "0.000000",
                 "g1_root_y": "0.000000",
@@ -42,6 +65,18 @@ def test_writer_init_header_one_row_flush_close() -> None:
                 "motion_source_label": "unit_test",
                 "camera_capture_marker": 0,
                 "body_pose_marker": 0,
+                "ttc_observed_availability": "missing",
+                "ttc_observed_source": "gate_result.metadata.ttc",
+                "ttc_forecast_availability": "missing",
+                "ttc_forecast_source": "gate_result.metadata.ttc_forecast_s",
+                "approach_rate_availability": "missing",
+                "approach_rate_source": "gate_result.metadata.approach_rate",
+                "relative_velocity_availability": "missing",
+                "relative_velocity_source": "not_exposed_in_runtime_gate_metadata",
+                "proxy_surface_velocity_availability": "present",
+                "proxy_surface_velocity_source": "adapter.human_hand_vel",
+                "robot_ee_velocity_availability": "present",
+                "robot_ee_velocity_source": "obs.safety.ee_vel",
             }
         )
         fh.flush()
@@ -55,6 +90,10 @@ def test_writer_init_header_one_row_flush_close() -> None:
         assert rows[0]["sim_step"] == "1"
         assert rows[0]["gate_effective"] == "ALLOW"
         assert rows[0]["motion_source_label"] == "unit_test"
+        with out.open("r", encoding="utf-8") as rf:
+            lines = [line.rstrip("\n") for line in rf if line.strip()]
+        assert len(lines) == 2
+        assert lines[0].count(",") == lines[1].count(",")
 
 
 def main() -> None:

@@ -1,0 +1,78 @@
+{
+  "milestone": "V1-M1Z7",
+  "title": "Dyn-B TTC root-cause observability augmentation",
+  "date": "2026-07-23",
+  "scope": {
+    "source_only": true,
+    "offline_tests_only": true,
+    "forbidden_executed": [
+      "build",
+      "docker",
+      "isaac",
+      "network",
+      "post"
+    ]
+  },
+  "artifacts": {
+    "code": [
+      "g1_ur10e_disturbance/scripts/run_phase3.py",
+      "g1_ur10e_disturbance/scripts/dyn_b_per_step_audit_writer.py",
+      "g1_ur10e_disturbance/scripts/dyn_b_per_step_audit_analyzer.py"
+    ],
+    "tests": [
+      "g1_ur10e_disturbance/scripts/test_dyn_b_per_step_audit_writer_unit.py",
+      "g1_ur10e_disturbance/scripts/test_dyn_b_per_step_audit_analyzer_unit.py"
+    ],
+    "docs": [
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1z7-dyn-b-ttc-observability-2026-07-23.md",
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1z7-dyn-b-ttc-observability-2026-07-23.json"
+    ]
+  },
+  "mapping": {
+    "protocol_phase": "per_part.phase.value",
+    "ur10e_stage": "ur10e.stage_name",
+    "gate_evaluated": "gate_decision.name",
+    "gate_effective": "resolve_effective_gate_name(...)",
+    "trigger_rule": "gate_result.metadata.trigger_rule",
+    "trigger_reason": "gate_result.reason",
+    "dist_min_for_gating_m": "_gate_distance_audit().dist_min_for_gating",
+    "dist_min_g1_body_m": "_g1_closest_body_dist",
+    "dist_min_proxy_m": "adapter_surface_dist",
+    "closest_g1_body": "_g1_closest_body_name",
+    "safe_dist_warn_active_m": "_gate_distance_audit().safe_dist_warn_active",
+    "safe_dist_hard_stop_active_m": "_gate_distance_audit().safe_dist_hard_stop_active",
+    "ttc_observed_s": "gate_result.metadata.ttc",
+    "ttc_forecast_s": "gate_result.metadata.ttc_forecast_s",
+    "approach_rate_mps": "gate_result.metadata.approach_rate",
+    "proxy_surface_velocity": "adapter.human_hand_vel",
+    "robot_ee_velocity": "obs.safety.ee_vel",
+    "disturbance_active": "disturbance_active",
+    "disturbance_source": "scripted_virtual_hand|_resolve_disturbance_source(...)",
+    "disturbance_attempt_id": "_disturbance_attempt_id",
+    "relative_velocity_mps": "null + missing provenance"
+  },
+  "compatibility": {
+    "old_schema_readable": true,
+    "old_schema_non_allow_policy": "INSUFFICIENT",
+    "no_guessing": true
+  },
+  "analyzer": {
+    "outputs": [
+      "schema_version",
+      "non_allow_steps",
+      "non_allow_ranges",
+      "non_allow_points[]",
+      "explained_steps",
+      "insufficient_steps"
+    ],
+    "attribution_status_values": [
+      "EXPLAINED",
+      "INSUFFICIENT"
+    ],
+    "margin_not_used_for_safety_inference": true
+  },
+  "next_step_gate": {
+    "allowed_only": "source-only image build + 1-step audit smoke",
+    "not_allowed": "formal capture"
+  }
+}

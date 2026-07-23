@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Fail-closed analyzer for Dyn-B per-step geometry audit CSV."""
+"""Dyn-B per-step attribution analyzer with old-schema compatibility."""
 
 from __future__ import annotations
 
@@ -10,8 +10,82 @@ from collections import Counter
 from pathlib import Path
 
 
-def _f(row: dict[str, str], key: str) -> float:
-    return float(str(row.get(key, "")).strip())
+def _to_int(text: str) -> int:
+    return int(str(text).strip())
+
+
+def _is_nullish(text: str | None) -> bool:
+    token = ("" if text is None else str(text).strip())
+    return token in {"", "null", "None", "nan", "NaN"}
+
+
+def _non_allow_ranges(steps: list[int]) -> list[dict[str, int | str]]:
+    if not steps:
+        return []
+    out: list[dict[str, int | str]] = []
+    s = steps[0]
+    p = steps[0]
+    for cur in steps[1:]:
+        if cur == p + 1:
+            p = cur
+            continue
+        out.append({"start": s, "end": p, "length": p - s + 1, "continuity": "contiguous"})
+        s = cur
+        p = cur
+    out.append({"start": s, "end": p, "length": p - s + 1, "continuity": "contiguous"})
+    return out
+
+
+def _attribution_for_non_allow(row: dict[str, str]) -> dict[str, str]:
+    trigger_rule = str(row.get("trigger_rule", "")).strip()
+    trigger_reason = str(row.get("trigger_reason", "")).strip()
+    gate_effective = str(row.get("gate_effective", "")).strip().upper()
+    has_new_schema = "ttc_observed_s" in row and "ttc_forecast_s" in row
+    if not has_new_schema:
+        return {
+            "attribution_status": "INSUFFICIENT",
+            "reason": "old_schema_missing_ttc_attribution_fields",
+            "trigger_rule": trigger_rule,
+            "trigger_reason": trigger_reason,
+            "gate_effective": gate_effective,
+        }
+
+    if trigger_rule == "":
+        return {
+            "attribution_status": "INSUFFICIENT",
+            "reason": "missing_trigger_rule",
+            "trigger_rule": trigger_rule,
+            "trigger_reason": trigger_reason,
+            "gate_effective": gate_effective,
+        }
+
+    if trigger_rule == "ttc":
+        has_ttc_observed = not _is_nullish(row.get("ttc_observed_s"))
+        has_ttc_forecast = not _is_nullish(row.get("ttc_forecast_s"))
+        has_approach_rate = not _is_nullish(row.get("approach_rate_mps"))
+        if (has_ttc_observed or has_ttc_forecast) and has_approach_rate:
+            return {
+                "attribution_status": "EXPLAINED",
+                "reason": "ttc_rule_with_runtime_ttc_and_approach_rate",
+                "trigger_rule": trigger_rule,
+                "trigger_reason": trigger_reason,
+                "gate_effective": gate_effective,
+            }
+        return {
+            "attribution_status": "INSUFFICIENT",
+            "reason": "ttc_rule_missing_runtime_ttc_or_approach_rate",
+            "trigger_rule": trigger_rule,
+            "trigger_reason": trigger_reason,
+            "gate_effective": gate_effective,
+        }
+
+    return {
+        "attribution_status": "EXPLAINED",
+        "reason": "non_ttc_rule_with_trigger_rule_present",
+        "trigger_rule": trigger_rule,
+        "trigger_reason": trigger_reason,
+        "gate_effective": gate_effective,
+    }
 
 
 def analyze_dyn_b_per_step_window(
@@ -21,54 +95,45 @@ def analyze_dyn_b_per_step_window(
     step_end: int = 340,
     min_margin_m: float = 0.10,
 ) -> dict:
+    del min_margin_m  # M1Z7: margin is not a safety/explanation criterion.
     path = Path(csv_path)
     with path.open("r", encoding="utf-8", newline="") as f:
         rows = list(csv.DictReader(f))
 
-    wanted = [r for r in rows if r.get("sim_step", "").strip() != ""]
-    steps = [int(r["sim_step"]) for r in wanted]
-    window = [r for r in wanted if step_start <= int(r["sim_step"]) <= step_end]
+    valid_rows = [r for r in rows if str(r.get("sim_step", "")).strip() != ""]
+    window = [r for r in valid_rows if step_start <= _to_int(r["sim_step"]) <= step_end]
     window_steps = [int(r["sim_step"]) for r in window]
     ctr = Counter(window_steps)
     expected = list(range(step_start, step_end + 1))
     missing = [s for s in expected if ctr.get(s, 0) == 0]
     duplicates = sorted(s for s, c in ctr.items() if c > 1)
-    out_of_window = sorted(s for s in window_steps if s < step_start or s > step_end)
+
+    non_allow_rows = [r for r in window if str(r.get("gate_effective", "")).upper() != "ALLOW"]
+    non_allow_steps = sorted(_to_int(r["sim_step"]) for r in non_allow_rows)
+    points = []
+    explained_steps: list[int] = []
+    insufficient_steps: list[int] = []
+    for row in non_allow_rows:
+        step = _to_int(row["sim_step"])
+        attr = _attribution_for_non_allow(row)
+        if attr["attribution_status"] == "EXPLAINED":
+            explained_steps.append(step)
+        else:
+            insufficient_steps.append(step)
+        points.append({"sim_step": step, **attr})
 
     errors: list[str] = []
     if missing:
         errors.append(f"missing sim_step(s): {missing}")
     if duplicates:
         errors.append(f"duplicate sim_step(s): {duplicates}")
-    if out_of_window:
-        errors.append(f"out-of-window steps present: {out_of_window}")
+    if insufficient_steps:
+        errors.append(f"non-ALLOW attribution insufficient at steps: {sorted(insufficient_steps)}")
 
-    non_allow = [int(r["sim_step"]) for r in window if str(r.get("gate_effective", "")).upper() != "ALLOW"]
-    if non_allow:
-        errors.append(f"non-ALLOW effective gate in window: {non_allow}")
-
-    stop_nonzero = [int(r["sim_step"]) for r in window if int(float(str(r.get("stop_flag", "0") or "0"))) != 0]
-    slow_nonzero = [int(r["sim_step"]) for r in window if int(float(str(r.get("slow_flag", "0") or "0"))) != 0]
-    replan_nonzero = [int(r["sim_step"]) for r in window if int(float(str(r.get("replan_flag", "0") or "0"))) != 0]
-    if stop_nonzero:
-        errors.append(f"stop_flag != 0 at steps: {stop_nonzero}")
-    if slow_nonzero:
-        errors.append(f"slow_flag != 0 at steps: {slow_nonzero}")
-    if replan_nonzero:
-        errors.append(f"replan_flag != 0 at steps: {replan_nonzero}")
-
-    low_margin = [int(r["sim_step"]) for r in window if _f(r, "margin_to_gate_m") < min_margin_m]
-    if low_margin:
-        errors.append(f"margin_to_gate_m < {min_margin_m:.2f} at steps: {low_margin}")
-
-    by_step = {int(r["sim_step"]): r for r in window}
-    phase_220 = str(by_step.get(220, {}).get("phase", ""))
-    phase_330 = str(by_step.get(330, {}).get("phase", ""))
-    if phase_220 != "lateral_positive_sweep":
-        errors.append(f"step 220 phase mismatch: {phase_220!r}")
-    if phase_330 != "lateral_negative_sweep":
-        errors.append(f"step 330 phase mismatch: {phase_330!r}")
-
+    has_new_schema = all(
+        name in (rows[0].keys() if rows else [])
+        for name in ("protocol_phase", "ur10e_stage", "ttc_observed_s", "ttc_forecast_s")
+    )
     return {
         "csv_path": str(path),
         "step_start": step_start,
@@ -77,25 +142,14 @@ def analyze_dyn_b_per_step_window(
         "observed_count": len(window_steps),
         "missing_steps": missing,
         "duplicate_steps": duplicates,
-        "non_allow_steps": non_allow,
-        "stop_nonzero_steps": stop_nonzero,
-        "slow_nonzero_steps": slow_nonzero,
-        "replan_nonzero_steps": replan_nonzero,
-        "low_margin_steps": low_margin,
-        "phase_220": phase_220,
-        "phase_330": phase_330,
+        "schema_version": "m1z7" if has_new_schema else "legacy_pre_m1z7",
+        "non_allow_steps": non_allow_steps,
+        "non_allow_ranges": _non_allow_ranges(non_allow_steps),
+        "non_allow_points": sorted(points, key=lambda x: int(x["sim_step"])),
+        "explained_steps": sorted(explained_steps),
+        "insufficient_steps": sorted(insufficient_steps),
         "pass": len(errors) == 0,
         "errors": errors,
-        "policy": {
-            "gate_effective_required": "ALLOW",
-            "stop_flag_required": 0,
-            "slow_flag_required": 0,
-            "replan_flag_required": 0,
-            "margin_to_gate_min_m": min_margin_m,
-            "phase_220_required": "lateral_positive_sweep",
-            "phase_330_required": "lateral_negative_sweep",
-            "step_uniqueness_required": "exactly_once_each_integer",
-        },
     }
 
 

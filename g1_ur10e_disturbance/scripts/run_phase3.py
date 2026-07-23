@@ -2948,23 +2948,101 @@ def main():
             if not isinstance(_meta, dict):
                 _meta = {}
             _trigger_rule = str(_meta.get("trigger_rule", "") or "")
+            _trigger_reason = str(getattr(gate_result, "reason", "") or "")
             _dist_min_g1_body = float(_g1_closest_body_dist)
             _margin_to_gate = _dist_min_g1_body - 0.10
+            _gate_audit = _gate_distance_audit()
+            _dist_min_for_gating = _gate_audit.get("dist_min_for_gating", "") or ""
+            _dist_min_proxy = (
+                f"{float(adapter_surface_dist):.6f}" if np.isfinite(float(adapter_surface_dist)) else "inf"
+            )
+            _warn_active = _gate_audit.get("safe_dist_warn_active", "") or ""
+            _hard_stop_active = _gate_audit.get("safe_dist_hard_stop_active", "") or ""
+            _ttc_observed = _meta.get("ttc")
+            _ttc_forecast = _meta.get("ttc_forecast_s")
+            _approach_rate = _meta.get("approach_rate")
+            _proxy_vel = None
+            _ee_vel = None
+            try:
+                _proxy_vel = adapter.human_hand_vel if adapter is not None else None
+            except Exception:
+                _proxy_vel = None
+            try:
+                _ee_vel = safety_obs_dict.get("ee_vel") if "safety_obs_dict" in locals() else None
+            except Exception:
+                _ee_vel = None
+            _proxy_speed = None
+            if _proxy_vel is not None:
+                try:
+                    _proxy_speed = float(np.linalg.norm(_proxy_vel))
+                except Exception:
+                    _proxy_speed = None
+            _ee_speed = None
+            if _ee_vel is not None:
+                try:
+                    _ee_speed = float(np.linalg.norm(_ee_vel))
+                except Exception:
+                    _ee_speed = None
             _camera_capture_marker = int(bool(args_cli.save_camera and _do_cam))
             _body_pose_marker = int(bool(_camera_capture_marker and _body_pose_fh is not None))
+            _protocol_phase = per_part.phase.value if per_part is not None else ""
+            _ur10e_stage = ur10e.stage_name if ur10e is not None else ""
+            _disturbance_source = (
+                "scripted_virtual_hand" if dynamic_sweep is not None
+                else _resolve_disturbance_source(args_cli, virtual_hand)
+            )
             _dyn_b_per_step_audit_writer.writerow(
                 {
                     "sim_step": int(step),
                     "policy_step": int(ur10e.time_step),
                     "phase": str(disturb.scenario_name),
+                    "protocol_phase": str(_protocol_phase),
+                    "ur10e_stage": str(_ur10e_stage),
                     "gate_evaluated": _evaluated_gate_name,
                     "gate_effective": _effective_gate_name,
                     "trigger_rule": _trigger_rule,
+                    "trigger_reason": _trigger_reason,
                     "stop_flag": int(_effective_gate_name == "STOP"),
                     "slow_flag": int(_effective_gate_name == "SLOW_DOWN"),
                     "replan_flag": int(bool(_replan_applied_this_step)),
                     "dist_min_g1_body_m": f"{_dist_min_g1_body:.6f}",
                     "margin_to_gate_m": f"{_margin_to_gate:.6f}",
+                    "dist_min_for_gating_m": _dist_min_for_gating if _dist_min_for_gating else "null",
+                    "dist_min_proxy_m": _dist_min_proxy,
+                    "closest_g1_body": str(_g1_closest_body_name or ""),
+                    "safe_dist_warn_active_m": _warn_active if _warn_active else "null",
+                    "safe_dist_hard_stop_active_m": _hard_stop_active if _hard_stop_active else "null",
+                    "ttc_observed_s": f"{float(_ttc_observed):.6f}" if _ttc_observed not in (None, "") else "null",
+                    "ttc_forecast_s": f"{float(_ttc_forecast):.6f}" if _ttc_forecast not in (None, "") else "null",
+                    "approach_rate_mps": f"{float(_approach_rate):.6f}" if _approach_rate not in (None, "") else "null",
+                    "relative_velocity_mps": "null",
+                    "proxy_surface_velocity_mps": (
+                        f"{float(_proxy_speed):.6f}" if _proxy_speed is not None else "null"
+                    ),
+                    "proxy_surface_velocity_x_mps": (
+                        f"{float(_proxy_vel[0]):.6f}" if _proxy_vel is not None else "null"
+                    ),
+                    "proxy_surface_velocity_y_mps": (
+                        f"{float(_proxy_vel[1]):.6f}" if _proxy_vel is not None else "null"
+                    ),
+                    "proxy_surface_velocity_z_mps": (
+                        f"{float(_proxy_vel[2]):.6f}" if _proxy_vel is not None else "null"
+                    ),
+                    "robot_ee_velocity_mps": (
+                        f"{float(_ee_speed):.6f}" if _ee_speed is not None else "null"
+                    ),
+                    "robot_ee_velocity_x_mps": (
+                        f"{float(_ee_vel[0]):.6f}" if _ee_vel is not None else "null"
+                    ),
+                    "robot_ee_velocity_y_mps": (
+                        f"{float(_ee_vel[1]):.6f}" if _ee_vel is not None else "null"
+                    ),
+                    "robot_ee_velocity_z_mps": (
+                        f"{float(_ee_vel[2]):.6f}" if _ee_vel is not None else "null"
+                    ),
+                    "disturbance_active": int(bool(disturbance_active)),
+                    "disturbance_source": str(_disturbance_source),
+                    "disturbance_attempt_id": int(_disturbance_attempt_id),
                     "g1_fell_flag": int(float(_g1_root_now[2]) < cfg.safety.collapse_z),
                     "g1_root_x": f"{float(_g1_root_now[0]):.6f}",
                     "g1_root_y": f"{float(_g1_root_now[1]):.6f}",
@@ -2973,6 +3051,28 @@ def main():
                     "motion_source_label": str(args_cli.motion_source_label or ""),
                     "camera_capture_marker": _camera_capture_marker,
                     "body_pose_marker": _body_pose_marker,
+                    "ttc_observed_availability": (
+                        "present" if _ttc_observed not in (None, "") else "missing"
+                    ),
+                    "ttc_observed_source": "gate_result.metadata.ttc",
+                    "ttc_forecast_availability": (
+                        "present" if _ttc_forecast not in (None, "") else "missing"
+                    ),
+                    "ttc_forecast_source": "gate_result.metadata.ttc_forecast_s",
+                    "approach_rate_availability": (
+                        "present" if _approach_rate not in (None, "") else "missing"
+                    ),
+                    "approach_rate_source": "gate_result.metadata.approach_rate",
+                    "relative_velocity_availability": "missing",
+                    "relative_velocity_source": "not_exposed_in_runtime_gate_metadata",
+                    "proxy_surface_velocity_availability": (
+                        "present" if _proxy_vel is not None else "missing"
+                    ),
+                    "proxy_surface_velocity_source": "adapter.human_hand_vel",
+                    "robot_ee_velocity_availability": (
+                        "present" if _ee_vel is not None else "missing"
+                    ),
+                    "robot_ee_velocity_source": "obs.safety.ee_vel",
                 }
             )
             _dyn_b_per_step_audit_fh.flush()
