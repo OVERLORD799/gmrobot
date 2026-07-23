@@ -1,6 +1,6 @@
 # V1-M1F3R Canonical Func-C Visual Smoke（2026-07-23）
 
-结论：**VISUAL_REVIEW_REQUIRED**（未授予 technical_visual_pass）
+结论：**VISUAL_REVIEW_REQUIRED**（artifact 移除技术复核通过，但语义清晰度待用户确认）
 
 ## 基线与门禁
 - HEAD：`b7034031beba3b4f7cdc0b85b1b5defd686302b1`
@@ -41,9 +41,18 @@
 - box_B spawn SHA256：`f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e`
 - camera pose：`pos=[0.35, 0.0, 2.5] rot=[0.7071, 0.0, 0.7071, 0.0]`
 
+## 主agent人工视觉复核（V1-M1F3.1）
+- 对比旧坏图 SHA256：`72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c`
+- 新图 SHA256：`a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5`
+- 独立结论 1：旧图中的白色阶梯/扇形爆炸阵列已消失。
+- 独立结论 2：新图左侧物体为紧凑矩形容器/托架，顶部 6 个规则重复件保持局部、无发散/爆炸。
+- `artifact_removal_technical_pass=true`
+- `semantic_clarity=user_review_required`（左箱颜色低对比，“箱子”语义清晰度有限）
+- `reviewer_approved=false`（本步骤禁止写入 `reviewer_approved=true`）
+
 ## 约束符合性
 - 未执行正式 Func-C 重采集
 - 未使用网络/POST/VLM/perception/SAM2/GDINO/five-stage/凭据
 - 不覆盖历史 tag 与历史结果
 
-> 按要求先保持 `VISUAL_REVIEW_REQUIRED`。仅主agent另行人工确认后，才可设置 technical_visual_pass。
+> 当前为技术层面 artifact 已移除，但语义清晰度仍需用户确认；在用户确认前保持 `VISUAL_REVIEW_REQUIRED`。

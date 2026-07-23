@@ -142,8 +142,20 @@
     "five_stage": false,
     "credentials": false
   },
+  "human_visual_review_v1m1f31": {
+    "new_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5",
+    "old_bad_frame_sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c",
+    "independent_conclusions": [
+      "old white staircase/fan-like burst array is no longer present",
+      "left object in new frame appears as compact rectangular container/bracket with six regular repeated top parts and no divergent/explosive artifact"
+    ],
+    "artifact_removal_technical_pass": true,
+    "semantic_clarity": "user_review_required",
+    "semantic_clarity_note": "left box has low color contrast and limited box-like semantic clarity",
+    "reviewer_approved": false
+  },
   "verdict": "VISUAL_REVIEW_REQUIRED",
-  "technical_visual_pass": false,
+  "technical_visual_pass": true,
   "status": "VISUAL_REVIEW_REQUIRED",
-  "note": "必须由主agent人工查看原图后，才能另行确认 technical_visual_pass。"
+  "note": "artifact 已技术性移除，但语义清晰度需用户确认；不得提前写 reviewer_approved=true。"
 }

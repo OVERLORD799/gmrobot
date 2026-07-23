@@ -1,0 +1,38 @@
+{
+  "task": "V1-M1F3.1 Func-C human visual review",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "head_required": "9577b6a7e2ca8638183d218f132882d55407589d",
+    "worktree_clean_required": true
+  },
+  "review_subject": {
+    "new_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png",
+    "new_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5",
+    "old_bad_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000200_env0.png",
+    "old_bad_frame_sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c"
+  },
+  "independent_conclusions": {
+    "artifact_disappearance": "旧图白色阶梯/扇形爆炸阵列已消失",
+    "left_object_shape_and_locality": "新图左侧物体为紧凑矩形容器/托架，顶部6个规则重复件保持局部、无发散/爆炸"
+  },
+  "artifact_removal_technical_pass": true,
+  "semantic_clarity": "user_review_required",
+  "semantic_clarity_note": "左箱颜色低对比且“箱子”语义清晰度有限",
+  "reviewer_approved": false,
+  "candidate_manifest_updates": {
+    "func_c": {
+      "technical_review_status": "artifact_removed_semantic_clarity_pending_user",
+      "reviewer_approved": false,
+      "formal_recapture_allowed": false
+    },
+    "dyn_b_unchanged": true,
+    "previous_version_refs_preserved": true
+  },
+  "constraints": {
+    "docs_manifest_only": true,
+    "no_source_or_usd_or_image_change": true,
+    "no_history_verdict_overwrite": true,
+    "no_docker_isaac_build_capture_network_post": true
+  }
+}

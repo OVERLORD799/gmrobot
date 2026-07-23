@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.0.0",
+  "manifest_version": "3.1.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -31,7 +31,7 @@
     "learned_whole_body_control": false,
     "VLM_output": false,
     "reviewer_approved": false,
-    "technical_review_status": "technical_temporal_pass_pending_user"
+    "technical_review_status": "artifact_removed_semantic_clarity_pending_user"
   },
   "candidates": [
     {
@@ -48,15 +48,17 @@
       ],
       "temporal_pair_required": false,
       "reviewer_approved": false,
-      "technical_review_status": "visual_corruption_confirmed_fix_pending",
+      "technical_review_status": "artifact_removed_semantic_clarity_pending_user",
+      "formal_recapture_allowed": false,
       "historical_verdict_ref": {
         "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-final-m1m-capture-2026-07-23.json",
         "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL"
       },
       "technical_gate_notes": [
         "target_container_and_contents_visually_clear",
-        "left_source_container_visual_corruption_confirmed",
-        "objective_gate_record_only"
+        "left_source_container_visual_corruption_removed_in_m1f3r_smoke_frame",
+        "artifact_removal_technical_passed_by_human_visual_review",
+        "semantic_clarity_user_confirmation_pending"
       ],
       "provenance": {
         "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/manifest/capture_manifest.json",
