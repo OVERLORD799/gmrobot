@@ -1,0 +1,62 @@
+{
+  "milestone": "V1-M1K",
+  "title": "capture evidence wrapper hardening",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "status": "DONE",
+  "scope": {
+    "implemented_host_one_shot_runner": true,
+    "minimal_capture_tool_integration": true,
+    "formal_capture_rerun": false
+  },
+  "prior_recovery_artifact": {
+    "commit": "5fdc79a",
+    "verdict": "CAPTURE_FAIL",
+    "retroactive_promotion_allowed": false,
+    "reason": "single-run evidence missing reliable real exit/timing persistence at runtime"
+  },
+  "changes": {
+    "added": [
+      "GMRobot/scripts/capture_one_shot_runner.py",
+      "GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1k-capture-runner-hardening-2026-07-23.md"
+    ],
+    "updated": [
+      "g1_ur10e_disturbance/scripts/run_e01_func_c_capture.sh",
+      "GMRobot/scripts/analyze_e01_func_c_capture.py"
+    ]
+  },
+  "runner_contract": {
+    "result_dir_created_before_run": true,
+    "pre_run_metadata_written_first": true,
+    "single_command_exec_no_pipeline": true,
+    "atomic_status_persistence": true,
+    "records_command_argv": true,
+    "records_start_end_utc": true,
+    "records_monotonic_elapsed": true,
+    "records_shell_observable_exit_code": true,
+    "records_raw_returncode_and_signal": true,
+    "preserves_stdout_stderr": true,
+    "fail_closed_on_status_persist_error": true,
+    "refuse_nonempty_formal_result_dir": true
+  },
+  "tests": [
+    {
+      "name": "python3 GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "PASS"
+    },
+    {
+      "name": "python3 GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "result": "FAIL",
+      "note": "pre-existing frozen hash mismatch for container_full_visual.usd in current workspace baseline"
+    }
+  ],
+  "constraints_respected": {
+    "no_docker_isaac_network_post": true,
+    "no_b0_b4_frozen_edits": true,
+    "no_safety_threshold_changes": true,
+    "no_usd_asset_edits": true,
+    "no_historical_result_mutation": true
+  },
+  "recommended_next_milestone": "Execute next formal one-shot capture using hardened runner and produce new immutable evidence package."
+}

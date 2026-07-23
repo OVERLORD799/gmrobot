@@ -44,7 +44,7 @@ def _find_steps_csv(safety_logs: Path) -> Path | None:
 
 def _post_proof(meta: Path) -> dict:
     text = ""
-    for name in ("capture_stdout.txt", "smoke_stdout.txt"):
+    for name in ("capture_stdout.txt", "capture_stderr.txt", "smoke_stdout.txt", "smoke_stderr.txt"):
         p = meta / name
         if p.is_file():
             text += p.read_text(encoding="utf-8", errors="replace")
