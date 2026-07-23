@@ -1,0 +1,75 @@
+{
+  "task": "V1-M1L Func-C frozen asset baseline reconcile",
+  "date": "2026-07-23",
+  "verdict": "STALE_EXPECTATION_REBASELINED",
+  "decision": {
+    "is_unexpected_asset_mutation": false,
+    "is_stale_expectation": true,
+    "action": "update_test_baseline_and_add_provenance_guard"
+  },
+  "scope": {
+    "commit_range_reviewed": "2741c7a..7764e30",
+    "forbidden_ops_respected": ["no_docker", "no_isaac", "no_network", "no_post"],
+    "untouched": [
+      "usd_geometry",
+      "safety_thresholds",
+      "b0_b4_assets_configs_results",
+      "historical_verdict_files"
+    ]
+  },
+  "sha_meaning": {
+    "old": {
+      "sha256": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
+      "meaning": "legacy pre-repair visual USD baseline used by old Func-C frozen test"
+    },
+    "new": {
+      "sha256": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+      "meaning": "canonical repaired Func-C lineage visual USD identity approved in later 2026-07-23 review chain"
+    }
+  },
+  "evidence": {
+    "workspace_asset_sha256": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+    "source_asset_sha256": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+    "generator_frozen_source_sha256": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+    "canonical_structural_fingerprint": "bb90e8cbf865dd9bdeb0c2fc0eea25f0ac1cc74a48f68f5d09709c079820920d",
+    "local_repro_binary_sha256": "00383bf11628aa53e0c5843eab958e77e4b91d53ff319db73ab9112b4ce16a8b",
+    "local_repro_note": "binary hash may vary by USDC writer environment while structural fingerprint remains canonical"
+  },
+  "changes": [
+    {
+      "path": "GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "type": "update",
+      "details": [
+        "replace container_full_visual.usd frozen hash 60ef... -> f392...",
+        "add test_container_full_visual_provenance_chain"
+      ]
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1l-func-c-asset-baseline-reconcile-2026-07-23.md",
+      "type": "add"
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1l-func-c-asset-baseline-reconcile-2026-07-23.json",
+      "type": "add"
+    }
+  ],
+  "tests": [
+    {
+      "cmd": "python3 GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "result": "pass"
+    },
+    {
+      "cmd": "python3 GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "pass"
+    },
+    {
+      "cmd": "pytest -q GMRobot/scripts/test_generate_container_full_visual_usd_unit.py",
+      "result": "pass",
+      "detail": "10 passed, 6 skipped"
+    },
+    {
+      "cmd": "python3 GMRobot/scripts/analyze_e01_func_c_capture.py --results-dir g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_recovery_20260723 --assets-dir GMRobot/source/GMRobot/GMRobot/assets",
+      "result": "pass"
+    }
+  ]
+}

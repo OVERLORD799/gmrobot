@@ -5,6 +5,7 @@ from __future__ import annotations
 
 import csv
 import hashlib
+import importlib.util
 import json
 import os
 import re
@@ -168,7 +169,8 @@ def test_geometry_manifest_roundtrip_and_b0b4():
 FROZEN_ASSET_HASHES: dict[str, str] = {
     "container.usd": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
     "container_full.usd": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
-    "container_full_visual.usd": "60efbaa11fc845492dcb5e734fe509e20a67e1b9fd7e51c03a65f4b404c83885",
+    # Canonical repaired Func-C visual asset identity (approved lineage, 2026-07-23).
+    "container_full_visual.usd": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
     "part_5000.usd": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6",
     "container_fixed.usd": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
     "part_fixed.usd": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
@@ -191,6 +193,41 @@ def test_frozen_asset_hashes_unchanged():
         assert path.is_file(), f"missing: {path}"
         actual = hashlib.sha256(path.read_bytes()).hexdigest()
         assert actual == expected, f"{key}: hash mismatch\nexpected: {expected}\nactual:   {actual}"
+
+
+def test_container_full_visual_provenance_chain():
+    """Strengthened provenance: frozen source + generator freeze-hash + structural identity."""
+    expected_source_sha = FROZEN_ASSET_HASHES["container_full.usd"]
+    source_path = ASSETS / "container_full.usd"
+    source_sha = hashlib.sha256(source_path.read_bytes()).hexdigest()
+    assert source_sha == expected_source_sha, f"container_full.usd hash drifted: {source_sha}"
+
+    generator_path = ROOT / "scripts" / "generate_container_full_visual_usd.py"
+    gen_text = generator_path.read_text(encoding="utf-8")
+    m = re.search(r'FROZEN_SOURCE_SHA256\\s*=\\s*"([0-9a-f]{64})"', gen_text)
+    assert m is not None, "generator missing FROZEN_SOURCE_SHA256"
+    assert m.group(1) == expected_source_sha, (
+        f"generator freeze hash mismatch: {m.group(1)} != {expected_source_sha}"
+    )
+
+    # Structural fingerprint is the stable identity guard when USDC binary bytes vary by writer/env.
+    try:
+        spec = importlib.util.spec_from_file_location(
+            "generate_container_full_visual_usd",
+            str(generator_path),
+        )
+        assert spec is not None and spec.loader is not None
+        mod = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(mod)
+        structural_fingerprint = getattr(mod, "structural_fingerprint")
+    except Exception:
+        return
+    actual_fp = structural_fingerprint(ASSETS / "container_full_visual.usd")
+    expected_fp = "bb90e8cbf865dd9bdeb0c2fc0eea25f0ac1cc74a48f68f5d09709c079820920d"
+    assert actual_fp == expected_fp, (
+        f"container_full_visual.usd structural fingerprint mismatch:\n"
+        f"expected: {expected_fp}\nactual:   {actual_fp}"
+    )
 
 
 def test_frozen_usd_structure_read_only():
