@@ -13,6 +13,7 @@ from shadow.target_full_override import (
     CAMERA_POS,
     CAMERA_ROT,
     CONTAINER_FULL_SCALE,
+    CONTAINER_FULL_SPAWN_USD_NAME,
     CONTAINER_FULL_USD_NAME,
     CONTAINER_USD_NAME,
     E01_FUNC_C_CAPTURE_STEPS,
@@ -77,13 +78,15 @@ def precheck_container_full_asset(assets_dir: Path | str) -> dict[str, Any]:
     root = Path(assets_dir)
     empty = root / CONTAINER_USD_NAME
     full = root / CONTAINER_FULL_USD_NAME
+    full_visual = root / CONTAINER_FULL_SPAWN_USD_NAME
     out: dict[str, Any] = {
         "ok": False,
         "verdict": "ASSET_SEMANTIC_DISTINCTION_UNPROVEN",
         "empty_path": str(empty),
         "full_path": str(full),
+        "full_visual_path": str(full_visual),
     }
-    if not empty.is_file() or not full.is_file():
+    if not empty.is_file() or not full.is_file() or not full_visual.is_file():
         out["reason"] = "missing_usd"
         return out
     out["empty_sha256"] = sha256_file(empty)
@@ -143,6 +146,63 @@ def precheck_container_full_asset(assets_dir: Path | str) -> dict[str, Any]:
     )
     if not distinct:
         out["reason"] = "no_extra_filled_geometry"
+        return out
+    # Spawn payload sanity gate for visual corruption prevention (offline/static only).
+    # Enforces no instance/prototype arcs, no Part_* prim naming, and stable root ops.
+    stage_v = Usd.Stage.Open(str(full_visual))
+    if stage_v is None:
+        out["reason"] = "visual_open_failed"
+        return out
+    filled_count = 0
+    part_numeric_count = 0
+    inst_related_count = 0
+    composed_arc_count = 0
+    for prim in stage_v.TraverseAll():
+        if prim.IsInstance() or prim.IsInstanceable():
+            inst_related_count += 1
+        if prim.HasAuthoredReferences() or prim.HasAuthoredPayloads() or prim.HasAuthoredInherits():
+            composed_arc_count += 1
+        name = prim.GetName()
+        if name.startswith("FilledContent_"):
+            filled_count += 1
+        if name.startswith("Part_") and name[5:].isdigit():
+            part_numeric_count += 1
+    c_prim = stage_v.GetPrimAtPath("/FullContainer/Container")
+    c_ops: list[str] = []
+    c_t = None
+    c_r = None
+    if c_prim:
+        c_x = UsdGeom.Xformable(c_prim).GetOrderedXformOps()
+        c_ops = [op.GetOpName() for op in c_x]
+        if len(c_x) > 0:
+            c_t = [float(x) for x in c_x[0].Get()]
+        if len(c_x) > 1:
+            c_r = [float(x) for x in c_x[1].Get()]
+    visual_ok = (
+        str(stage_v.GetDefaultPrim().GetPath()) == "/FullContainer"
+        and float(stage_v.GetMetadata("metersPerUnit")) == 1.0
+        and filled_count == 30
+        and part_numeric_count == 0
+        and inst_related_count == 0
+        and composed_arc_count == 0
+        and c_ops == ["xformOp:translate", "xformOp:rotateXYZ"]
+        and c_t == [0.015, 0.0, 0.1]
+        and c_r == [90.0, 0.0, 0.0]
+    )
+    out["full_visual_stats"] = {
+        "default_prim": str(stage_v.GetDefaultPrim().GetPath()) if stage_v.GetDefaultPrim() else None,
+        "metersPerUnit": float(stage_v.GetMetadata("metersPerUnit")),
+        "filled_content_count": int(filled_count),
+        "part_numeric_count": int(part_numeric_count),
+        "instance_related_count": int(inst_related_count),
+        "composed_arc_count": int(composed_arc_count),
+        "container_ops": c_ops,
+        "container_translate": c_t,
+        "container_rotate_xyz": c_r,
+        "visual_spawn_gate_ok": bool(visual_ok),
+    }
+    if not visual_ok:
+        out["reason"] = "visual_spawn_sanity_fail"
         return out
     out["ok"] = True
     out["verdict"] = "ASSET_DISTINCTION_OK"

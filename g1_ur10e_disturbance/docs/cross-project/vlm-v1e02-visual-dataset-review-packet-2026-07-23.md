@@ -2,12 +2,12 @@
 
 - preflight HEAD: `5e52299` (full SHA matched in run metadata)
 - reviewer_approved: `false` (fixed)
-- technical_review_status: `pending_user_review`
+- technical_review_status: `visual_corruption_confirmed_fix_pending`
 - candidate manifest: `/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json`
 - manifest index: `/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-manifest-index-2026-07-23.json`
 
 ## Objective Technical Review
-- Func-C step100/200: target and contents clear; no USD garble.
+- Func-C step100/200: left source-container visual corruption confirmed; do not treat as clean visual evidence.
 - Dyn-B M1Z9 step220/330: G1 visible with white-background low contrast.
 - Dyn-B dynamic claim requires temporal pair / tracking evidence; single frame not sufficient.
 - M1Z9 geometry_isolated=false with historical `FAIL_NONALLOW_GEOMETRY`; cannot be promoted to live-control positive.

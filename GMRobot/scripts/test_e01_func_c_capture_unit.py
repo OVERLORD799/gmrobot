@@ -390,6 +390,49 @@ def test_normalized_asset_structure_gate():
     assert not child_rigid, f"part_fixed: child rigid bodies detected: {child_rigid}"
 
 
+def test_container_full_visual_scenegraph_transform_gate():
+    """Static USD gate for Func-C visual payload (no sim, no render)."""
+    try:
+        from pxr import Usd, UsdGeom  # type: ignore
+    except ImportError:
+        return
+
+    visual_path = ASSETS / "container_full_visual.usd"
+    stage = Usd.Stage.Open(str(visual_path))
+    assert stage is not None, f"failed to open {visual_path}"
+    assert str(stage.GetDefaultPrim().GetPath()) == "/FullContainer"
+    assert float(stage.GetMetadata("metersPerUnit")) == 1.0
+
+    filled_content_names: list[str] = []
+    has_instance_or_instanceable = False
+    has_ref_payload_inherit = False
+    has_part_numeric_name = False
+    for prim in stage.TraverseAll():
+        if prim.IsInstance() or prim.IsInstanceable():
+            has_instance_or_instanceable = True
+        if prim.HasAuthoredReferences() or prim.HasAuthoredPayloads() or prim.HasAuthoredInherits():
+            has_ref_payload_inherit = True
+        name = prim.GetName()
+        if name.startswith("Part_") and name[5:].isdigit():
+            has_part_numeric_name = True
+        if name.startswith("FilledContent_"):
+            filled_content_names.append(name)
+    assert has_instance_or_instanceable is False, "visual USD must not use instance/prototype paths"
+    assert has_ref_payload_inherit is False, "visual USD must not compose external references/payloads"
+    assert has_part_numeric_name is False, "visual USD must avoid Part_* naming conflicts"
+    assert len(set(filled_content_names)) == 30, f"expected 30 FilledContent_* prims, got {len(set(filled_content_names))}"
+
+    container_prim = stage.GetPrimAtPath("/FullContainer/Container")
+    assert container_prim, "missing /FullContainer/Container"
+    xform = UsdGeom.Xformable(container_prim)
+    op_names = [op.GetOpName() for op in xform.GetOrderedXformOps()]
+    assert op_names == ["xformOp:translate", "xformOp:rotateXYZ"], f"unexpected container ops: {op_names}"
+    tx = xform.GetOrderedXformOps()[0].Get()
+    rx = xform.GetOrderedXformOps()[1].Get()
+    assert tuple(float(v) for v in tx) == (0.015, 0.0, 0.1)
+    assert tuple(float(v) for v in rx) == (90.0, 0.0, 0.0)
+
+
 def test_part_initial_pose_numeric_gate():
     """Numeric gate: 20 parts with initial slot positions well-formed."""
     cfg_text = ENV_CFG.read_text(encoding="utf-8")

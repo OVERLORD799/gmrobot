@@ -1,0 +1,59 @@
+{
+  "task": "V1-M1F2 Func-C left container/part-array corruption root-cause and offline fix",
+  "date": "2026-07-23",
+  "preflight": {
+    "head_short": "edfb5a2",
+    "worktree_clean_at_start": true
+  },
+  "evidence_frame": {
+    "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000200_env0.png",
+    "sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c"
+  },
+  "retracted_conclusion": "no_usd_garble_detected",
+  "root_cause": {
+    "verdict": "ROOT_CAUSE_CONFIRMED",
+    "type": "visual_asset_scale_chain_regression_in_legacy_func_c_capture_lineage",
+    "decision": "箱体视觉资产问题（旧 lineage 的 container_full_visual.usd），不是 scene graph instance/prototype，不是 Part_* 重复 spawn，不是错误父子变换。",
+    "evidence": [
+      "legacy capture doc pins v1e01_func_c_capture_20260722 visual spawn hash to 60ef... and records white fan/step artifact",
+      "M1D isolation evidence: hide ContainerB removes white fan completely; containerA and parts remain",
+      "static USD audit (current canonical visual asset): no instances, no references/payloads/inherits, no Part_* naming, expected container transforms"
+    ]
+  },
+  "offline_fix": {
+    "scope": "source+packaging+tests+docs+manifest only",
+    "changes": [
+      "Added visual spawn static sanity gate in shadow/v1e01_func_c_capture.py precheck_container_full_asset()",
+      "Added static unit test gate for scene graph/transform/reference checks in GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "Added offline audit tool GMRobot/scripts/audit_func_c_visual_usd.py and exported USDA/JSON audit artifacts",
+      "Downgraded Func-C technical review status in E0.2 candidate/review packet to visual_corruption_confirmed_fix_pending (Dyn-B unchanged)"
+    ],
+    "not_changed": [
+      "B0-B4 frozen assets/config/results",
+      "safety thresholds, control logic, VLM logic",
+      "historical PNG or historical reports"
+    ]
+  },
+  "not_a_hide_workaround": {
+    "box_hidden": false,
+    "camera_crop": false,
+    "reason": "修复通过资产封装与静态门禁约束完成；未通过隐藏起始箱或裁剪相机掩盖问题。"
+  },
+  "scene_identity_safety": {
+    "target_full_semantics_kept": true,
+    "part_naming_conflict_guarded": true,
+    "part_spawn_logic_unchanged": true
+  },
+  "manifest_updates": {
+    "candidate_manifest": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+    "func_c_technical_review_status": "visual_corruption_confirmed_fix_pending",
+    "func_c_reviewer_approved": false,
+    "dyn_b_unchanged": true,
+    "previous_version_refs_preserved": true
+  },
+  "gates_pending": [
+    "source-only build",
+    "exactly one visual smoke capture"
+  ],
+  "next_step_policy": "Only source-only build + one visual smoke is allowed. No formal simulation rerun in this task."
+}
