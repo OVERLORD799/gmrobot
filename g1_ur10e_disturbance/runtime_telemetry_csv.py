@@ -23,9 +23,16 @@ RUNTIME_TELEMETRY_FIELDNAMES = [
     "ur10_hold_hash",
     "ur10_joint_baseline_provenance_json",
     "ur10_hold_action_provenance_json",
+    "ur10_gripper_selected_state",
     "ur10_action_norm",
+    "ur10_arm_joint_delta_norm",
+    "ur10_arm_joint_delta_max_abs",
+    "ur10_gripper_joint_delta",
     "ur10_joint_delta_norm",
     "ur10_joint_delta_max_abs",
+    "ur10_joint_delta_semantics",
+    "ur10_arm_joint_delta_max_abs_settled",
+    "ur10_gripper_joint_delta_settled",
     "ur10_joint_delta_max_abs_settled",
 ]
 

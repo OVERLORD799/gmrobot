@@ -191,8 +191,12 @@ def test_freeze_metrics_joint_delta_and_action_norm() -> None:
         initial_joint_pose=joint0,
     )
     assert abs(m["ur10_action_norm"]) < 1e-12
+    assert m["ur10_arm_joint_delta_norm"] > 0.0
+    assert abs(m["ur10_arm_joint_delta_max_abs"] - 0.02) < 1e-6
+    assert abs(m["ur10_gripper_joint_delta"]) < 1e-12
     assert m["ur10_joint_delta_norm"] > 0.0
     assert abs(m["ur10_joint_delta_max_abs"] - 0.02) < 1e-6
+    assert m["ur10_joint_delta_semantics"] == "legacy_aggregate_arm6_plus_gripper1"
 
 
 def test_articulation_hold_mapping_by_joint_name_order() -> None:

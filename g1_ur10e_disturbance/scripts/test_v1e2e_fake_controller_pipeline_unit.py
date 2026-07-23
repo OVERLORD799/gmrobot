@@ -47,6 +47,22 @@ def test_freeze_overrides_fake_controller_proposed_action() -> None:
     assert hold_action_hash(hold) == hold_action_hash(hold.copy())
 
 
+def test_freeze_metrics_arm_static_gripper_binary_settling_isolated() -> None:
+    initial_joint = np.zeros(7, dtype=np.float32)
+    current_joint = np.array([0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.314159], dtype=np.float32)
+    m = compute_ur10_freeze_metrics(
+        effective_action=np.zeros(8, dtype=np.float32),
+        current_joint_pose=current_joint,
+        initial_joint_pose=initial_joint,
+    )
+    assert m["ur10_arm_joint_delta_max_abs"] == 0.0
+    assert abs(m["ur10_gripper_joint_delta"] - 0.314159) < 1e-6
+    # Legacy aggregate keeps the historical semantics for backward compatibility.
+    assert abs(m["ur10_joint_delta_max_abs"] - 0.314159) < 1e-6
+    assert m["ur10_joint_delta_semantics"] == "legacy_aggregate_arm6_plus_gripper1"
+
+
 if __name__ == "__main__":
     test_freeze_overrides_fake_controller_proposed_action()
+    test_freeze_metrics_arm_static_gripper_binary_settling_isolated()
     print("PASS test_v1e2e_fake_controller_pipeline_unit")

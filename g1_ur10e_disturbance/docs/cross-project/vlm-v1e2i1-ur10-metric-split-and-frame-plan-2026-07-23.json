@@ -1,0 +1,95 @@
+{
+  "milestone": "V1-E2I.1",
+  "date": "2026-07-23",
+  "mode": "offline_only",
+  "docker_isaac_network": "not_run",
+  "inputs": {
+    "e2i_summary_json": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2i-dyn-c-motion-isolation-preflight-2026-07-23.json",
+    "e2i_postrun_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/meta/v1e2i_postrun_analyzer.json",
+    "e2i_runtime_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/safety_logs/phase3_runtime_telemetry.csv",
+    "e2i_steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2i_dyn_c_motion_isolation_preflight_20260723/safety_logs/phase3_steps.csv"
+  },
+  "metric_split": {
+    "new_runtime_fields": [
+      "ur10_arm_joint_delta_norm",
+      "ur10_arm_joint_delta_max_abs",
+      "ur10_gripper_joint_delta",
+      "ur10_arm_joint_delta_max_abs_settled",
+      "ur10_gripper_joint_delta_settled",
+      "ur10_gripper_selected_state"
+    ],
+    "legacy_fields_kept": [
+      "ur10_joint_delta_norm",
+      "ur10_joint_delta_max_abs",
+      "ur10_joint_delta_max_abs_settled"
+    ],
+    "legacy_marking": {
+      "field": "ur10_joint_delta_semantics",
+      "value": "legacy_aggregate_arm6_plus_gripper1"
+    },
+    "retrospective_interpretation_e2i": {
+      "legacy_aggregate_joint_delta_max_abs_settled": 0.314159,
+      "attribution": "finger_joint converged from 0.0 to GRIPPER_OPEN=0.314159",
+      "arm_motion_not_implied": true,
+      "ee_displacement_settled_max_m": 3.129243850708008e-07
+    }
+  },
+  "preflight_decision_policy_update": {
+    "arm_freeze_gate_inputs_only": [
+      "ur10_arm_joint_delta_max_abs_settled_max",
+      "ur10_ee_displacement_settled_max_m"
+    ],
+    "arm_freeze_thresholds": {
+      "ur10_arm_joint_delta_max_abs_settled_max": 1e-06,
+      "ur10_ee_displacement_settled_max_m": 1e-06
+    },
+    "gripper_report_only": {
+      "fields": [
+        "ur10_gripper_selected_state",
+        "ur10_gripper_joint_delta_settled"
+      ],
+      "affects_arm_freeze_decision": false
+    }
+  },
+  "historical_status_policy": {
+    "e2i_original_fail_record_rewritten": false,
+    "e2i_original_fail_remains_visual_gate_fail": true,
+    "retrospective_arm_freeze_qualified": true,
+    "overall_visual_margin_fail_retained": true
+  },
+  "next_preflight_collection_plan": {
+    "execute_now": false,
+    "camera_trajectory_velocity_thresholds_unchanged": true,
+    "current_audit_frames": [
+      149,
+      150,
+      219,
+      220
+    ],
+    "phase_timing_evidence": {
+      "steps_149_150_phase": "settle_heading_mirror",
+      "steps_219_220_phase": "lateral_negative_sweep_mirror",
+      "max_projected_actual_displacement_px_observed": 36.88848765316308,
+      "max_observed_interval": "150->219",
+      "trend_note": "219->220 collapsed to 0.4358px, indicating post-peak capture"
+    },
+    "proposed_audit_frame_shift": {
+      "strategy": "delay the postrun audit tail frames deeper into lateral_negative_sweep_mirror to increase baseline parallax",
+      "proposed_frames_for_next_single_precheck": [
+        149,
+        150,
+        239,
+        250
+      ],
+      "selection_rationale": "phase3_steps shows mirrored trajectory continues laterally after step 220 (root_y magnitude keeps increasing toward step 250), so replacing 219/220 with later-in-phase frames increases expected projected displacement while preserving all other settings"
+    },
+    "preregistered_gate": {
+      "projected_centroid_displacement_px_min": 40.0,
+      "required_frame_pairs_meeting_gate_min_count": 2
+    },
+    "config_scope_guardrail": {
+      "default_impact_other_scenarios": "none",
+      "implementation_requirement": "if capture-step override is added, bind it to mirrored_outer_lateral_patrol preflight path only and keep global defaults unchanged"
+    }
+  }
+}

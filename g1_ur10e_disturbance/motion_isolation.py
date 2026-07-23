@@ -300,10 +300,18 @@ def compute_ur10_freeze_metrics(
     if eff.shape[0] < 7 or cur.shape[0] != 7 or init.shape[0] != 7:
         raise ValueError("invalid UR10 action/joint shape")
     delta = cur - init
+    arm_delta = delta[:6]
+    gripper_delta = float(delta[6])
+    aggregate_semantics = "legacy_aggregate_arm6_plus_gripper1"
     return {
         "ur10_action_norm": float(np.linalg.norm(eff[:7])),
+        "ur10_arm_joint_delta_norm": float(np.linalg.norm(arm_delta)),
+        "ur10_arm_joint_delta_max_abs": float(np.max(np.abs(arm_delta))),
+        "ur10_gripper_joint_delta": gripper_delta,
+        # Backward-compatible aggregate metrics: keep unchanged semantics.
         "ur10_joint_delta_norm": float(np.linalg.norm(delta)),
         "ur10_joint_delta_max_abs": float(np.max(np.abs(delta))),
+        "ur10_joint_delta_semantics": aggregate_semantics,
     }
 
 

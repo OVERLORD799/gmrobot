@@ -37,9 +37,17 @@ def test_runtime_telemetry_schema_roundtrip() -> None:
                 "key_body_links_json": json.dumps({"torso_link": [0.1, -0.4, 0.95]}, ensure_ascii=True),
                 "ur10_freeze_enabled": 1,
                 "ur10_hold_hash": "abc123",
+                "ur10_gripper_selected_state": "open",
                 "ur10_action_norm": "0.000000",
+                "ur10_arm_joint_delta_norm": "0.000000",
+                "ur10_arm_joint_delta_max_abs": "0.000000",
+                "ur10_gripper_joint_delta": "0.314159",
                 "ur10_joint_delta_norm": "0.000000",
                 "ur10_joint_delta_max_abs": "0.000000",
+                "ur10_joint_delta_semantics": "legacy_aggregate_arm6_plus_gripper1",
+                "ur10_arm_joint_delta_max_abs_settled": "0.000000",
+                "ur10_gripper_joint_delta_settled": "0.314159",
+                "ur10_joint_delta_max_abs_settled": "0.314159",
             }
         )
         fh.flush()
@@ -53,6 +61,7 @@ def test_runtime_telemetry_schema_roundtrip() -> None:
         assert rows[0]["sim_step"] == "240"
         assert rows[0]["frame_id"] == "frame_000240_env0.png"
         assert rows[0]["ur10_freeze_enabled"] == "1"
+        assert rows[0]["ur10_joint_delta_semantics"] == "legacy_aggregate_arm6_plus_gripper1"
 
 
 if __name__ == "__main__":

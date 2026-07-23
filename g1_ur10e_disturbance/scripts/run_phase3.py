@@ -1391,7 +1391,10 @@ def main():
         initial_joint_pose=_ur10_joint0,
     )
     _UR10_SETTLING_STEPS = 5
+    _ur10_arm_joint_delta_max_abs_settled = 0.0
+    _ur10_gripper_joint_delta_settled = 0.0
     _ur10_joint_delta_max_abs_settled = 0.0
+    _ur10_gripper_selected_state = str(ur10e_gripper_term_audit.get("selected", "unknown"))
     if args_cli.freeze_ur10e:
         print(
             f"[phase3] UR10 freeze enabled: initial_joint_baseline7="
@@ -2484,6 +2487,14 @@ def main():
             initial_joint_pose=_ur10_joint0,
         )
         if step >= _UR10_SETTLING_STEPS:
+            _ur10_arm_joint_delta_max_abs_settled = max(
+                float(_ur10_arm_joint_delta_max_abs_settled),
+                float(_ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs"]),
+            )
+            _ur10_gripper_joint_delta_settled = max(
+                float(_ur10_gripper_joint_delta_settled),
+                abs(float(_ur10_freeze_last_metrics["ur10_gripper_joint_delta"])),
+            )
             _ur10_joint_delta_max_abs_settled = max(
                 float(_ur10_joint_delta_max_abs_settled),
                 float(_ur10_freeze_last_metrics["ur10_joint_delta_max_abs"]),
@@ -2924,9 +2935,16 @@ def main():
                     "ur10_hold_hash": _ur10_hold_hash,
                     "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_gripper_selected_state": _ur10_gripper_selected_state,
                     "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
+                    "ur10_arm_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_norm']:.6f}",
+                    "ur10_arm_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs']:.6f}",
+                    "ur10_gripper_joint_delta": f"{_ur10_freeze_last_metrics['ur10_gripper_joint_delta']:.6f}",
                     "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                     "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                    "ur10_joint_delta_semantics": str(_ur10_freeze_last_metrics["ur10_joint_delta_semantics"]),
+                    "ur10_arm_joint_delta_max_abs_settled": f"{float(_ur10_arm_joint_delta_max_abs_settled):.6f}",
+                    "ur10_gripper_joint_delta_settled": f"{float(_ur10_gripper_joint_delta_settled):.6f}",
                     "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                 }
             )
@@ -2990,9 +3008,16 @@ def main():
                     "ur10_hold_hash": _ur10_hold_hash,
                     "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
+                    "ur10_gripper_selected_state": _ur10_gripper_selected_state,
                     "ur10_action_norm": _ur10_freeze_last_metrics["ur10_action_norm"],
+                    "ur10_arm_joint_delta_norm": _ur10_freeze_last_metrics["ur10_arm_joint_delta_norm"],
+                    "ur10_arm_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs"],
+                    "ur10_gripper_joint_delta": _ur10_freeze_last_metrics["ur10_gripper_joint_delta"],
                     "ur10_joint_delta_norm": _ur10_freeze_last_metrics["ur10_joint_delta_norm"],
                     "ur10_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_joint_delta_max_abs"],
+                    "ur10_joint_delta_semantics": _ur10_freeze_last_metrics["ur10_joint_delta_semantics"],
+                    "ur10_arm_joint_delta_max_abs_settled": float(_ur10_arm_joint_delta_max_abs_settled),
+                    "ur10_gripper_joint_delta_settled": float(_ur10_gripper_joint_delta_settled),
                     "ur10_joint_delta_max_abs_settled": float(_ur10_joint_delta_max_abs_settled),
                 }
                 # Prefer live closest-body dist from adapter when available.
@@ -3033,9 +3058,16 @@ def main():
                         "ur10_hold_hash": _ur10_hold_hash,
                         "ur10_joint_baseline_provenance_json": json.dumps(_ur10_joint_baseline_provenance, sort_keys=True, ensure_ascii=True),
                         "ur10_hold_action_provenance_json": json.dumps(_ur10_hold_action_provenance, sort_keys=True, ensure_ascii=True),
+                        "ur10_gripper_selected_state": _ur10_gripper_selected_state,
                         "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
+                        "ur10_arm_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_norm']:.6f}",
+                        "ur10_arm_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs']:.6f}",
+                        "ur10_gripper_joint_delta": f"{_ur10_freeze_last_metrics['ur10_gripper_joint_delta']:.6f}",
                         "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                         "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                        "ur10_joint_delta_semantics": str(_ur10_freeze_last_metrics["ur10_joint_delta_semantics"]),
+                        "ur10_arm_joint_delta_max_abs_settled": f"{float(_ur10_arm_joint_delta_max_abs_settled):.6f}",
+                        "ur10_gripper_joint_delta_settled": f"{float(_ur10_gripper_joint_delta_settled):.6f}",
                         "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                     }
                 )

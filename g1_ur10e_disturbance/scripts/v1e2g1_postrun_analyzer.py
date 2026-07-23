@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import argparse
+import csv
 import json
 from pathlib import Path
 import sys
@@ -31,11 +32,116 @@ def _load_body_pose_rows(path: Path) -> list[dict[str, Any]]:
     return rows
 
 
+def _safe_float(value: Any, default: float = 0.0) -> float:
+    try:
+        return float(value)
+    except Exception:
+        return float(default)
+
+
+def _load_runtime_telemetry_rows(path: Path) -> list[dict[str, Any]]:
+    if not path.exists():
+        return []
+    with path.open("r", encoding="utf-8", newline="") as fh:
+        reader = csv.DictReader(fh)
+        rows = list(reader)
+    rows.sort(key=lambda r: int(r.get("sim_step", "0")))
+    return rows
+
+
+def _analyze_ur10_freeze_from_runtime(
+    runtime_rows: list[dict[str, Any]],
+    *,
+    frame_steps: list[int],
+    body_rows_by_step: dict[int, dict[str, Any]],
+) -> dict[str, Any]:
+    if not runtime_rows:
+        return {
+            "available": False,
+            "reason": "runtime_telemetry_missing",
+        }
+    arm_settled_max = max(
+        (_safe_float(r.get("ur10_arm_joint_delta_max_abs_settled"), 0.0) for r in runtime_rows),
+        default=0.0,
+    )
+    arm_norm_max = max(
+        (_safe_float(r.get("ur10_arm_joint_delta_norm"), 0.0) for r in runtime_rows),
+        default=0.0,
+    )
+    arm_max_abs = max(
+        (_safe_float(r.get("ur10_arm_joint_delta_max_abs"), 0.0) for r in runtime_rows),
+        default=0.0,
+    )
+    grip_settled_abs_max = max(
+        (abs(_safe_float(r.get("ur10_gripper_joint_delta_settled"), 0.0)) for r in runtime_rows),
+        default=0.0,
+    )
+    selected = "unknown"
+    for row in runtime_rows:
+        cand = str(row.get("ur10_gripper_selected_state", "")).strip()
+        if cand:
+            selected = cand
+            break
+    legacy_settled_max = max(
+        (_safe_float(r.get("ur10_joint_delta_max_abs_settled"), 0.0) for r in runtime_rows),
+        default=0.0,
+    )
+    legacy_semantics = ""
+    for row in runtime_rows:
+        cand = str(row.get("ur10_joint_delta_semantics", "")).strip()
+        if cand:
+            legacy_semantics = cand
+            break
+
+    ee_disp_pairs: list[dict[str, Any]] = []
+    sorted_steps = sorted(int(s) for s in frame_steps)
+    for idx in range(1, len(sorted_steps)):
+        s0 = sorted_steps[idx - 1]
+        s1 = sorted_steps[idx]
+        r0 = body_rows_by_step.get(s0)
+        r1 = body_rows_by_step.get(s1)
+        if r0 is None or r1 is None:
+            continue
+        p0 = r0.get("ur10e_ee")
+        p1 = r1.get("ur10e_ee")
+        if not isinstance(p0, list) or not isinstance(p1, list) or len(p0) < 3 or len(p1) < 3:
+            continue
+        dx = float(p1[0]) - float(p0[0])
+        dy = float(p1[1]) - float(p0[1])
+        dz = float(p1[2]) - float(p0[2])
+        ee_disp_pairs.append({"from": s0, "to": s1, "disp_m": float((dx * dx + dy * dy + dz * dz) ** 0.5)})
+    ee_disp_settled_max_m = max((float(r["disp_m"]) for r in ee_disp_pairs), default=0.0)
+
+    arm_freeze_threshold_max_abs = 1e-6
+    ee_disp_threshold_m = 1e-6
+    arm_freeze_qualified = bool(
+        arm_settled_max <= arm_freeze_threshold_max_abs and ee_disp_settled_max_m <= ee_disp_threshold_m
+    )
+    return {
+        "available": True,
+        "arm_joint_delta_max_abs_max": arm_max_abs,
+        "arm_joint_delta_norm_max": arm_norm_max,
+        "arm_joint_delta_max_abs_settled_max": arm_settled_max,
+        "gripper_selected_state": selected,
+        "gripper_joint_delta_settled_abs_max": grip_settled_abs_max,
+        "legacy_joint_delta_max_abs_settled_max": legacy_settled_max,
+        "legacy_joint_delta_semantics": legacy_semantics or "missing",
+        "ee_disp_pairs_m": ee_disp_pairs,
+        "ee_disp_settled_max_m": ee_disp_settled_max_m,
+        "arm_freeze_thresholds": {
+            "arm_joint_delta_max_abs_settled_max": arm_freeze_threshold_max_abs,
+            "ee_disp_settled_max_m": ee_disp_threshold_m,
+        },
+        "arm_freeze_qualified": arm_freeze_qualified,
+    }
+
+
 def analyze_postrun(result_dir: Path) -> dict[str, Any]:
     meta = result_dir / "meta"
     frame_inventory = _load_json(meta / "frame_inventory.json")
     camera = _load_json(meta / "camera_pose.json")
     body_rows = _load_body_pose_rows(meta / "body_poses.jsonl")
+    runtime_rows = _load_runtime_telemetry_rows(result_dir / "safety_logs" / "phase3_runtime_telemetry.csv")
     if not body_rows:
         raise ValueError("body_poses.jsonl has no rows")
     row_by_step = {int(r["step"]): r for r in body_rows}
@@ -110,6 +216,9 @@ def analyze_postrun(result_dir: Path) -> dict[str, Any]:
         previous = dict(rec)
         previous["projected_links"] = projected_links
 
+    frame_steps = [int(f.get("step", 0)) for f in frames]
+    ur10 = _analyze_ur10_freeze_from_runtime(runtime_rows, frame_steps=frame_steps, body_rows_by_step=row_by_step)
+
     return {
         "milestone": "V1-E2G.1",
         "result_dir": str(result_dir),
@@ -118,6 +227,7 @@ def analyze_postrun(result_dir: Path) -> dict[str, Any]:
         "frames": frames,
         "max_projected_actual_displacement_px": max((f["projected_actual_displacement_px"] for f in frames), default=0.0),
         "max_roi_area_fraction": max((f["roi_area_fraction"] for f in frames), default=0.0),
+        "ur10": ur10,
     }
 
 
