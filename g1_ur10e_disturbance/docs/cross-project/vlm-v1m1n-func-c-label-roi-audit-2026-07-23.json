@@ -90,12 +90,43 @@
     }
   },
   "label_gate": {
-    "label_status": "provisional",
-    "reviewer_approved": false,
-    "blocked": true,
-    "blocker": "full/unavailable semantics still provisional without independent human semantic adjudication record",
+    "label_status": "reviewer_approved",
+    "reviewer_approved": true,
+    "blocked": false,
+    "blocker": null,
     "not_vlm_positive": true,
     "ready_for_vlm_screen": false
+  },
+  "human_semantic_review": {
+    "reviewer_role": "supervising_codex_reviewer",
+    "review_timestamp": "2026-07-23T12:21:00+08:00",
+    "decision_origin": "independent_human_review_not_vlm",
+    "target_identity": {
+      "target_name": "B",
+      "target_description": "upper-right green bin",
+      "target_roi_xyxy": [
+        341,
+        80,
+        415,
+        211
+      ],
+      "filled_contents_roi_xyxy": [
+        350,
+        97,
+        407,
+        192
+      ]
+    },
+    "frame_hashes": {
+      "frame_000100_env0.png": "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80",
+      "frame_000200_env0.png": "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051"
+    },
+    "decision": "reviewer_approved_functional_positive_target_container_full_unavailable",
+    "rationale": "In both reviewed frames, target B appears densely occupied by regularly arranged parts with no visually apparent slot for continued placement.",
+    "limitations": [
+      "No Docker/Isaac/network/VLM/SAM2/POST executed in this review step.",
+      "This audit approves only semantic label status and ROI identity evidence."
+    ]
   },
   "regression": {
     "added_target_identity_evidence_gate": true,

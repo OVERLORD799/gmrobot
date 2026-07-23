@@ -59,16 +59,16 @@
     "v1c1r_p1_rgb": 0
   },
   "usable_positives": {
-    "FUNCTIONAL_POSITIVE": 2,
+    "FUNCTIONAL_POSITIVE": 4,
     "DYNAMIC_POSITIVE": 0,
-    "functional_scene_groups": 1,
+    "functional_scene_groups": 2,
     "dynamic_scene_groups": 0
   },
   "dataset_status": "DATASET_INSUFFICIENT",
-  "dataset_insufficient_reason": "Only one functional scene-group (D1B) with 2 provisional positive frames; DYNAMIC_POSITIVE with real RGB+SAM2 = 0; V0-C3/P1 have track but no RGB. Do not approve V1-E1 live prompt matrix; collect more evidenced scenes first.",
+  "dataset_insufficient_reason": "After V1-M1O human approval, functional positives increase to two grouped scenes (D1B historical + M1M repaired) with 4 total frames, but DYNAMIC_POSITIVE with real RGB+verifiable tracking remains 0. Keep active semantic control not approved; continue evidence collection first.",
   "worthy_of_v1e1_live_prompt_eval": false,
   "splits": {
-    "rule": "group_by_scene_group; D1B frames never split; no adjacent-frame leakage across development/held-out",
+    "rule": "group_by_scene_group; D1B-lineage and M1M-lineage frames never split across train/held-out; no adjacent-frame leakage across development/held-out",
     "prompt_development": [
       "v0b1_step000000",
       "v0b1_step000010",
@@ -79,7 +79,9 @@
       "v0b1_step000040",
       "d1b_step000000",
       "d1b_step000100",
-      "d1b_step000200"
+      "d1b_step000200",
+      "m1m_step000100",
+      "m1m_step000200"
     ],
     "negative_regression": [
       "v0b1_step000050",

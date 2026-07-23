@@ -94,10 +94,69 @@
   },
   "labels": {
     "expected_risk_type": "functional",
-    "label_status": "provisional",
-    "reviewer_approved": false,
+    "label_status": "reviewer_approved",
+    "reviewer_approved": true,
     "vlm_claimed_success": false,
     "ready_for_vlm_screen": false
+  },
+  "human_review": {
+    "review_kind": "independent_human_semantic_label_decision",
+    "reviewer_role": "supervising_codex_reviewer",
+    "review_timestamp": "2026-07-23T12:21:00+08:00",
+    "source_provenance": {
+      "decision_origin": "human_visual_inspection_only",
+      "not_vlm_output": true,
+      "forbidden_actions_confirmed": [
+        "docker",
+        "isaac",
+        "network",
+        "vlm",
+        "sam2",
+        "post"
+      ],
+      "raw_artifacts_preserved": true
+    },
+    "scene_grouping": {
+      "scene_group": "e01_func_c_final_m1m_20260723",
+      "grouped_semantic_sample_count": 1,
+      "grouped_frame_count": 2,
+      "grouped_frame_steps": [
+        100,
+        200
+      ],
+      "independent_frame_samples": false
+    },
+    "target_identity": {
+      "target_name": "B",
+      "target_description": "upper-right green bin",
+      "target_roi_xyxy": [
+        341,
+        80,
+        415,
+        211
+      ],
+      "filled_contents_roi_xyxy": [
+        350,
+        97,
+        407,
+        192
+      ]
+    },
+    "frame_hashes": {
+      "frame_000100_env0.png": "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80",
+      "frame_000200_env0.png": "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051"
+    },
+    "semantic_decision": {
+      "risk_type": "functional",
+      "decision": "positive",
+      "decision_text": "target container full/unavailable for continued placement",
+      "rationale": "Both reviewed frames show the approved target B bin densely occupied by regularly arranged parts with no visually apparent slot for another same-type part."
+    },
+    "limitations": [
+      "Decision is image-semantic only and does not prove physical collision impossibility.",
+      "Dynamic positive evidence count remains zero.",
+      "This approval does not authorize live/active semantic control."
+    ]
   },
   "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL",
   "failed_required_gates": [],

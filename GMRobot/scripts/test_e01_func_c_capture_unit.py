@@ -149,6 +149,32 @@ def test_roi_identity_evidence_on_m1m_frames_if_present():
         assert ev["checks"]["target_right_of_source"] is True, f"{p.name}: {ev}"
 
 
+def test_human_label_approval_provenance_and_grouping_if_present():
+    """Approval record must preserve provenance and grouped-scene integrity."""
+    approval_json = (
+        ROOT.parent
+        / "g1_ur10e_disturbance"
+        / "docs"
+        / "cross-project"
+        / "vlm-v1m1o-func-c-human-label-approval-2026-07-23.json"
+    )
+    if not approval_json.is_file():
+        return
+    rec = json.loads(approval_json.read_text(encoding="utf-8"))
+    assert rec["review"]["not_vlm_output"] is True
+    assert rec["approved_semantic_label"]["label_status"] == "reviewer_approved"
+    assert rec["approved_semantic_label"]["reviewer_approved"] is True
+    assert rec["approved_semantic_label"]["target_identity"]["target_roi_xyxy"] == [341, 80, 415, 211]
+    assert rec["approved_semantic_label"]["target_identity"]["filled_contents_roi_xyxy"] == [350, 97, 407, 192]
+    hashes = rec["source_artifacts"]["frame_hashes_sha256"]
+    assert hashes["frame_000100_env0.png"] == "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80"
+    assert hashes["frame_000200_env0.png"] == "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051"
+    group = rec["grouping_and_split_integrity"]
+    assert group["grouped_scene_samples"] == 1
+    assert group["grouped_frames"] == 2
+    assert group["independent_frame_samples"] is False
+
+
 def test_geometry_manifest_roundtrip_and_b0b4():
     with tempfile.TemporaryDirectory() as td:
         td_path = Path(td)
@@ -410,6 +436,8 @@ def main():
     test_seed_camera_steps_labels()
     test_network_rejected()
     test_asset_precheck_and_roi()
+    test_roi_identity_evidence_on_m1m_frames_if_present()
+    test_human_label_approval_provenance_and_grouping_if_present()
     test_geometry_manifest_roundtrip_and_b0b4()
     test_frozen_asset_hashes_unchanged()
     test_frozen_usd_structure_read_only()

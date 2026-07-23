@@ -153,6 +153,22 @@
       "artifact_exists": true,
       "existing_manifest_sha": "d00b77a31972c1cad8ac0c503f20d33665d91a6f4a9fa595e0d222b657e58ba0",
       "paper_claim_boundary": "design_only_no_capture_no_results_dir"
+    },
+    {
+      "milestone": "V1-M1O",
+      "verdict": "REVIEWER_APPROVED_FUNCTIONAL_POSITIVE",
+      "result_root": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723",
+      "primary_summary": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1m1o-func-c-human-label-approval-2026-07-23.json",
+      "image_sha": null,
+      "config_sha": null,
+      "seed": 51,
+      "post_count": 0,
+      "current_or_historical": "current",
+      "superseded_by": null,
+      "artifact_exists": true,
+      "existing_manifest_sha": null,
+      "paper_claim_boundary": "independent_human_semantic_approval_of_repaired_func_c_only",
+      "notes": "Two reviewed frames are one grouped functional scene; no Docker/Isaac/network/VLM/SAM2/POST in M1O review."
     }
   ],
   "missing": []

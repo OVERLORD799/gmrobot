@@ -2,7 +2,7 @@
   "phase": "V1-E0.1",
   "date": "2026-07-22",
   "title": "positive_dataset_acquisition_feasibility_design",
-  "status": "DESIGN_READY_AWAITING_CAPTURE_APPROVAL",
+  "status": "PARTIAL_PROGRESS_FUNC_C_HUMAN_APPROVED_DATASET_STILL_INSUFFICIENT",
   "boundaries": {
     "design_only": true,
     "post_count": 0,
@@ -246,5 +246,24 @@
   ],
   "recommended_execution_order_if_approved": ["E01-Dyn-A", "E01-Func-C", "E01-Dyn-B"],
   "md_path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.md",
-  "next_action": "stop_await_user_capture_decision"
+  "dataset_progress_update_2026_07_23": {
+    "source_milestone": "V1-M1O",
+    "functional_scene_groups_total": 2,
+    "functional_frames_total": 4,
+    "dynamic_scene_groups_total": 0,
+    "newly_added_group": {
+      "scene_group": "e01_func_c_final_m1m_20260723",
+      "group_type": "functional",
+      "frames": [
+        "frame_000100_env0.png",
+        "frame_000200_env0.png"
+      ],
+      "grouped_as_single_scene_sample": true,
+      "reviewer_approved": true
+    },
+    "split_integrity_guard": "D1B/M1M related frames remain grouped and held-out only; no train leakage.",
+    "active_semantic_control_ready": false,
+    "readiness_verdict": "NOT_APPROVED_DYNAMIC_ZERO"
+  },
+  "next_action": "collect_at_least_two_independent_dynamic_positive_scene_groups_then_reassess"
 }

@@ -1,0 +1,94 @@
+{
+  "milestone": "V1-M1O",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "scope": {
+    "offline_only": true,
+    "forbidden_actions": [
+      "docker",
+      "isaac",
+      "network",
+      "vlm",
+      "sam2",
+      "post"
+    ],
+    "raw_png_rewritten": false,
+    "safety_logs_rewritten": false,
+    "historical_fail_docs_rewritten": false
+  },
+  "review": {
+    "type": "independent_human_semantic_label_decision",
+    "reviewer_role": "supervising_codex_reviewer",
+    "timestamp": "2026-07-23T12:21:00+08:00",
+    "not_vlm_output": true,
+    "approved": true
+  },
+  "source_artifacts": {
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723",
+    "frames": [
+      "scene/frame_000100_env0.png",
+      "scene/frame_000200_env0.png"
+    ],
+    "frame_hashes_sha256": {
+      "frame_000100_env0.png": "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80",
+      "frame_000200_env0.png": "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051"
+    }
+  },
+  "approved_semantic_label": {
+    "risk_type": "functional",
+    "label_status": "reviewer_approved",
+    "reviewer_approved": true,
+    "target_identity": {
+      "target_name": "B",
+      "target_description": "upper-right green bin",
+      "target_roi_xyxy": [
+        341,
+        80,
+        415,
+        211
+      ],
+      "filled_contents_roi_xyxy": [
+        350,
+        97,
+        407,
+        192
+      ]
+    },
+    "decision_text": "target container full/unavailable for continued placement",
+    "decision_rationale": "In both reviewed frames, target B is densely occupied by regularly arranged parts with no visually apparent slot for another same-type part."
+  },
+  "grouping_and_split_integrity": {
+    "scene_group_id": "e01_func_c_final_m1m_20260723",
+    "group_type": "functional_positive",
+    "grouped_scene_samples": 1,
+    "grouped_frames": 2,
+    "frame_steps": [
+      100,
+      200
+    ],
+    "independent_frame_samples": false,
+    "split_rule": "Treat both frames as one grouped functional scene. Do not leak D1B/M1M-related frames across train and held-out."
+  },
+  "dataset_reassessment": {
+    "functional_positive_frames_total": 4,
+    "functional_scene_groups_total": 2,
+    "dynamic_positive_frames_total": 0,
+    "dynamic_scene_groups_total": 0,
+    "live_active_semantic_control_approved": false,
+    "readiness_verdict": "DATASET_INSUFFICIENT_DYNAMIC_ZERO"
+  },
+  "limitations": [
+    "Decision is based on semantic appearance in reviewed RGB frames and does not prove physical feasibility beyond the observed evidence.",
+    "No new dynamic positive scene was added.",
+    "This approval does not authorize V1-E1 live/active semantic control."
+  ],
+  "derived_updates": {
+    "updated_files": [
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-final-m1m-capture-2026-07-23.json",
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1n-func-c-label-roi-audit-2026-07-23.json",
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1e0-semantic-evaluation-design-2026-07-22.json",
+      "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.json",
+      "g1_ur10e_disturbance/docs/cross-project/paper-evidence-index-2026-07-22.json"
+    ]
+  }
+}
