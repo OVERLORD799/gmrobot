@@ -1,0 +1,15 @@
+FROM gmdisturb:e01-func-c-m1j-20260723
+
+# Source-only closure for reference-locked Func-C bin visual smoke.
+COPY source/GMRobot/GMRobot/shadow/target_full_override.py /opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py
+COPY source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py /opt/projects/GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py
+COPY source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py /opt/projects/GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py
+COPY source/GMRobot/GMRobot/assets/container.usd /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container.usd
+COPY source/GMRobot/GMRobot/assets/container_full.usd /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_full.usd
+COPY source/GMRobot/GMRobot/assets/container_full_visual.usd /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd
+COPY source/GMRobot/GMRobot/assets/container_fixed.usd /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd
+COPY source/GMRobot/GMRobot/assets/part/part_fixed.usd /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd
+COPY configs/ivj_v1e01_target_container_full.yaml /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml
+
+LABEL gmdisturb.e01_func_c_reference_bin_m1f5="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1j-20260723"

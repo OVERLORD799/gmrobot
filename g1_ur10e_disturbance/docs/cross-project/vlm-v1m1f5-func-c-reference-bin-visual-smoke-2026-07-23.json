@@ -1,0 +1,99 @@
+{
+  "task": "V1-M1F5 reference-locked Func-C left source-only build + single visual smoke",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "head": "d8f20a1f6ad3b0270e65309cc851ef2b8c947a39",
+  "origin_main_match": true,
+  "worktree_clean_preflight": true,
+  "m1f4_preflight": {
+    "manifest_validator_pass": true,
+    "func_c_tests_count": 17,
+    "func_c_tests_pass": true
+  },
+  "budget": {
+    "build": 1,
+    "isaac_applauncher_smoke": 1,
+    "retry": 0
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/GMRobot/docker/Dockerfile.e01-func-c-reference-bin-m1f5",
+    "dockerfile_sha256": "869737e9d7320804d44aa7db7e5132641665af272fe9ce335bda184b4d325ea1",
+    "tag": "gmdisturb:e01-func-c-reference-bin-m1f5-20260723",
+    "image_sha": "sha256:caec76f07e57a3cbdcc6dd54552ea7e71f83118dbf7be6d043ec239045bdf29e",
+    "exit_code": 0
+  },
+  "smoke": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_reference_bin_smoke_m1f5_20260723",
+    "exit_code": 0,
+    "frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_reference_bin_smoke_m1f5_20260723/scene/frame_000000_env0.png",
+    "frame_sha256": "790f1d70bd5affc915c30dae64a9eddd0f1e8981509eb687c32a0223e246fedb"
+  },
+  "reference_lock": {
+    "source_container_asset_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+    "source_container_asset_sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "source_container_expected_sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "containerA_asset_identity_assertion": true,
+    "source_container_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "source_container_orientation_quat_wxyz": [
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "scale_orientation_matches_m1f4": true,
+    "container_full_visual_asset_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd",
+    "container_full_visual_sha256": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+    "reference_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+    "reference_frame_sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "rejected_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png",
+    "rejected_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5"
+  },
+  "camera_pose": {
+    "pos": [
+      0.35,
+      0.0,
+      2.5
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ]
+  },
+  "gates": {
+    "exit_0": true,
+    "png_valid_nonblack": true,
+    "source_roi_present": true,
+    "target_roi_present": true,
+    "right_box_content_present": true,
+    "post_zero": true,
+    "no_traceback": true,
+    "no_device_lost": true,
+    "no_new_xid": true,
+    "no_residual": true
+  },
+  "gpu_xid": {
+    "pre_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_reference_bin_smoke_m1f5_20260723/meta/gpu_xid_pre.txt",
+    "post_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_reference_bin_smoke_m1f5_20260723/meta/gpu_xid_post.txt",
+    "pre_count": 0,
+    "post_count": 0,
+    "new_xid": false
+  },
+  "forbidden_capabilities_used": {
+    "formal_func_c_recapture": false,
+    "network_post": false,
+    "vlm": false,
+    "perception": false,
+    "sam2": false,
+    "gdino": false,
+    "five_stage": false,
+    "credentials": false
+  },
+  "visual_verdict": "VISUAL_REVIEW_REQUIRED",
+  "note": "No automatic visual PASS. Main agent must perform side-by-side review with reference frame_000330_env0."
+}
