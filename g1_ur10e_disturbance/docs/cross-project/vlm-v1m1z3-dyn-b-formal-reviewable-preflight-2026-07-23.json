@@ -1,0 +1,121 @@
+{
+  "doc": "vlm-v1m1z3-dyn-b-formal-reviewable-preflight-2026-07-23",
+  "milestone": "V1-M1Z3",
+  "verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY",
+  "run_count": 1,
+  "retry_count": 0,
+  "image_rebuild": false,
+  "runtime_code_modified": false,
+  "vlm_or_perception_run": false,
+  "label_auto_approved": false,
+  "identity": {
+    "git_head_required": "c0eeaf771efc2d56f4a89a2cba11e416c31af268",
+    "git_head_observed": "c0eeaf771efc2d56f4a89a2cba11e416c31af268",
+    "image_tag": "gmdisturb:e01-dyn-b-clean-m1z2-20260723",
+    "image_sha_required": "sha256:84b0bdbfb50f3912abd3d55cc2cb9f17a43be82b9bae161df04fab2520777c28",
+    "image_sha_observed": "sha256:84b0bdbfb50f3912abd3d55cc2cb9f17a43be82b9bae161df04fab2520777c28"
+  },
+  "result_root": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z3_20260723",
+  "scenario": {
+    "seed": 43,
+    "scenario": "outer_lateral_patrol",
+    "motion_source_label": "scripted_g1_outer_lateral_patrol",
+    "max_steps": 341,
+    "camera_pos": [0.45, 0.0, 2.7],
+    "camera_rot": [0.7071, 0.0, 0.7071, 0.0],
+    "camera_save_steps": [219, 220, 221, 329, 330, 331]
+  },
+  "launcher": {
+    "canonical_run_sh": true,
+    "first_payload": ["bash", "-lc"],
+    "isaac_python_not_first_payload": true,
+    "host_code_bind_mounted": false,
+    "capture_one_shot_runner": "GMRobot/scripts/capture_one_shot_runner.py",
+    "formal_command_meta": "results/paper_demo/v1e01_dyn_b_preflight_m1z3_20260723/meta/formal_command.txt"
+  },
+  "runner": {
+    "exit_code": 86,
+    "elapsed_monotonic_sec": 30.857351954,
+    "forbid_pattern_hits": [
+      {
+        "pattern": "Traceback \\(most recent call last\\):",
+        "stream": "stderr",
+        "match": "Traceback (most recent call last):"
+      }
+    ],
+    "missing_required_paths": [
+      "scene/frame_000219_env0.png",
+      "scene/frame_000220_env0.png",
+      "scene/frame_000221_env0.png",
+      "scene/frame_000329_env0.png",
+      "scene/frame_000330_env0.png",
+      "scene/frame_000331_env0.png",
+      "safety_logs/phase3.csv"
+    ]
+  },
+  "failure": {
+    "class": "RUNTIME_NAMEERROR_CSV_IMPORT_MISSING",
+    "primary_error": "NameError: name 'csv' is not defined",
+    "location": "run_phase3.py:main ~line 977 (csv.DictWriter for --dyn-b-per-step-audit-csv)",
+    "stderr_excerpt": "Traceback (most recent call last):\n  File \"/opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py\", line 3193, in <module>\n    main()\n  File \"/opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py\", line 977, in main\n    _dyn_b_per_step_audit_writer = csv.DictWriter(\n                                   ^^^\nNameError: name 'csv' is not defined",
+    "note": "M1Z2 smoke used max_steps=1 without --dyn-b-per-step-audit-csv, so this formal preflight is the first path exercising the audit writer. Host HEAD at the fixed commit also lacks `import csv`. Policy forbids fix/retune/rerun."
+  },
+  "runtime_gates": {
+    "exit_eq_0": false,
+    "no_traceback": false,
+    "no_missing_module": true,
+    "no_numpy_abi_or_paramspec_error": true,
+    "no_extension_startup_failure": true,
+    "no_device_lost": true,
+    "numpy_pre_post_single_root_consistent": true,
+    "numpy_version": "1.26.0",
+    "numpy_root": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle",
+    "ParamSpec_pre": true,
+    "ParamSpec_post": true,
+    "POST_count": 0,
+    "new_xid": false,
+    "residual_running_container": false,
+    "residual_compute_process": false
+  },
+  "geometry_gates_190_340": {
+    "pass": false,
+    "expected_rows": 151,
+    "observed_rows": 0,
+    "analyzer_exit": 1,
+    "analyzer_pass": false,
+    "reason": "audit CSV empty (header never written); simulation aborted before step loop"
+  },
+  "visual_gates": {
+    "pass": false,
+    "png_count": 0,
+    "frames_220_330_valid": false,
+    "centroid_displacement_px_220_330": null,
+    "reason": "no PNG / body_poses produced before crash"
+  },
+  "artifacts": {
+    "phase3_dyn_b_per_step_audit_csv": "safety_logs/phase3_dyn_b_per_step_audit.csv (size=0)",
+    "camera_pose_json": "meta/camera_pose.json (written; override_enabled=true, pos/rot match design)",
+    "body_poses_jsonl": "meta/body_poses.jsonl (size=0)",
+    "numpy_origin_pre_post": true,
+    "typing_extensions_pre_post": true,
+    "stdout_stderr_status": true
+  },
+  "labels_unchanged": {
+    "risk_type": "dynamic",
+    "label_status": "provisional",
+    "reviewer_approved": false,
+    "motion_provenance": "scripted_g1_outer_lateral_patrol",
+    "synthetic_scripted": true,
+    "human_hand": false,
+    "PPE": false,
+    "VLM_output": false
+  },
+  "policy": {
+    "no_retry": true,
+    "no_code_fix": true,
+    "no_image_rebuild": true,
+    "no_vlm_sam2_after_pass_or_fail": true,
+    "results_not_committed": true
+  }
+}
