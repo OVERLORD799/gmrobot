@@ -1,0 +1,13 @@
+{
+  "run_id": "v1e02_visual_dataset_review_packet_20260723",
+  "date": "2026-07-23",
+  "candidate_manifest_path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+  "manifest_index_path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-manifest-index-2026-07-23.json",
+  "technical_review_status": "pending_user_review",
+  "reviewer_approved": false,
+  "notes": {
+    "func_c": "target/contents clear; no USD garble in selected frames.",
+    "dyn_b": "G1 visible but low-contrast white background; dynamic cannot be proved from single frame.",
+    "dyn_b_gate": "M1Z9 remains FAIL_NONALLOW_GEOMETRY and cannot be live-control positive."
+  }
+}

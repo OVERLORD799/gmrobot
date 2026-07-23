@@ -1,0 +1,20 @@
+{
+  "index_id": "vlm-v1e02-visual-dataset-review-packet-index",
+  "version": "1.0.0",
+  "date": "2026-07-23",
+  "artifacts": [
+    {
+      "kind": "review_doc_md",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-review-packet-2026-07-23.md"
+    },
+    {
+      "kind": "review_doc_json",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-review-packet-2026-07-23.json"
+    },
+    {
+      "kind": "dataset_candidate_manifest",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json"
+    }
+  ],
+  "results_large_files_included": false
+}

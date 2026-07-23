@@ -1,0 +1,219 @@
+{
+  "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
+  "manifest_version": "2.0.0",
+  "previous_version_refs": [
+    {
+      "version": "1.0.0",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.json",
+      "immutable": true
+    }
+  ],
+  "review_packet": {
+    "run_id": "v1e02_visual_dataset_review_packet_20260723",
+    "date": "2026-07-23",
+    "packet_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e02_visual_dataset_review_packet_20260723",
+    "preflight": {
+      "head": "5e52299394c6fdd9b42af8380a301a490961152c",
+      "worktree_clean": true,
+      "note": "clean verified before offline docs/script edits"
+    },
+    "offline_only": true
+  },
+  "global_flags": {
+    "human_hand": false,
+    "glove": false,
+    "PPE": false,
+    "learned_whole_body_control": false,
+    "VLM_output": false,
+    "reviewer_approved": false,
+    "technical_review_status": "pending_user_review"
+  },
+  "candidates": [
+    {
+      "id": "E02-FUNC-C-STEP100-200",
+      "source_milestone": "V1-M1M",
+      "category": "provisional",
+      "risk_type": "functional",
+      "functional_label": "filled_container_visible",
+      "scene_group": "e01_func_c_final_m1m_20260723",
+      "camera": "gmrobot_scene_default",
+      "required_steps": [
+        100,
+        200
+      ],
+      "temporal_pair_required": false,
+      "reviewer_approved": false,
+      "technical_review_status": "pending_user_review",
+      "historical_verdict_ref": {
+        "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-final-m1m-capture-2026-07-23.json",
+        "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL"
+      },
+      "technical_gate_notes": [
+        "target_container_and_contents_visually_clear",
+        "no_usd_garble_detected",
+        "objective_gate_record_only"
+      ],
+      "provenance": {
+        "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/manifest/capture_manifest.json",
+        "camera": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/meta/runtime_safety_config.yaml",
+        "scene": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene"
+      },
+      "frames": [
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene/frame_000100_env0.png",
+          "sha256": "8da7319646faf76734624fd8b2453e3b0a0eea13b903ff5eeaf26d3531e96d80",
+          "size_bytes": 191148,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Func-C",
+          "scene_group": "e01_func_c_final_m1m_20260723",
+          "camera": "gmrobot_scene_default",
+          "step": 100,
+          "stream": "primary",
+          "stability_only": false
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/scene/frame_000200_env0.png",
+          "sha256": "37baa81ff93ece84dd2a7cc13a11b65837e56876bd7eff83101a1cff84698051",
+          "size_bytes": 197676,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Func-C",
+          "scene_group": "e01_func_c_final_m1m_20260723",
+          "camera": "gmrobot_scene_default",
+          "step": 200,
+          "stream": "primary",
+          "stability_only": false
+        }
+      ]
+    },
+    {
+      "id": "E02-DYN-B-M1Z9-STEP220-330",
+      "source_milestone": "V1-M1Z9",
+      "category": "provisional",
+      "risk_type": "dynamic",
+      "motion_label": "scripted_g1_outer_lateral_patrol",
+      "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+      "camera": "dual_scene_topdown_m1z9",
+      "required_steps": [
+        220,
+        330
+      ],
+      "stability_evidence_steps": [
+        219,
+        221,
+        329,
+        331
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": false,
+      "technical_review_status": "pending_user_review",
+      "historical_verdict_ref": {
+        "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1z9-dyn-b-formal-capture-2026-07-23.json",
+        "verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL"
+      },
+      "technical_gate_notes": [
+        "g1_visible_with_white_background_low_contrast",
+        "single_frame_insufficient_for_dynamic_claim",
+        "dynamic_evidence_requires_cross_frame_or_track",
+        "geometry_isolated=false",
+        "FAIL_NONALLOW_GEOMETRY",
+        "cannot_be_live_control_positive"
+      ],
+      "provenance": {
+        "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/audited_summary_semantics_v2.json",
+        "camera": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/meta/camera_pose.json",
+        "scene": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene"
+      },
+      "frames": [
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000219_env0.png",
+          "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+          "size_bytes": 189422,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 219,
+          "stream": "stability",
+          "stability_only": true
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000220_env0.png",
+          "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+          "size_bytes": 189422,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 220,
+          "stream": "primary",
+          "stability_only": false
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000221_env0.png",
+          "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+          "size_bytes": 189422,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 221,
+          "stream": "stability",
+          "stability_only": true
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000329_env0.png",
+          "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+          "size_bytes": 183689,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 329,
+          "stream": "stability",
+          "stability_only": true
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+          "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+          "size_bytes": 183689,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 330,
+          "stream": "primary",
+          "stability_only": false
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000331_env0.png",
+          "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+          "size_bytes": 183689,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-B",
+          "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 331,
+          "stream": "stability",
+          "stability_only": true
+        }
+      ]
+    }
+  ],
+  "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py"
+}
