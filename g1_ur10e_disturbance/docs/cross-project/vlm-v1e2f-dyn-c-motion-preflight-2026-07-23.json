@@ -1,0 +1,73 @@
+{
+  "milestone": "V1-E2F",
+  "date": "2026-07-23",
+  "task": "Dyn-C motion isolation source-only build + short Isaac preflight (non-formal)",
+  "status": "motion_preflight_fail",
+  "gate": "STOP_NO_FORMAL_CAPTURE",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723",
+  "build": {
+    "attempts": 1,
+    "retry": 0,
+    "copy_only": true,
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2f-20260723",
+    "image_id": "sha256:0ef7664d2b84df7fea087eed35cc65b55af775e8f272c12853d8ba6849e3a6ad",
+    "repo_digests": [
+      "gmdisturb@sha256:0ef7664d2b84df7fea087eed35cc65b55af775e8f272c12853d8ba6849e3a6ad"
+    ]
+  },
+  "run": {
+    "attempts": 1,
+    "retry": 0,
+    "exit_code": 0,
+    "runtime_seconds": 31.634,
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "freeze_ur10e": true,
+    "max_steps": 260,
+    "capture_steps": [
+      149,
+      150,
+      219,
+      220
+    ],
+    "failure": {
+      "type": "KeyError",
+      "message": "'joint_pos'",
+      "location": "scripts/run_phase3.py main(): obs[\"ur10e_policy\"][\"joint_pos\"]",
+      "post0_ok": false,
+      "errors_present": true,
+      "xid_present": false,
+      "residual_present": false
+    }
+  },
+  "artifacts": {
+    "runtime_telemetry_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723/safety_logs/phase3_runtime_telemetry.csv",
+    "runtime_telemetry_sha256": "4f80ac88d4f7bed2888c431fa0d6499706c7eec0abd183b08903418cff08c382",
+    "runtime_telemetry_rows": 0,
+    "runtime_telemetry_header_present": true,
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723/safety_logs/phase3_steps.csv",
+    "steps_row_count_including_header": 0,
+    "body_pose_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723/meta/body_poses.jsonl",
+    "body_pose_rows": 0,
+    "events_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723/safety_logs/phase3_events.csv",
+    "events_row_count_including_header": 0,
+    "diagnostic_frames_saved": 0
+  },
+  "gates": {
+    "exit0": true,
+    "ur10_effective_action_joint_delta_near_zero_and_hash_stable": "NOT_EVALUABLE_NO_DATA_ROWS",
+    "g1_actual_root_link_displacement_direction_consistent": "NOT_EVALUABLE_RUN_ABORTED_BEFORE_STEPS",
+    "projected_displacement_px_ge_40": "NOT_EVALUABLE",
+    "roi_area_fraction_ge_0_012": "NOT_EVALUABLE",
+    "no_fall": "NOT_EVALUABLE",
+    "telemetry_frame_step_sync": "FAIL_NO_STEP_OR_FRAME_OUTPUT",
+    "post0_no_errors_xid_residual": "FAIL_TRACEBACK_PRESENT"
+  },
+  "command_vs_actual": {
+    "command": "scripted_g1_mirrored_outer_lateral_patrol expected motion across >=2 waypoint segments",
+    "actual": "no evaluable motion samples due early abort; no frame and no body/step telemetry rows",
+    "disposition": "STOP as required; formal capture forbidden"
+  },
+  "generated_at_utc": "2026-07-23T12:35:11Z"
+}

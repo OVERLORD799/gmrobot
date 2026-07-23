@@ -344,8 +344,8 @@
       "temporal_pair_required": true,
       "reviewer_approved": false,
       "user_rejected": true,
-      "technical_review_status": "implementation_ready_pending_short_preflight",
-      "status": "motion_isolation_implementation_pending",
+      "technical_review_status": "fail",
+      "status": "fail",
       "count_as_dynamic_positive_group": false,
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
@@ -404,6 +404,19 @@
             "310_311": 0.757
           }
         }
+      },
+      "motion_preflight": {
+        "run_id": "v1e2f_dyn_c_motion_preflight_20260723",
+        "status": "motion_preflight_fail",
+        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2f_dyn_c_motion_preflight_20260723",
+        "image_tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2f-20260723",
+        "image_id": "sha256:0ef7664d2b84df7fea087eed35cc65b55af775e8f272c12853d8ba6849e3a6ad",
+        "run_exit_code": 0,
+        "runtime_error": "KeyError: 'joint_pos'",
+        "telemetry_rows": 0,
+        "diagnostic_frames_saved": 0,
+        "report_json": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2f-dyn-c-motion-preflight-2026-07-23.json",
+        "report_md": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2f-dyn-c-motion-preflight-2026-07-23.md"
       }
     }
   ],
