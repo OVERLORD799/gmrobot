@@ -27,7 +27,7 @@ import json
 import os
 import sys
 
-import numpy as np
+from numpy_abi_guard import verify_numpy_single_root
 
 from isaaclab.app import AppLauncher
 
@@ -254,6 +254,18 @@ parser.add_argument(
     help="Safety enforcement: active (gate+replan), shadow (evaluate+log only), "
          "off (same as --no-safety when combined).  Default: active.",
 )
+parser.add_argument(
+    "--numpy-origin-pre-json",
+    type=str,
+    default="",
+    help="Optional JSON path to persist NumPy origin guard before AppLauncher.",
+)
+parser.add_argument(
+    "--numpy-origin-post-json",
+    type=str,
+    default="",
+    help="Optional JSON path to persist NumPy origin guard after AppLauncher.",
+)
 AppLauncher.add_app_launcher_args(parser)
 args_cli = parser.parse_args()
 
@@ -335,9 +347,21 @@ if args_cli.mode == parser.get_default("mode"):
 # negligible (~one render target texture).
 args_cli.enable_cameras = True
 
+_numpy_pre = verify_numpy_single_root(
+    stage="before_app_launcher",
+    eager=True,
+    json_out=(args_cli.numpy_origin_pre_json or None),
+)
 app_launcher = AppLauncher(args_cli)
 simulation_app = app_launcher.app
+_numpy_post = verify_numpy_single_root(
+    stage="after_app_launcher",
+    eager=False,
+    expected_root=str(_numpy_pre.get("numpy_root", "")),
+    json_out=(args_cli.numpy_origin_post_json or None),
+)
 
+import numpy as np
 import torch
 import gymnasium as gym
 

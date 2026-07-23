@@ -1,0 +1,18 @@
+# V1-M1U1: NumPy ABI remediation before Isaac AppLauncher in Dyn-B image.
+FROM gmdisturb:e01-func-c-m1j-20260723
+
+COPY scripts/run_phase3.py /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py
+COPY scripts/numpy_abi_guard.py /opt/projects/g1_ur10e_disturbance/scripts/numpy_abi_guard.py
+COPY g1_disturbance_controller.py /opt/projects/g1_ur10e_disturbance/g1_disturbance_controller.py
+COPY e01_dyn_b_runtime_guard.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py
+COPY e01_dyn_b_offline_readiness.py /opt/projects/g1_ur10e_disturbance/e01_dyn_b_offline_readiness.py
+COPY configs/e01_dyn_b_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_b_capture.yaml
+COPY scripts/isaac_abi_import_preflight.py /opt/projects/g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py
+COPY scripts/test_e01_dyn_b_runtime_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py
+COPY scripts/test_e01_dyn_b_offline_readiness_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_offline_readiness_unit.py
+COPY scripts/test_e01_dyn_b_m1u0_image_bake_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_e01_dyn_b_m1u0_image_bake_unit.py
+COPY scripts/test_numpy_abi_guard_unit.py /opt/projects/g1_ur10e_disturbance/scripts/test_numpy_abi_guard_unit.py
+
+LABEL gmdisturb.e01_dyn_b_m1u1="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1j-20260723" \
+      gmdisturb.milestone="V1-M1U1"

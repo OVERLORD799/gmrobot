@@ -1,0 +1,71 @@
+{
+  "doc": "vlm-v1m1u1-dyn-b-abi-remediation-2026-07-23",
+  "verdict": "ABI_REMEDIATION_FAIL_STOP",
+  "next_gate": "NO_CAPTURE_AUTHORIZATION",
+  "allow_formal_dyn_b_capture": false,
+  "formal_dyn_b_capture_run": false,
+  "build_count": 1,
+  "smoke_count": 1,
+  "build_retry_used": false,
+  "smoke_retry_used": false,
+  "head_before_work": "e1de11dd4e2f427d31d81bb15c3dac8c06598e23",
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-m1u1-20260723",
+    "id": "sha256:195b141daa0ba6935f8409da3f46781925b98eeca4a4ac2993ea4de474e700c9",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-m1u1"
+  },
+  "hypothesis_check": {
+    "statement": "run_phase3 leaves lazy numpy submodules and AppLauncher/Kit path mutation introduces pip_prebundle numpy subtree",
+    "result": "supported",
+    "evidence": {
+      "pre_single_root": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/numpy_origin_pre.json",
+      "post_mixed_roots": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/numpy_origin_post.json"
+    }
+  },
+  "smoke": {
+    "runner_exit_code": 86,
+    "elapsed_sec": 18.095590358,
+    "status_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/run_status.json",
+    "stderr_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/smoke_stderr.txt",
+    "stdout_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/smoke_stdout.txt",
+    "inner_command_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/smoke_inner_command.sh.txt",
+    "required_csv": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/safety_logs/phase3.csv",
+    "required_csv_exists": false,
+    "forbid_hits": [
+      "Traceback (most recent call last):"
+    ]
+  },
+  "numpy_origin": {
+    "pre": {
+      "numpy_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/__init__.py",
+      "numpy_random_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/random/__init__.py",
+      "numpy_version": "2.4.6",
+      "roots": [
+        "/isaac-sim/kit/python/lib/python3.11/site-packages"
+      ]
+    },
+    "post": {
+      "numpy_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/__init__.py",
+      "numpy_random_file": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy/random/__init__.py",
+      "roots": [
+        "/isaac-sim/kit/python/lib/python3.11/site-packages",
+        "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle"
+      ],
+      "guard_failed": true
+    }
+  },
+  "gpu_xid": {
+    "pre_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/gpu_pre.txt",
+    "post_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/gpu_post.txt",
+    "xid_pre_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/xid_pre.txt",
+    "xid_post_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/xid_post.txt",
+    "new_xid_detected": false
+  },
+  "bake_static_check_file": "results/paper_demo/v1m1u1_dyn_b_abi_smoke_20260723/meta/image_bake_static_check.txt",
+  "tests": {
+    "test_numpy_abi_guard_unit": "PASS",
+    "test_e01_dyn_b_runtime_guard_unit": "PASS",
+    "test_e01_dyn_b_m1u0_image_bake_unit": "PASS",
+    "test_capture_one_shot_runner_unit": "PASS"
+  }
+}

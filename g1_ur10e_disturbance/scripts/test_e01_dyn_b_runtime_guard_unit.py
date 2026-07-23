@@ -41,14 +41,15 @@ def test_run_phase3_command_has_dyn_b_contract():
 def test_canonical_shell_contains_numpy_origin_and_app_launcher_smoke():
     cmd = canonical_dyn_b_smoke_shell(
         output_csv="/tmp/phase3.csv",
-        numpy_origin_json="/tmp/numpy.json",
+        numpy_origin_pre_json="/tmp/numpy_pre.json",
+        numpy_origin_post_json="/tmp/numpy_post.json",
     )
-    assert "/isaac-sim/python.sh -c " in cmd
-    assert "numpy_random_file" in cmd
+    assert "/isaac-sim/python.sh " in cmd
     assert "--scenario outer_lateral_patrol" in cmd
     assert "--max_steps 1" in cmd
     assert "--output_csv /tmp/phase3.csv" in cmd
-    assert "/tmp/numpy.json" in cmd
+    assert "--numpy-origin-pre-json /tmp/numpy_pre.json" in cmd
+    assert "--numpy-origin-post-json /tmp/numpy_post.json" in cmd
 
 
 def main() -> None:

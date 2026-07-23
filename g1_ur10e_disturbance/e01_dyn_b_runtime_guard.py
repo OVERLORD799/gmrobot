@@ -4,15 +4,16 @@ from __future__ import annotations
 
 from pathlib import Path
 
-M1U0_IMAGE_TAG = "gmdisturb:e01-dyn-b-m1u0-20260723"
-M1U0_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-m1u0"
-M1U0_BAKE_FILES: tuple[str, ...] = (
+M1U1_IMAGE_TAG = "gmdisturb:e01-dyn-b-m1u1-20260723"
+M1U1_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-m1u1"
+M1U1_BAKE_FILES: tuple[str, ...] = (
     "scripts/run_phase3.py",
     "g1_disturbance_controller.py",
     "e01_dyn_b_runtime_guard.py",
     "e01_dyn_b_offline_readiness.py",
     "configs/e01_dyn_b_capture.yaml",
     "scripts/isaac_abi_import_preflight.py",
+    "scripts/numpy_abi_guard.py",
 )
 
 
@@ -25,35 +26,38 @@ def run_phase3_command(
     *,
     project_root: str = "/opt/projects/g1_ur10e_disturbance",
     output_csv: str = "/tmp/e01_dyn_b_preflight.csv",
+    numpy_origin_pre_json: str = "",
+    numpy_origin_post_json: str = "",
 ) -> str:
     script = Path(project_root) / "scripts" / "run_phase3.py"
-    return (
+    cmd = (
         f"/isaac-sim/python.sh {script} "
         "--headless --seed 43 --scenario outer_lateral_patrol "
         "--max_steps 1 --progress_interval 1 "
         f"--output_csv {output_csv}"
     )
+    if numpy_origin_pre_json:
+        cmd += f" --numpy-origin-pre-json {numpy_origin_pre_json}"
+    if numpy_origin_post_json:
+        cmd += f" --numpy-origin-post-json {numpy_origin_post_json}"
+    return cmd
 
 
 def canonical_dyn_b_smoke_shell(
     *,
     project_root: str = "/opt/projects/g1_ur10e_disturbance",
-    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1t/safety_logs/phase3.csv",
-    numpy_origin_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1t/meta/numpy_origin.json",
+    output_csv: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u1/safety_logs/phase3.csv",
+    numpy_origin_pre_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u1/meta/numpy_origin_pre.json",
+    numpy_origin_post_json: str = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1u1/meta/numpy_origin_post.json",
 ) -> str:
     """Single-shell command: record NumPy origins then run AppLauncher smoke."""
-    phase3 = run_phase3_command(project_root=project_root, output_csv=output_csv)
-    return (
-        "set -euo pipefail; "
-        "/isaac-sim/python.sh -c "
-        "\"import json,numpy as np; "
-        "payload={'numpy_file':getattr(np,'__file__',''),"
-        "'numpy_version':getattr(np,'__version__',''),"
-        "'numpy_random_file':getattr(np.random,'__file__','')}; "
-        f"open('{numpy_origin_json}','w',encoding='utf-8').write(json.dumps(payload,ensure_ascii=True,indent=2)+'\\\\n'); "
-        "print(json.dumps(payload,ensure_ascii=True))\"; "
-        f"{phase3}"
+    phase3 = run_phase3_command(
+        project_root=project_root,
+        output_csv=output_csv,
+        numpy_origin_pre_json=numpy_origin_pre_json,
+        numpy_origin_post_json=numpy_origin_post_json,
     )
+    return "set -euo pipefail; " + phase3
 
 
 def assert_no_host_code_bind_mount(docker_argv: list[str] | tuple[str, ...]) -> None:
@@ -111,7 +115,7 @@ def dockerfile_bake_mentions_outer_lateral(dockerfile_text: str) -> bool:
 def host_bake_sources_include_outer_lateral(repo_root: Path | str) -> dict[str, bool]:
     root = Path(repo_root)
     out: dict[str, bool] = {}
-    for rel in M1U0_BAKE_FILES:
+    for rel in M1U1_BAKE_FILES:
         text = (root / rel).read_text(encoding="utf-8", errors="replace")
         out[rel] = ("outer_lateral_patrol" in text) or ("scripted_g1_outer_lateral_patrol" in text)
     return out
