@@ -1,0 +1,165 @@
+{
+  "milestone": "V1-E2H",
+  "date": "2026-07-23",
+  "task": "Dyn-C final motion preflight (copy-only rebuild + single run, no retry)",
+  "status": "motion_preflight_fail",
+  "gate": "STOP_NO_FORMAL_CAPTURE",
+  "next": "STOP",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723",
+  "preflight": {
+    "required_head": "7a63f41",
+    "head_ok": true,
+    "origin_main_aligned": true,
+    "worktree_clean": true,
+    "e2g1_tests_import_config": {
+      "test_motion_isolation_unit.py": "pass",
+      "test_v1e2g1_postrun_analyzer_unit.py": "pass",
+      "test_v1e2e_dyn_c_motion_preflight_unit.py": "pass",
+      "test_v1e2e_dyn_c_motion_preflight_config_unit.py": "pass",
+      "import_preflight_in_container": "pass"
+    }
+  },
+  "build": {
+    "attempts": 1,
+    "retry": 0,
+    "copy_only": true,
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2h-20260723",
+    "image_id": "sha256:66416282b4c95bdeb3641a84e7156cb4485ba15aaaff2678e9c94afad7ca8b68",
+    "repo_digests": [
+      "gmdisturb@sha256:66416282b4c95bdeb3641a84e7156cb4485ba15aaaff2678e9c94afad7ca8b68"
+    ]
+  },
+  "run": {
+    "attempts": 1,
+    "retry": 0,
+    "exit_code": 0,
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "freeze_ur10e": true,
+    "max_steps": 260,
+    "capture_steps": [
+      149,
+      150,
+      219,
+      220
+    ],
+    "no_models_post_scan": {
+      "POST": 0,
+      "/analyze": 0,
+      "/ground": 0,
+      "enable_vlm": 0,
+      "enable_perception": 0
+    },
+    "runtime_errors": {
+      "traceback": false,
+      "keyerror": false,
+      "xid": false,
+      "residual": false
+    }
+  },
+  "artifacts": {
+    "runtime_telemetry_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/safety_logs/phase3_runtime_telemetry.csv",
+    "runtime_telemetry_sha256": "72dad7cbea9b0485b95b7f75cfd9d2236af76e15bbc7a601cbf66d8a674eb83f",
+    "runtime_telemetry_rows": 264,
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/safety_logs/phase3_steps.csv",
+    "steps_rows": 6,
+    "phase3_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/safety_logs/phase3.csv",
+    "body_pose_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/meta/body_poses.jsonl",
+    "body_pose_rows": 4,
+    "frame_inventory_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/meta/frame_inventory.json",
+    "postrun_analyzer_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2h_dyn_c_motion_preflight_20260723/meta/v1e2g1_postrun_analyzer.json",
+    "diagnostic_frames_saved": 4
+  },
+  "metrics": {
+    "ur10_hold_hash_unique": 1,
+    "ur10_action_norm_max": 3.141593,
+    "ur10_joint_delta_norm_max": 4.356525,
+    "ur10_joint_delta_max_abs_max": 3.231203,
+    "ur10_joint_delta_max_abs_settled_max": 3.231203,
+    "ur10_settled_joint_delta_gate_threshold": 1e-06,
+    "ur10_hold_provenance_example": [
+      {
+        "joint_id": 0,
+        "joint_name": "shoulder_pan_joint",
+        "kind": "arm",
+        "value": 0.0
+      },
+      {
+        "joint_id": 1,
+        "joint_name": "shoulder_lift_joint",
+        "kind": "arm",
+        "value": -1.5707963705062866
+      },
+      {
+        "joint_id": 2,
+        "joint_name": "elbow_joint",
+        "kind": "arm",
+        "value": 1.5707963705062866
+      },
+      {
+        "joint_id": 3,
+        "joint_name": "wrist_1_joint",
+        "kind": "arm",
+        "value": -1.5707963705062866
+      },
+      {
+        "joint_id": 4,
+        "joint_name": "wrist_2_joint",
+        "kind": "arm",
+        "value": -1.5707963705062866
+      },
+      {
+        "joint_id": 5,
+        "joint_name": "wrist_3_joint",
+        "kind": "arm",
+        "value": 0.0
+      },
+      {
+        "joint_id": 6,
+        "joint_name": "finger_joint",
+        "kind": "gripper",
+        "value": 0.0
+      }
+    ],
+    "g1_commanded_root_displacement_xy_m": [
+      1.1164000000000034,
+      -0.2928000000000002
+    ],
+    "g1_actual_root_displacement_xy_m": [
+      1.0598049999999999,
+      -0.287814
+    ],
+    "g1_commanded_vs_actual_direction_dot": 1.2674382412000034,
+    "postrun_max_projected_actual_displacement_px": 36.88848765316308,
+    "postrun_max_roi_area_fraction": 0.01949922108351044,
+    "postrun_min_visible_link_count": 8,
+    "postrun_max_clipping_ratio": 0.0,
+    "phase3_g1_fell": false,
+    "frame_sync": {
+      "runtime_rows": 264,
+      "scene_png_count": 4,
+      "body_pose_rows": 4,
+      "postrun_frame_count": 4
+    }
+  },
+  "gates": {
+    "exit0": true,
+    "ur10_settled_joint_delta_near_zero": "FAIL_MAX_3.231203_GT_1E-6",
+    "ur10_hold_provenance_actual_articulation": "PASS",
+    "g1_actual_displacement_direction_consistent": "PASS",
+    "projected_displacement_px_ge_40": "FAIL_MAX_36.88848765316308",
+    "roi_area_fraction_ge_0_012": "PASS",
+    "visible_links_ge_4": "PASS",
+    "clipping_ratio_le_0_5": "PASS",
+    "no_fall": "PASS_PHASE3_G1_FELL_FALSE",
+    "frame_sync": "PASS",
+    "post0_no_models_or_errors": "PASS"
+  },
+  "command_vs_actual": {
+    "command": "fixed seed/scenario/camera/freeze/preflight-step contract with one-shot preflight only",
+    "actual": "UR10 settled joint delta violates near-zero threshold and projected displacement does not reach 40px despite ROI/links/clipping/no-fall/frame-sync pass",
+    "disposition": "STOP as required; formal capture forbidden"
+  },
+  "generated_at_utc": "2026-07-23T13:00:00Z"
+}
