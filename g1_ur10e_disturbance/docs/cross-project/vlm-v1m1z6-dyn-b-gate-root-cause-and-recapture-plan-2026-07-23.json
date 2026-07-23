@@ -1,0 +1,329 @@
+{
+  "milestone": "V1-M1Z6",
+  "verdict": "BLOCKED",
+  "root_cause_confidence": {
+    "level": "low_to_medium",
+    "score_0_to_1": 0.45,
+    "reason": "Two isolated ttc-triggered slowdowns with large static distance margins, but exact TTC/velocity telemetry at steps 212/228 is missing."
+  },
+  "fixed_result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723",
+  "head_verification_required": "7902bd59bcba5b11e93681b0cc5cb741db72a004",
+  "step_root_cause_audit": {
+    "212": {
+      "gate_evaluated": "SLOW_DOWN",
+      "gate_effective": "SLOW_DOWN",
+      "trigger_rule": "ttc",
+      "trigger_reason_in_available_logs": "ttc",
+      "distance": {
+        "dist_min_g1_body_m": 1.118868,
+        "margin_to_gate_m": 1.018868
+      },
+      "ttc": {
+        "ttc_value_s": null,
+        "time_to_risk_steps": null,
+        "available": false,
+        "evidence": "phase3_events.csv is empty; per-step audit retains trigger_rule only"
+      },
+      "velocity": {
+        "g1_or_sweep_velocity_xyz": null,
+        "available": false,
+        "evidence": "velocity fields are not persisted in phase3_dyn_b_per_step_audit.csv"
+      },
+      "source_phase": {
+        "motion_source_label": "scripted_g1_outer_lateral_patrol",
+        "phase": "lateral_positive_sweep"
+      },
+      "g1_state": {
+        "g1_root_xyz": [
+          -0.592339,
+          -0.102179,
+          -0.26383
+        ],
+        "g1_tilt_rad": 0.143391,
+        "g1_fell_flag": 0
+      },
+      "ur10e_stage_proxy": {
+        "stage_from_phase3_steps_at_same_step": null,
+        "proxy_fields_at_same_step": null,
+        "available": false,
+        "evidence": "phase3_steps.csv is sparse (0/50/.../300); no rows for steps 212/228"
+      },
+      "flags": {
+        "stop_flag": 0,
+        "slow_flag": 1,
+        "replan_flag": 0
+      }
+    },
+    "228": {
+      "gate_evaluated": "SLOW_DOWN",
+      "gate_effective": "SLOW_DOWN",
+      "trigger_rule": "ttc",
+      "trigger_reason_in_available_logs": "ttc",
+      "distance": {
+        "dist_min_g1_body_m": 1.083372,
+        "margin_to_gate_m": 0.983372
+      },
+      "ttc": {
+        "ttc_value_s": null,
+        "time_to_risk_steps": null,
+        "available": false,
+        "evidence": "phase3_events.csv is empty; per-step audit retains trigger_rule only"
+      },
+      "velocity": {
+        "g1_or_sweep_velocity_xyz": null,
+        "available": false,
+        "evidence": "velocity fields are not persisted in phase3_dyn_b_per_step_audit.csv"
+      },
+      "source_phase": {
+        "motion_source_label": "scripted_g1_outer_lateral_patrol",
+        "phase": "lateral_positive_sweep"
+      },
+      "g1_state": {
+        "g1_root_xyz": [
+          -0.557248,
+          -0.026652,
+          -0.267906
+        ],
+        "g1_tilt_rad": 0.144308,
+        "g1_fell_flag": 0
+      },
+      "ur10e_stage_proxy": {
+        "stage_from_phase3_steps_at_same_step": null,
+        "proxy_fields_at_same_step": null,
+        "available": false,
+        "evidence": "phase3_steps.csv is sparse (0/50/.../300); no rows for steps 212/228"
+      },
+      "flags": {
+        "stop_flag": 0,
+        "slow_flag": 1,
+        "replan_flag": 0
+      }
+    }
+  },
+  "scan_0_340_non_allow_ranges": [
+    {
+      "start": 75,
+      "end": 75,
+      "length": 1,
+      "continuity": "contiguous"
+    },
+    {
+      "start": 98,
+      "end": 98,
+      "length": 1,
+      "continuity": "contiguous"
+    },
+    {
+      "start": 103,
+      "end": 103,
+      "length": 1,
+      "continuity": "contiguous"
+    },
+    {
+      "start": 167,
+      "end": 167,
+      "length": 1,
+      "continuity": "contiguous"
+    },
+    {
+      "start": 212,
+      "end": 212,
+      "length": 1,
+      "continuity": "contiguous"
+    },
+    {
+      "start": 228,
+      "end": 228,
+      "length": 1,
+      "continuity": "contiguous"
+    }
+  ],
+  "scan_0_340_non_allow_steps": [
+    75,
+    98,
+    103,
+    167,
+    212,
+    228
+  ],
+  "risk_source_judgement": {
+    "primary": "telemetry_or_rule_projection",
+    "secondary": "g1_ur10e_relative_self_motion",
+    "excluded_or_low_likelihood": [
+      "static_scene",
+      "proxy_contact",
+      "g1_fall"
+    ],
+    "evidence": [
+      "all non-ALLOW trigger_rule == ttc",
+      "dist_min_g1_body_m at 212/228 remains >1.08m",
+      "motion_source_label is scripted_g1_outer_lateral_patrol",
+      "phase3_events.csv missing prevents direct TTC/velocity validation"
+    ]
+  },
+  "available_field_coverage_note": {
+    "phase3_dyn_b_per_step_audit_rows": 341,
+    "phase3_steps_sampled_rows": 7,
+    "phase3_events_rows": 0,
+    "sampled_stage_proxy_context": {
+      "200": {
+        "stage": "grasp_slot_A_1",
+        "closest_g1_body": "right_wrist_pitch_link",
+        "dist_min_g1_body": 1.0809,
+        "dist_min_proxy": null,
+        "dist_min_for_gating": 1.0677,
+        "safe_dist_warn_active": 0.13,
+        "safe_dist_hard_stop_active": 0.13
+      },
+      "250": {
+        "stage": "lift_slot_A_1",
+        "closest_g1_body": "left_wrist_pitch_link",
+        "dist_min_g1_body": 1.0177,
+        "dist_min_proxy": null,
+        "dist_min_for_gating": 1.0061,
+        "safe_dist_warn_active": 0.2364,
+        "safe_dist_hard_stop_active": 0.13
+      },
+      "300": {
+        "stage": "move_above_box_with_slot_B_1",
+        "closest_g1_body": "left_wrist_pitch_link",
+        "dist_min_g1_body": 0.905,
+        "dist_min_proxy": null,
+        "dist_min_for_gating": 0.8875,
+        "safe_dist_warn_active": 0.2623,
+        "safe_dist_hard_stop_active": 0.13
+      }
+    }
+  },
+  "review_window_design": {
+    "window_name": "lateral_dual_sweep_full_segment",
+    "step_start": 159,
+    "step_end": 338,
+    "continuity": "fixed_contiguous",
+    "phase_basis": {
+      "start_phase": "lateral_positive_sweep",
+      "includes_transition_phase": "lateral_negative_sweep",
+      "physical_basis": "covers complete signed lateral direction change under scripted_g1_outer_lateral_patrol with unchanged camera pose"
+    },
+    "anti_cherry_pick_rules": [
+      "window bounds are declared by phase boundary before recapture",
+      "window includes known historical anomalies (212, 228) and must not be filtered post-hoc",
+      "no sparse frame selection outside declared contiguous window",
+      "keyframe groups are deterministic offsets anchored to this fixed window"
+    ]
+  },
+  "keyframe_groups": {
+    "group_A_positive_lateral": [
+      {
+        "step": 219,
+        "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.010059261450383682,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      },
+      {
+        "step": 220,
+        "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.010050027415302547,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      },
+      {
+        "step": 221,
+        "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.0100459133152407,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      }
+    ],
+    "group_B_negative_lateral": [
+      {
+        "step": 329,
+        "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.011256034010586247,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      },
+      {
+        "step": 330,
+        "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.011271897452820687,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      },
+      {
+        "step": 331,
+        "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+        "links_visible_margin_8": 8,
+        "clipping_ratio": 0.0,
+        "roi_area_fraction": 0.011268587227663494,
+        "gate_links_ge_4": true,
+        "gate_clipping_le_0_5": true,
+        "gate_roi_ge_0_01": true
+      }
+    ],
+    "centroid_displacement_px_220_330": 24.297366596071075,
+    "centroid_displacement_gate_px": 20.0
+  },
+  "no_code_change_feasibility": {
+    "can_attempt_with_window_only": true,
+    "reason": "Current fixed camera and scripted trajectory already satisfy link/ROI/clipping/displacement gates on both 3-frame groups.",
+    "minimal_source_change_if_future_blocked": {
+      "needed": false,
+      "candidate": "add per-step event logging durability checks only; no control/threshold semantics changes"
+    }
+  },
+  "next_capture_command_draft": {
+    "outer_command": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/run.sh --tag gmdisturb:e01-dyn-b-clean-m1z4-20260723 --results /home/czz/GMrobot/g1_ur10e_disturbance/results bash -lc 'set -euo pipefail; /isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py --headless --seed 43 --scenario outer_lateral_patrol --motion_source_label scripted_g1_outer_lateral_patrol --max_steps 341 --progress_interval 1 --output_csv /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/safety_logs/phase3.csv --save_camera --camera_output_dir /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/scene --camera_save_steps 219,220,221,329,330,331 --camera_pose_json /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/camera_pose.json --body_pose_jsonl /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/body_poses.jsonl --dyn-b-per-step-audit-csv /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/safety_logs/phase3_dyn_b_per_step_audit.csv --numpy-origin-pre-json /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/numpy_origin_pre.json --numpy-origin-post-json /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/numpy_origin_post.json --typing-extensions-pre-json /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/typing_extensions_pre.json --typing-extensions-post-json /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z6_20260723/meta/typing_extensions_post.json'",
+    "declared_review_window_step_start": 159,
+    "declared_review_window_step_end": 338,
+    "declared_keyframe_steps": [
+      219,
+      220,
+      221,
+      329,
+      330,
+      331
+    ]
+  },
+  "expected_image_sha": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1z4-20260723",
+    "sha256": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83",
+    "expected_exact": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83"
+  },
+  "forbidden_items": [
+    "no Docker/Isaac/build/network execution in this milestone",
+    "no POST, VLM, GDINO, SAM2",
+    "no credentials read",
+    "no change to B0-B4 frozen configs/results",
+    "no safety threshold or gate/replan/control semantic changes",
+    "no deletion or rewrite of M1Z5 FAIL evidence"
+  ],
+  "budget": {
+    "build_runs_allowed": 0,
+    "capture_runs_allowed": 1
+  },
+  "stop_conditions": [
+    "HEAD mismatch or dirty worktree at execution time",
+    "result directory already exists",
+    "events telemetry still missing exact TTC/velocity for non-ALLOW steps",
+    "any non-ALLOW appears inside declared review window 159..338",
+    "centroid displacement < 20px or any keyframe ROI/link/clipping gate fails",
+    "missing per-step evidence for declared keyframes or window"
+  ]
+}
