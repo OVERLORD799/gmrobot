@@ -38,6 +38,13 @@ M1V_RESULT_ROOT = (
     "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1v_dyn_b_clean_runtime_20260723"
 )
 
+# V1-M1V1 source-closure recovery (scene_camera_override and full local closure).
+M1V1_IMAGE_TAG = "gmdisturb:e01-dyn-b-clean-m1v1-20260723"
+M1V1_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-clean-m1v1"
+M1V1_RESULT_ROOT = (
+    "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1v1_dyn_b_clean_runtime_20260723"
+)
+
 
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
     preflight = Path(project_root) / "scripts" / "isaac_abi_import_preflight.py"
@@ -74,11 +81,11 @@ def run_phase3_command(
 def canonical_dyn_b_smoke_shell(
     *,
     project_root: str = "/opt/projects/g1_ur10e_disturbance",
-    output_csv: str = f"{M1V_RESULT_ROOT}/safety_logs/phase3.csv",
-    numpy_origin_pre_json: str = f"{M1V_RESULT_ROOT}/meta/numpy_origin_pre.json",
-    numpy_origin_post_json: str = f"{M1V_RESULT_ROOT}/meta/numpy_origin_post.json",
-    typing_extensions_pre_json: str = f"{M1V_RESULT_ROOT}/meta/typing_extensions_pre.json",
-    typing_extensions_post_json: str = f"{M1V_RESULT_ROOT}/meta/typing_extensions_post.json",
+    output_csv: str = f"{M1V1_RESULT_ROOT}/safety_logs/phase3.csv",
+    numpy_origin_pre_json: str = f"{M1V1_RESULT_ROOT}/meta/numpy_origin_pre.json",
+    numpy_origin_post_json: str = f"{M1V1_RESULT_ROOT}/meta/numpy_origin_post.json",
+    typing_extensions_pre_json: str = f"{M1V1_RESULT_ROOT}/meta/typing_extensions_pre.json",
+    typing_extensions_post_json: str = f"{M1V1_RESULT_ROOT}/meta/typing_extensions_post.json",
 ) -> str:
     """Single-shell AppLauncher smoke with NumPy + typing_extensions pre/post guards."""
     phase3 = run_phase3_command(
