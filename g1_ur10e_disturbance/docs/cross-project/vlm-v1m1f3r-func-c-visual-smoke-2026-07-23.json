@@ -1,0 +1,149 @@
+{
+  "task": "V1-M1F3R canonical Func-C visual smoke",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "head": "b7034031beba3b4f7cdc0b85b1b5defd686302b1",
+  "origin_main": "b7034031beba3b4f7cdc0b85b1b5defd686302b1",
+  "head_origin_match": true,
+  "preflight": {
+    "git_clean_required": true,
+    "test_e01_func_c_capture_unit": "16 passed",
+    "generator_provenance_fail_closed_tests": "2 passed",
+    "audit_gate_passed": true
+  },
+  "budget": {
+    "build": 1,
+    "smoke": 1,
+    "retries": 0
+  },
+  "build": {
+    "dockerfile": "GMRobot/docker/Dockerfile.e01-func-c-m1f3r",
+    "dockerfile_sha256": "a6497334e9e86721d7131b1a649294ce5274a16899134a3b51e30ed9451486d4",
+    "tag": "gmdisturb:e01-func-c-visual-m1f3r-20260723",
+    "image_sha": "sha256:0fa40c934133a34ed2740382eac5c301b2994775232ce585b00b9136a4e86e8c",
+    "exit": {
+      "exit_code": 0,
+      "elapsed_sec": 1
+    }
+  },
+  "smoke": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723",
+    "exit": {
+      "exit_code": 0,
+      "elapsed_sec": 31
+    },
+    "frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png",
+    "frame_sha256": {
+      "frame_000000_env0.png": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5"
+    },
+    "camera_pose": {
+      "pos": [
+        0.35,
+        0.0,
+        2.5
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "spawn_asset_abs_paths": {
+      "box_A": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd",
+      "box_B": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd"
+    },
+    "spawn_asset_sha256": {
+      "box_A": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+      "box_B": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e"
+    }
+  },
+  "gates": {
+    "exit_0": true,
+    "png_valid_nonblack": true,
+    "roi_source_box_present": true,
+    "roi_target_box_present": true,
+    "roi_filled_present": true,
+    "right_box_content_present": true,
+    "no_traceback": true,
+    "no_device_lost": true,
+    "post_zero": true,
+    "no_new_xid": true,
+    "no_residual": true
+  },
+  "provenance": {
+    "source_closure_sha256": {
+      "GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py": {
+        "sha256": "bb08c3f601940a9cfff5df3f8f1ce0c6ddc5b0e6a08bbe14954efd795b9e1c63",
+        "bytes": 3867,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/shadow/target_full_override.py"
+      },
+      "GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py": {
+        "sha256": "ee5f1d98358a8000d7ce0fe3627ca037e895a265c96eabd4f421fe6bb949ebec",
+        "bytes": 27377,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/shadow/v1e01_func_c_capture.py"
+      },
+      "GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py": {
+        "sha256": "8389212cce2909619c2dfb88a5cbcc084a252b90d8fac8af2a00844c917b34a1",
+        "bytes": 23388,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py"
+      },
+      "GMRobot/source/GMRobot/GMRobot/assets/container.usd": {
+        "sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+        "bytes": 21397011,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container.usd"
+      },
+      "GMRobot/source/GMRobot/GMRobot/assets/container_full.usd": {
+        "sha256": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+        "bytes": 42677665,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_full.usd"
+      },
+      "GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd": {
+        "sha256": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+        "bytes": 42650964,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd"
+      },
+      "GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd": {
+        "sha256": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+        "bytes": 21397337,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd"
+      },
+      "GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd": {
+        "sha256": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
+        "bytes": 364468,
+        "abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd"
+      },
+      "GMRobot/configs/ivj_v1e01_target_container_full.yaml": {
+        "sha256": "b30f728b32deb528621ef6e552f2306133eba123f946681b0d1aca5a8731fee8",
+        "bytes": 1438,
+        "abs_path": "/home/czz/GMrobot/GMRobot/configs/ivj_v1e01_target_container_full.yaml"
+      },
+      "old_bad_frame": {
+        "abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000200_env0.png",
+        "sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c",
+        "exists": true
+      }
+    },
+    "old_bad_frame": {
+      "abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_capture_20260722/scene/frame_000200_env0.png",
+      "sha256": "72b5c1167f59b56d997ccce24346ebcccaf1050e9429f7c04bc633a6462cd89c",
+      "exists": true
+    },
+    "gpu_xid_pre": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/meta/gpu_xid_pre.txt",
+    "gpu_xid_post": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/meta/gpu_xid_post.txt"
+  },
+  "forbidden_capabilities_used": {
+    "formal_recapture": false,
+    "network_post": false,
+    "vlm": false,
+    "perception": false,
+    "sam2": false,
+    "gdino": false,
+    "five_stage": false,
+    "credentials": false
+  },
+  "verdict": "VISUAL_REVIEW_REQUIRED",
+  "technical_visual_pass": false,
+  "status": "VISUAL_REVIEW_REQUIRED",
+  "note": "必须由主agent人工查看原图后，才能另行确认 technical_visual_pass。"
+}
