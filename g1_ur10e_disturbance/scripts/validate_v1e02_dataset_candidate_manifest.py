@@ -9,6 +9,14 @@ import json
 from pathlib import Path
 from typing import Any
 
+ALLOWED_TECHNICAL_REVIEW_STATUS = {
+    "pending_user_review",
+    "technical_temporal_pass_pending_user",
+    "artifact_removed_semantic_clarity_pending_user",
+    "fail",
+}
+ALLOWED_SEMANTIC_CLARITY = {"user_review_required"}
+
 
 def _sha256(path: Path) -> str:
     h = hashlib.sha256()
@@ -28,7 +36,7 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
     for key in ("human_hand", "glove", "PPE", "learned_whole_body_control", "VLM_output", "reviewer_approved"):
         if flags.get(key) is not False:
             errors.append(f"global_flags.{key} must be false")
-    if flags.get("technical_review_status") not in {"pending_user_review", "technical_temporal_pass_pending_user", "fail"}:
+    if flags.get("technical_review_status") not in ALLOWED_TECHNICAL_REVIEW_STATUS:
         errors.append("global_flags.technical_review_status invalid")
 
     candidates = manifest.get("candidates", [])
@@ -47,8 +55,17 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
             errors.append(f"{rid}: category must be provisional")
         if c.get("reviewer_approved") is not False:
             errors.append(f"{rid}: reviewer_approved must be false")
-        if c.get("technical_review_status") not in {"pending_user_review", "technical_temporal_pass_pending_user", "fail"}:
+        if c.get("technical_review_status") not in ALLOWED_TECHNICAL_REVIEW_STATUS:
             errors.append(f"{rid}: technical_review_status invalid")
+        if c.get("technical_review_status") == "artifact_removed_semantic_clarity_pending_user":
+            if c.get("reviewer_approved") is not False:
+                errors.append(f"{rid}: reviewer_approved must be false under semantic_clarity pending status")
+            if c.get("formal_recapture_allowed") is not False:
+                errors.append(f"{rid}: formal_recapture_allowed must be false under semantic_clarity pending status")
+            if c.get("semantic_clarity") not in ALLOWED_SEMANTIC_CLARITY:
+                errors.append(f"{rid}: semantic_clarity must be user_review_required under semantic_clarity pending status")
+        elif "semantic_clarity" in c:
+            errors.append(f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user")
 
         hv = c.get("historical_verdict_ref", {})
         if "verdict" not in hv:

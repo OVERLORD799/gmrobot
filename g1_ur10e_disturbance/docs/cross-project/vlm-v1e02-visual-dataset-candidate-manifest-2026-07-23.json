@@ -50,6 +50,7 @@
       "reviewer_approved": false,
       "technical_review_status": "artifact_removed_semantic_clarity_pending_user",
       "formal_recapture_allowed": false,
+      "semantic_clarity": "user_review_required",
       "historical_verdict_ref": {
         "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-final-m1m-capture-2026-07-23.json",
         "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL"

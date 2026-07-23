@@ -1,0 +1,36 @@
+{
+  "task_id": "V1-M1F3.2",
+  "date": "2026-07-23",
+  "repo_head_base": "f550384f5663956535c4405a531415fcc064a4ca",
+  "scope": "minimal offline consistency fix for V1-E0.2 manifest validator and unit tests",
+  "changes": [
+    "validator now explicitly allows artifact_removed_semantic_clarity_pending_user status",
+    "validator enforces strict combo when status=artifact_removed_semantic_clarity_pending_user: reviewer_approved=false, formal_recapture_allowed=false, semantic_clarity=user_review_required",
+    "validator rejects semantic_clarity field under non-semantic-clarity-pending statuses",
+    "unit tests add pass case for new status and regression failures for old/illegal combinations",
+    "manifest func-c candidate now includes semantic_clarity=user_review_required to satisfy strict validation"
+  ],
+  "gymnasium_collection_issue": {
+    "failing_command": "pytest -q g1_ur10e_disturbance/scripts/test_v1e02_dataset_candidate_manifest_unit.py g1_ur10e_disturbance/scripts/test_v1e03_dyn_b_offline_temporal_evidence_unit.py GMRobot/scripts/test_e01_func_c_capture_unit.py",
+    "dependency_chain": [
+      "pytest test collection",
+      "import g1_ur10e_disturbance package",
+      "g1_ur10e_disturbance/__init__.py imports gymnasium",
+      "ModuleNotFoundError: gymnasium"
+    ],
+    "separation": "code logic validated with direct pure-function/unit entry commands (no gymnasium import path)"
+  },
+  "offline_validation_commands": [
+    "python g1_ur10e_disturbance/scripts/validate_v1e02_dataset_candidate_manifest.py --manifest g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json --repo-root /home/czz/GMrobot",
+    "python g1_ur10e_disturbance/scripts/test_v1e02_dataset_candidate_manifest_unit.py",
+    "python g1_ur10e_disturbance/scripts/test_v1e03_dyn_b_offline_temporal_evidence_unit.py",
+    "python GMRobot/scripts/test_e01_func_c_capture_unit.py"
+  ],
+  "offline_validation_result": "pass",
+  "pytest_collection_result": "blocked_by_environment_missing_gymnasium",
+  "constraints_respected": [
+    "no pip install",
+    "no runtime code masking dependencies",
+    "no docker/isaac/network actions"
+  ]
+}

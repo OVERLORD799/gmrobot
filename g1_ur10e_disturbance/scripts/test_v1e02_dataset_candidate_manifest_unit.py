@@ -116,8 +116,62 @@ def test_validate_manifest_dynamic_label_boundaries() -> None:
         assert any("motion_attribution" in e for e in errors)
 
 
+def test_validate_manifest_accepts_func_c_semantic_clarity_pending_state() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["global_flags"]["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        func["formal_recapture_allowed"] = False
+        func["semantic_clarity"] = "user_review_required"
+        assert validate_manifest(manifest, repo_root) == []
+
+
+def test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        func = manifest["candidates"][0]
+
+        # Old status with semantic_clarity field must fail.
+        old_status = copy.deepcopy(manifest)
+        old_func = old_status["candidates"][0]
+        old_func["semantic_clarity"] = "user_review_required"
+        errors = validate_manifest(old_status, repo_root)
+        assert any("semantic_clarity only allowed" in e for e in errors)
+
+        # New status with illegal approval combination must fail.
+        bad_approval = copy.deepcopy(manifest)
+        bad_approval["global_flags"]["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        bad_func = bad_approval["candidates"][0]
+        bad_func["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        bad_func["formal_recapture_allowed"] = True
+        bad_func["reviewer_approved"] = True
+        bad_func["semantic_clarity"] = "user_review_required"
+        errors = validate_manifest(bad_approval, repo_root)
+        assert any("formal_recapture_allowed must be false" in e for e in errors)
+        assert any("reviewer_approved must be false" in e for e in errors)
+
+        # New status with arbitrary semantic_clarity string must fail.
+        bad_semantic = copy.deepcopy(manifest)
+        bad_semantic["global_flags"]["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        bad_sem_func = bad_semantic["candidates"][0]
+        bad_sem_func["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
+        bad_sem_func["formal_recapture_allowed"] = False
+        bad_sem_func["semantic_clarity"] = "any_string_should_not_pass"
+        errors = validate_manifest(bad_semantic, repo_root)
+        assert any("semantic_clarity must be user_review_required" in e for e in errors)
+
+
 if __name__ == "__main__":
     test_validate_manifest_ok()
     test_validate_manifest_detects_errors()
     test_validate_manifest_dynamic_label_boundaries()
+    test_validate_manifest_accepts_func_c_semantic_clarity_pending_state()
+    test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos()
     print(json.dumps({"ok": True}))
