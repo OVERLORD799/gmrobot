@@ -12,7 +12,9 @@
   ],
   "correction_summary": {
     "freeze_only_term_resolution": true,
-    "hold_action_source": "audited ur10e_ee term pose7 + binary gripper sign",
+    "hold_action_source": "audited ur10e_ee term root-frame pose7 (body_offset included) + binary gripper sign",
+    "world_frame_conversion_for_raw_action": false,
+    "non_identity_root_regression_test": true,
     "joint_baseline_only_for_metrics": true,
     "runtime_ee_tracking_restored": "body_link_pos_w + cfg.safety.ee_track.offset",
     "provenance_fields": [

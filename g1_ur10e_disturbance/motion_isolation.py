@@ -39,30 +39,6 @@ GRIPPER_CLOSED = float(_CFG_GRIPPER_CLOSED)
 GRIPPER_OPEN = float(_CFG_GRIPPER_OPEN)
 
 
-def _quat_multiply_wxyz(q1: np.ndarray, q2: np.ndarray) -> np.ndarray:
-    """Hamilton product for quaternions in (w, x, y, z)."""
-    w1, x1, y1, z1 = [float(v) for v in np.asarray(q1, dtype=np.float64).reshape(4)]
-    w2, x2, y2, z2 = [float(v) for v in np.asarray(q2, dtype=np.float64).reshape(4)]
-    return np.asarray(
-        [
-            w1 * w2 - x1 * x2 - y1 * y2 - z1 * z2,
-            w1 * x2 + x1 * w2 + y1 * z2 - z1 * y2,
-            w1 * y2 - x1 * z2 + y1 * w2 + z1 * x2,
-            w1 * z2 + x1 * y2 - y1 * x2 + z1 * w2,
-        ],
-        dtype=np.float32,
-    )
-
-
-def _quat_apply_wxyz(quat_wxyz: np.ndarray, vec3: np.ndarray) -> np.ndarray:
-    """Rotate a 3D vector by quaternion (wxyz)."""
-    q = np.asarray(quat_wxyz, dtype=np.float64).reshape(4)
-    vq = np.asarray([0.0, *np.asarray(vec3, dtype=np.float64).reshape(3)], dtype=np.float64)
-    q_conj = np.asarray([q[0], -q[1], -q[2], -q[3]], dtype=np.float64)
-    out = _quat_multiply_wxyz(_quat_multiply_wxyz(q, vq), q_conj)
-    return np.asarray(out[1:], dtype=np.float32)
-
-
 def _scale_vector(cfg_scale: Any, *, action_dim: int) -> np.ndarray:
     """Normalize action cfg.scale into a per-dimension float vector."""
     if isinstance(cfg_scale, (int, float)):
@@ -132,12 +108,12 @@ def resolve_ur10e_ee_action_term(
     }
 
 
-def compute_ur10e_ee_world_pose_from_action_term(term: Any, *, env_index: int = 0) -> tuple[np.ndarray, np.ndarray]:
-    """Compute world-frame EE pose from audited action term _compute_frame_pose()."""
+def resolve_ur10e_ee_hold_pose7_from_action_term(
+    term: Any, *, env_index: int = 0, quat_norm_tol: float = 1e-3
+) -> tuple[np.ndarray, dict[str, Any]]:
+    """Resolve freeze raw pose7 from audited ur10e_ee term (fail-closed)."""
     if not hasattr(term, "_compute_frame_pose"):
         raise ValueError("term missing _compute_frame_pose()")
-    if not hasattr(term, "_asset") or not hasattr(term._asset, "data"):
-        raise ValueError("term missing _asset.data required for root pose")
     ee_pos_b, ee_quat_b = term._compute_frame_pose()
     pos_b = _to_float32_1d(ee_pos_b[int(env_index)], context="term._compute_frame_pose.pos_b[env_idx]")
     quat_b = _to_float32_1d(ee_quat_b[int(env_index)], context="term._compute_frame_pose.quat_b[env_idx]")
@@ -145,26 +121,7 @@ def compute_ur10e_ee_world_pose_from_action_term(term: Any, *, env_index: int = 
         raise ValueError(f"_compute_frame_pose position must be 3D, got {pos_b.shape[0]}")
     if quat_b.shape[0] != 4:
         raise ValueError(f"_compute_frame_pose quaternion must be 4D, got {quat_b.shape[0]}")
-    root_pos_w = _to_float32_1d(term._asset.data.root_pos_w[int(env_index)], context="term._asset.data.root_pos_w[env_idx]")
-    root_quat_w = _to_float32_1d(
-        term._asset.data.root_quat_w[int(env_index)],
-        context="term._asset.data.root_quat_w[env_idx]",
-    )
-    if root_pos_w.shape[0] != 3:
-        raise ValueError(f"root_pos_w must be 3D, got {root_pos_w.shape[0]}")
-    if root_quat_w.shape[0] != 4:
-        raise ValueError(f"root_quat_w must be 4D, got {root_quat_w.shape[0]}")
-    ee_pos_w = root_pos_w + _quat_apply_wxyz(root_quat_w, pos_b)
-    ee_quat_w = _quat_multiply_wxyz(root_quat_w.astype(np.float32), quat_b.astype(np.float32))
-    return ee_pos_w.astype(np.float32), ee_quat_w.astype(np.float32)
-
-
-def resolve_ur10e_ee_hold_pose7_from_action_term(
-    term: Any, *, env_index: int = 0, quat_norm_tol: float = 1e-3
-) -> tuple[np.ndarray, dict[str, Any]]:
-    """Resolve freeze raw pose7 from audited ur10e_ee term (fail-closed)."""
-    pos_w, quat_w = compute_ur10e_ee_world_pose_from_action_term(term, env_index=env_index)
-    pose7 = np.concatenate([pos_w.reshape(3), quat_w.reshape(4)]).astype(np.float32)
+    pose7 = np.concatenate([pos_b.reshape(3), quat_b.reshape(4)]).astype(np.float32)
     if pose7.shape[0] != 7:
         raise ValueError(f"ur10e_ee hold pose7 shape invalid: expected 7, got {pose7.shape[0]}")
     if not np.all(np.isfinite(pose7)):
@@ -179,7 +136,7 @@ def resolve_ur10e_ee_hold_pose7_from_action_term(
         )
     pose7[3:7] = pose7[3:7] / max(quat_norm_raw, 1e-12)
     return pose7, {
-        "pose_source": "ur10e_ee_term._compute_frame_pose+asset_root_world",
+        "pose_source": "ur10e_ee_term._compute_frame_pose.root_frame_with_body_offset",
         "pose_env_index": int(env_index),
         "quat_norm_raw": quat_norm_raw,
         "quat_norm_tol": float(quat_norm_tol),

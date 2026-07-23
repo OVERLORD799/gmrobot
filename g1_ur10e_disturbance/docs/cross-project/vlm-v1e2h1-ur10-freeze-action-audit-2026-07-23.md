@@ -10,7 +10,8 @@
 - Term resolution and audits were executed unconditionally at startup, even when `--freeze-ur10e` was disabled.
 
 ## Corrective Implementation
-- Freeze-only action path now reads pose from audited `ur10e_ee` term `_compute_frame_pose()` and root transform, then composes raw `pose7=[pos3,quat_wxyz4]` with finite/shape/quaternion-norm fail-closed checks.
+- Freeze-only action path now reads the root-frame target pose directly from the audited `ur10e_ee` term `_compute_frame_pose()` (which already includes `body_offset`), then composes raw `pose7=[pos3,quat_wxyz4]` with finite/shape/quaternion-norm fail-closed checks.
+- A post-`26be087` review corrected an intermediate world-frame conversion. Isaac Lab compares the absolute IK command against `_compute_frame_pose()` in the robot root frame, so a world transform must not be applied. A non-identity-root regression test now enforces this contract.
 - Joint baseline remains independent and is used only for `compute_ur10_freeze_metrics`; it is never used to build the action payload.
 - Gripper raw action is derived from articulation `finger_joint` proximity to `GRIPPER_OPEN` / `GRIPPER_CLOSED`, mapped to BinaryJointPositionAction sign (`open=+1.0`, `close=-1.0`) with `ur10e_gripper.action_dim==1` validation.
 - Runtime `ur10e_ee` tracking behavior is restored to FK path (`body_link_pos_w + cfg.safety.ee_track.offset`) in loop and camera/body-pose logging.
@@ -24,6 +25,7 @@
 - Gripper open/close mapping and invalid `ur10e_gripper.action_dim`.
 - Fail-closed coverage for NaN pose and bad quaternion norm.
 - Existing fail-closed checks retained for bad IK action dim, bad scale, and relative mode.
+- Non-identity robot root pose does not alter the root-frame hold action.
 
 ## Execution Scope
 - No Docker / Isaac simulation run in this corrective pass.

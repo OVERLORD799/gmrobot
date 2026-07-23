@@ -313,8 +313,10 @@ def test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale() -> None
         assert "scale" in str(exc)
 
 
-def test_resolve_ur10e_ee_hold_pose7_from_action_term_uses_root_transform() -> None:
-    # root rotation = +90 deg around Z in wxyz
+def test_resolve_ur10e_ee_hold_pose7_stays_in_action_term_root_frame() -> None:
+    # A non-identity world root must not leak into the absolute IK raw action:
+    # DifferentialIKController compares commands with _compute_frame_pose(),
+    # and both quantities are expressed in the robot root frame.
     s = np.float32(np.sqrt(0.5))
     term = _FakeIkTerm(
         root_pos_w=np.array([[1.0, 2.0, 3.0]], dtype=np.float32),
@@ -323,8 +325,9 @@ def test_resolve_ur10e_ee_hold_pose7_from_action_term_uses_root_transform() -> N
         ee_quat_b=np.array([[1.0, 0.0, 0.0, 0.0]], dtype=np.float32),
     )
     pose7, audit = resolve_ur10e_ee_hold_pose7_from_action_term(term)
-    assert np.allclose(pose7[:3], np.array([1.0, 3.0, 3.0], dtype=np.float32), atol=1e-6)
-    assert np.allclose(pose7[3:], np.array([s, 0.0, 0.0, s], dtype=np.float32), atol=1e-6)
+    assert np.allclose(pose7[:3], np.array([1.0, 0.0, 0.0], dtype=np.float32), atol=1e-6)
+    assert np.allclose(pose7[3:], np.array([1.0, 0.0, 0.0, 0.0], dtype=np.float32), atol=1e-6)
+    assert "root_frame_with_body_offset" in str(audit["pose_source"])
     assert abs(float(audit["quat_norm_raw"]) - 1.0) < 1e-6
 
 
@@ -397,7 +400,7 @@ if __name__ == "__main__":
     test_resolve_ur10e_ee_action_term_passes_expected_contract()
     test_resolve_ur10e_ee_action_term_fails_closed_on_bad_controller_cfg()
     test_resolve_ur10e_ee_action_term_fails_closed_on_bad_dim_or_scale()
-    test_resolve_ur10e_ee_hold_pose7_from_action_term_uses_root_transform()
+    test_resolve_ur10e_ee_hold_pose7_stays_in_action_term_root_frame()
     test_hold_pose7_fails_closed_on_nan_and_bad_quat_norm()
     test_gripper_raw_sign_selects_open_close_and_validates_term_dim()
     test_joint_baseline_never_enters_hold_action()
