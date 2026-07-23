@@ -1,0 +1,109 @@
+{
+  "milestone": "V1-M1Z4",
+  "date": "2026-07-23",
+  "scope": {
+    "narrow_repair": true,
+    "target_bug": "NameError: csv not defined in run_phase3.py per-step writer init",
+    "excluded_changes": [
+      "formal Dyn-B capture",
+      "VLM/perception/SAM2/POST",
+      "safety/trajectory/camera/USD/B0-B4 behavior"
+    ]
+  },
+  "changes": {
+    "code": [
+      "scripts/run_phase3.py",
+      "scripts/dyn_b_per_step_audit_writer.py"
+    ],
+    "tests": [
+      "scripts/test_dyn_b_per_step_audit_writer_unit.py"
+    ],
+    "docker": [
+      "docker/Dockerfile.e01-dyn-b-clean-m1z4"
+    ],
+    "docs": [
+      "docs/cross-project/vlm-v1m1z4-dyn-b-audit-writer-fix-2026-07-23.md",
+      "docs/cross-project/vlm-v1m1z4-dyn-b-audit-writer-fix-2026-07-23.json"
+    ]
+  },
+  "host_validation": {
+    "py_compile": [
+      "scripts/run_phase3.py",
+      "scripts/dyn_b_per_step_audit_writer.py",
+      "scripts/test_dyn_b_per_step_audit_writer_unit.py"
+    ],
+    "tests": [
+      "test_e01_dyn_b_m1z_image_policy_unit.py",
+      "test_e01_dyn_b_m1y_camera_framing_unit.py",
+      "test_e01_dyn_b_m1z2_dockerfile_policy_unit.py",
+      "test_e01_dyn_b_m1z_build_hermetic_policy_unit.py",
+      "test_dyn_b_per_step_audit_writer_unit.py"
+    ],
+    "all_pass": true
+  },
+  "build": {
+    "count": 1,
+    "image_tag": "gmdisturb:e01-dyn-b-clean-m1z4-20260723",
+    "image_sha": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83",
+    "dockerfile": "docker/Dockerfile.e01-dyn-b-clean-m1z4"
+  },
+  "smoke": {
+    "count": 1,
+    "max_steps": 1,
+    "exit_code": 0,
+    "elapsed_sec": 30.97,
+    "camera_capture": false,
+    "result_root": "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723",
+    "output_csv": "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/safety_logs/phase3.csv",
+    "dyn_b_per_step_csv": "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/safety_logs/phase3_dyn_b_per_step_audit.csv",
+    "numpy_typing_json": [
+      "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/meta/numpy_origin_pre.json",
+      "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/meta/numpy_origin_post.json",
+      "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/meta/typing_extensions_pre.json",
+      "results/paper_demo/v1m1z4_dyn_b_audit_writer_smoke_20260723/meta/typing_extensions_post.json"
+    ]
+  },
+  "per_step_csv_check": {
+    "schema": [
+      "sim_step",
+      "policy_step",
+      "phase",
+      "gate_evaluated",
+      "gate_effective",
+      "trigger_rule",
+      "stop_flag",
+      "slow_flag",
+      "replan_flag",
+      "dist_min_g1_body_m",
+      "margin_to_gate_m",
+      "g1_fell_flag",
+      "g1_root_x",
+      "g1_root_y",
+      "g1_root_z",
+      "g1_tilt_rad",
+      "motion_source_label",
+      "camera_capture_marker",
+      "body_pose_marker"
+    ],
+    "data_row_count": 1,
+    "row_0": {
+      "sim_step": "0",
+      "policy_step": "1",
+      "phase": "approach_outer_lane",
+      "gate_effective": "ALLOW",
+      "camera_capture_marker": "0",
+      "body_pose_marker": "0"
+    }
+  },
+  "forbidden_error_scan": {
+    "traceback": false,
+    "nameerror": false,
+    "missing_modules": false,
+    "abi_or_paramspec_or_extension_or_device_fatal": false,
+    "post0": false,
+    "xid": false,
+    "residue": false
+  },
+  "verdict": "DYN_B_AUDIT_WRITER_SMOKE_PASS",
+  "next_state": "ONE_REVIEWABLE_DYN_B_PREFLIGHT_MAY_BE_REQUESTED"
+}

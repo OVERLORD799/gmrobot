@@ -23,6 +23,7 @@ from __future__ import annotations
 
 import argparse
 import atexit
+import csv
 import json
 import os
 import sys
@@ -337,6 +338,7 @@ from dynamic_audit_csv import (
     build_dynamic_audit_row,
     format_dynamic_audit_row,
 )
+from dyn_b_per_step_audit_writer import init_dyn_b_per_step_audit_writer
 from event_csv import EVENT_CSV_HEADER, build_event_row, format_event_row
 from config_loader import load_config, Phase3Config
 
@@ -968,38 +970,11 @@ def main():
     _dyn_b_per_step_audit_fh = None
     _dyn_b_per_step_audit_writer = None
     if args_cli.dyn_b_per_step_audit_csv:
-        _dyn_b_dir = os.path.dirname(args_cli.dyn_b_per_step_audit_csv)
-        if _dyn_b_dir:
-            os.makedirs(_dyn_b_dir, exist_ok=True)
-        _dyn_b_per_step_audit_fh = open(
-            args_cli.dyn_b_per_step_audit_csv, "w", newline="", encoding="utf-8"
+        _dyn_b_per_step_audit_fh, _dyn_b_per_step_audit_writer = (
+            init_dyn_b_per_step_audit_writer(
+                args_cli.dyn_b_per_step_audit_csv,
+            )
         )
-        _dyn_b_per_step_audit_writer = csv.DictWriter(
-            _dyn_b_per_step_audit_fh,
-            fieldnames=[
-                "sim_step",
-                "policy_step",
-                "phase",
-                "gate_evaluated",
-                "gate_effective",
-                "trigger_rule",
-                "stop_flag",
-                "slow_flag",
-                "replan_flag",
-                "dist_min_g1_body_m",
-                "margin_to_gate_m",
-                "g1_fell_flag",
-                "g1_root_x",
-                "g1_root_y",
-                "g1_root_z",
-                "g1_tilt_rad",
-                "motion_source_label",
-                "camera_capture_marker",
-                "body_pose_marker",
-            ],
-        )
-        _dyn_b_per_step_audit_writer.writeheader()
-        _dyn_b_per_step_audit_fh.flush()
     if _dynamic_audit_fh is not None:
         _dynamic_audit_fh.write(DYNAMIC_AUDIT_HEADER)
     if _trajectory_fh is not None:
