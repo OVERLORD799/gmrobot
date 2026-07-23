@@ -1,0 +1,105 @@
+{
+  "task": "V1-M1F10 canonical双绿箱+content-only满箱组合 source-only build + visual smoke",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "313a1bb",
+    "actual_head": "313a1bb32296a06e5090a402ef685665030012b8",
+    "origin_main_match": true,
+    "worktree_clean_before_run": true
+  },
+  "tag": "gmdisturb:e01-func-c-composed-full-m1f10-20260723",
+  "dockerfile": "GMRobot/docker/Dockerfile.e01-func-c-composed-full-m1f10",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723",
+  "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/scene/frame_000000_env0.png",
+  "reference_frame330_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+  "visual_verdict": "REVIEW_REQUIRED",
+  "overall_status": "STOP_NO_RETRY",
+  "smoke_exit_code": 0,
+  "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/runtime_scene_assertions.json",
+  "runtime_scene_assertions_present": false,
+  "runtime_scene_assertions_passed": false,
+  "runtime_scene_assertions": null,
+  "runtime_required_checks": {
+    "Part_count0": false,
+    "ContainerA_B+GridA_B": false,
+    "boxA_B_container.usd": false,
+    "FilledContent_stage_count20": false,
+    "content_asset_identity": false
+  },
+  "camera": {
+    "pos": [
+      0.35,
+      0.0,
+      2.5
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ]
+  },
+  "sha256": {
+    "frame_000000_env0_png": "a04ffc7709c2b35c573986a07b440f6f7aecb89e549a398d480d7d9bafef53a5",
+    "reference_frame_000330_env0_png": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "container_usd": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "container_full_content_visual_usd": "5ca656f996c783c0ab9717cae265c8461054d98bd487b08d9b5770f3bb36f935"
+  },
+  "gpu": "| 0   | NVIDIA GeForce RTX 5090 Laptop.. | Yes: 0 |     | 24463   MB | 10de      | 0          |",
+  "xid": {
+    "before_lines": [],
+    "after_lines": [],
+    "new_xid_detected": false
+  },
+  "auto_gate": {
+    "exit0": true,
+    "PNG": true,
+    "doubleROI": true,
+    "content": true,
+    "assertions": false,
+    "POST0": false,
+    "no_errors": false,
+    "residual": true,
+    "no_traceback": true,
+    "no_device_lost": true,
+    "no_new_xid": true
+  },
+  "manual_review": {
+    "verdict": "REVIEW_REQUIRED",
+    "checks": {
+      "both_sides_green_border_and_white_grid": "REVIEW_REQUIRED",
+      "left_B_allows_20_contents_inside_grid_only": "REVIEW_REQUIRED",
+      "forbid_white_tray_stair_fan_shape": "REVIEW_REQUIRED"
+    },
+    "current_roi_stats": {
+      "A": {
+        "green_ratio": 0.9311111111111111,
+        "white_ratio": 0.000505050505050505,
+        "dark_ratio": 0.9880808080808081
+      },
+      "B": {
+        "green_ratio": 0.8729292929292929,
+        "white_ratio": 0.07101010101010101,
+        "dark_ratio": 0.8740404040404041
+      }
+    },
+    "reference_roi_stats": {
+      "A": {
+        "green_ratio": 0.06888888888888889,
+        "white_ratio": 0.4027272727272727,
+        "dark_ratio": 0.5051515151515151
+      },
+      "B": {
+        "green_ratio": 0.07666666666666666,
+        "white_ratio": 0.5144444444444445,
+        "dark_ratio": 0.4090909090909091
+      }
+    }
+  },
+  "logs": {
+    "stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/smoke_stdout.txt",
+    "stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/smoke_stderr.txt",
+    "build_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/build_stdout.txt",
+    "build_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_composed_full_smoke_m1f10_20260723/meta/build_stderr.txt"
+  }
+}
