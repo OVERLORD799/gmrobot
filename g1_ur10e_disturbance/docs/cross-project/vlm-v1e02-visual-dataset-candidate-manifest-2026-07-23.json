@@ -48,9 +48,11 @@
       ],
       "temporal_pair_required": false,
       "reviewer_approved": false,
-      "technical_review_status": "visual_rework_in_progress_reference_locked",
+      "technical_review_status": "visual_rework_parts_occlusion_fix_pending",
       "formal_recapture_allowed": false,
       "semantic_clarity": "user_review_required",
+      "m1f5_user_rejected": true,
+      "m1f5_user_rejected_reason": "new_frame_white_rectangle_not_equal_reference_frame330_left_green_empty_box",
       "reference_locked": {
         "reference_scene_group": "e01_dyn_b_formal_m1z9_20260723",
         "reference_frame": "frame_000330_env0.png",

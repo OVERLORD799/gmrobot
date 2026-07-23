@@ -14,6 +14,7 @@ ALLOWED_TECHNICAL_REVIEW_STATUS = {
     "technical_temporal_pass_pending_user",
     "artifact_removed_semantic_clarity_pending_user",
     "visual_rework_in_progress_reference_locked",
+    "visual_rework_parts_occlusion_fix_pending",
     "fail",
 }
 ALLOWED_SEMANTIC_CLARITY = {"user_review_required"}
@@ -65,12 +66,18 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
                 errors.append(f"{rid}: formal_recapture_allowed must be false under semantic_clarity pending status")
             if c.get("semantic_clarity") not in ALLOWED_SEMANTIC_CLARITY:
                 errors.append(f"{rid}: semantic_clarity must be user_review_required under semantic_clarity pending status")
-        elif "semantic_clarity" in c and c.get("technical_review_status") != "visual_rework_in_progress_reference_locked":
+        elif "semantic_clarity" in c and c.get("technical_review_status") not in {
+            "visual_rework_in_progress_reference_locked",
+            "visual_rework_parts_occlusion_fix_pending",
+        }:
             errors.append(
                 f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user "
                 "or visual_rework_in_progress_reference_locked"
             )
-        if c.get("technical_review_status") == "visual_rework_in_progress_reference_locked":
+        if c.get("technical_review_status") in {
+            "visual_rework_in_progress_reference_locked",
+            "visual_rework_parts_occlusion_fix_pending",
+        }:
             if c.get("reviewer_approved") is not False:
                 errors.append(f"{rid}: reviewer_approved must be false under reference-locked rework status")
             if c.get("formal_recapture_allowed") is not False:

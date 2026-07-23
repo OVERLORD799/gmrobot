@@ -43,9 +43,11 @@ PART_USD = os.path.join(_ASSETS_DIR, "part/part_5000.usd")
 PART_FIXED_USD = os.path.join(_ASSETS_DIR, "part/part_fixed.usd")
 
 from ....shadow.target_full_override import (  # noqa: E402
+    assert_v1e01_mode_gate,
     resolve_box_scale,
     resolve_box_usd_name,
     resolve_part_usd_name,
+    resolve_v1e01_mode_flags,
     target_full_enabled,
 )
 
@@ -217,6 +219,9 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
 
 def build_part_assets() -> dict[str, RigidObjectCfg]:
     assets: dict[str, RigidObjectCfg] = {}
+    if not bool(_V1E01_MODE_FLAGS.get("spawn_task_parts", True)):
+        # Capture-only visual mode: forbid spawning 20 task parts.
+        return assets
 
     # In Func-C mode, use part_fixed.usd (root-prim RigidBodyAPI + MassAPI)
     # to avoid nested rigid bodies from spawn mass_props applying to parent prim.
@@ -260,6 +265,8 @@ def build_part_assets() -> dict[str, RigidObjectCfg]:
 
 
 CONTAINER_ASSETS = build_container_grid_assets()
+assert_v1e01_mode_gate()
+_V1E01_MODE_FLAGS = resolve_v1e01_mode_flags()
 PART_ASSETS = build_part_assets()
 
 
@@ -318,6 +325,8 @@ def build_box_observations() -> dict[str, ObsTerm]:
 
 
 def build_part_observations() -> dict[str, ObsTerm]:
+    if not bool(_V1E01_MODE_FLAGS.get("spawn_task_parts", True)):
+        return {}
     return {
         f"part_{idx}_pos": ObsTerm(
             func=mdp.body_pose_w,

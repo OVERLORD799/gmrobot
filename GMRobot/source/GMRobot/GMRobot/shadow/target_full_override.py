@@ -4,6 +4,10 @@ Default Dual/GMRobot box_B remains ``container.usd``. Opt-in:
 
   GMROBOT_V1E01_TARGET_FULL=1
 
+Visual-only capture mode (explicit opt-in, default off):
+
+  GMROBOT_V1E01_VISUAL_ONLY=1
+
 When enabled, only ``box_B`` switches to ``container_full.usd`` with a
 Func-C-specific spawn scale (the full USD already embeds cm→m hierarchy
 and ``metersPerUnit=1``; applying the empty-box ``0.01`` scale would shrink
@@ -66,6 +70,11 @@ def target_full_enabled(env: Mapping[str, str] | None = None) -> bool:
     return _truthy(e.get("GMROBOT_V1E01_TARGET_FULL"))
 
 
+def visual_only_enabled(env: Mapping[str, str] | None = None) -> bool:
+    e = os.environ if env is None else env
+    return _truthy(e.get("GMROBOT_V1E01_VISUAL_ONLY"))
+
+
 def d1b_blocker_enabled(env: Mapping[str, str] | None = None) -> bool:
     e = os.environ if env is None else env
     return _truthy(e.get("GMROBOT_V1D1B_FUNCTIONAL_BLOCK"))
@@ -116,6 +125,38 @@ def resolve_part_usd_name(
     if target_full_enabled(env):
         return PART_FIXED_USD_NAME
     return PART_USD_NAME
+
+
+def resolve_v1e01_mode_flags(env: Mapping[str, str] | None = None) -> dict[str, object]:
+    """Resolve explicit mode flags for Func-C capture/runtime gating."""
+    visual_only = visual_only_enabled(env)
+    target_full = target_full_enabled(env)
+    d1b_blocker = d1b_blocker_enabled(env)
+    gate_ok = (not visual_only) or (target_full and not d1b_blocker)
+    reasons: list[str] = []
+    if visual_only and not target_full:
+        reasons.append("visual_only_requires_target_full")
+    if visual_only and d1b_blocker:
+        reasons.append("visual_only_forbids_d1b_blocker")
+    return {
+        "target_full_enabled": bool(target_full),
+        "visual_only_enabled": bool(visual_only),
+        "d1b_blocker_enabled": bool(d1b_blocker),
+        "task_execution": False if visual_only else True,
+        "visual_dataset_only": True if visual_only else False,
+        "spawn_task_parts": False if visual_only else True,
+        "gate_ok": bool(gate_ok),
+        "gate_reasons": reasons,
+    }
+
+
+def assert_v1e01_mode_gate(env: Mapping[str, str] | None = None) -> None:
+    flags = resolve_v1e01_mode_flags(env)
+    if not bool(flags["gate_ok"]):
+        raise RuntimeError(
+            "Invalid V1E01 mode gate: "
+            + ",".join(str(x) for x in flags.get("gate_reasons", []))
+        )
 
 
 def assets_dir_from_env_cfg_file(env_cfg_path: Path | str) -> Path:

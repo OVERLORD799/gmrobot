@@ -25,6 +25,7 @@ from shadow.target_full_override import (
     REVIEWER_APPROVED,
     SCENE_GROUP,
     d1b_blocker_enabled,
+    resolve_v1e01_mode_flags,
     resolve_box_scale,
     source_visual_contract,
     resolve_box_usd_name,
@@ -59,7 +60,15 @@ __all__ = [
     "filled_content_roi",
     "build_frame_record",
     "build_capture_manifest",
+    "audit_source_bin_task_part_occlusion",
 ]
+
+CONTAINER_X_SLOTS = 5
+CONTAINER_Y_SLOTS = 4
+CONTAINER_X_GAP = 0.11042
+CONTAINER_Y_GAP = 0.07
+PART_HEIGHT = 0.17
+SOURCE_CONTAINER_POSE = (0.75, -0.25, 0.0)
 
 
 B0_B4_PAPER_SCENARIO_FILES: tuple[str, ...] = (
@@ -234,9 +243,12 @@ def validate_func_c_flags(
     expected_risk_type: str = EXPECTED_RISK_TYPE,
 ) -> dict[str, Any]:
     reasons: list[str] = []
+    mode_flags = resolve_v1e01_mode_flags(env)
     if not target_full_enabled(env):
         # For capture-mode validation env should enable the switch.
         pass
+    if not mode_flags.get("gate_ok", True):
+        reasons.append("invalid_mode_gate:" + ",".join(mode_flags.get("gate_reasons", [])))
     if d1b_blocker_enabled(env):
         reasons.append("d1b_blocker_enabled")
     if int(seed) != E01_FUNC_C_SEED:
@@ -278,6 +290,63 @@ def validate_func_c_flags(
         "expected_risk_type": EXPECTED_RISK_TYPE,
         "scene_group": SCENE_GROUP,
         "target_full_default_off": not target_full_enabled({}),
+        "mode_flags": mode_flags,
+    }
+
+
+def _slot_local_offset(slot_idx_zero_based: int) -> tuple[float, float, float]:
+    x_idx = slot_idx_zero_based // CONTAINER_Y_SLOTS
+    y_idx = slot_idx_zero_based % CONTAINER_Y_SLOTS
+    x_center = 0.5 * (CONTAINER_X_SLOTS - 1) * CONTAINER_X_GAP
+    y_center = 0.5 * (CONTAINER_Y_SLOTS - 1) * CONTAINER_Y_GAP
+    return (
+        x_idx * CONTAINER_X_GAP - x_center,
+        y_idx * CONTAINER_Y_GAP - y_center,
+        PART_HEIGHT,
+    )
+
+
+def audit_source_bin_task_part_occlusion() -> dict[str, Any]:
+    """Project default 20 Part_* spawn points and test overlap with source box_A ROI."""
+    source_roi = source_box_a_roi()
+    sx0, sy0, sx1, sy1 = [int(v) for v in source_roi["bbox_xyxy"]]
+    rows: list[dict[str, Any]] = []
+    overlap = 0
+    for idx in range(1, 21):
+        slot_zero = idx - 1
+        loc = _slot_local_offset(slot_zero)
+        wx = float(SOURCE_CONTAINER_POSE[0]) + float(loc[0])
+        wy = float(SOURCE_CONTAINER_POSE[1]) + float(loc[1])
+        wz = float(SOURCE_CONTAINER_POSE[2]) + float(loc[2])
+        uv = _project_world_to_uv_pinhole((wx, wy, wz))
+        if uv is None:
+            continue
+        u, v = float(uv[0]), float(uv[1])
+        in_source = sx0 <= u <= sx1 and sy0 <= v <= sy1
+        overlap += 1 if in_source else 0
+        rows.append(
+            {
+                "part_name": f"Part_{idx}",
+                "location": f"A@{idx}",
+                "slot_index": idx,
+                "world_xyz": [wx, wy, wz],
+                "projected_uv": [u, v],
+                "inside_source_roi_aabb": bool(in_source),
+            }
+        )
+    return {
+        "task_parts_total": 20,
+        "part_locations": [f"A@{i}" for i in range(1, 21)],
+        "slot_grid": {
+            "x_slots": CONTAINER_X_SLOTS,
+            "y_slots": CONTAINER_Y_SLOTS,
+            "x_gap_m": CONTAINER_X_GAP,
+            "y_gap_m": CONTAINER_Y_GAP,
+        },
+        "source_roi_aabb": source_roi,
+        "parts_projected_inside_source_roi_aabb": overlap,
+        "occlusion_possible": bool(overlap > 0),
+        "parts": rows,
     }
 
 
@@ -675,10 +744,14 @@ def build_capture_manifest(
     asset_precheck: Mapping[str, Any],
     seed: int = E01_FUNC_C_SEED,
     post_count: int = 0,
+    visual_only: bool = False,
     extra: Mapping[str, Any] | None = None,
 ) -> dict[str, Any]:
+    mode_env = {"GMROBOT_V1E01_TARGET_FULL": "1"}
+    if visual_only:
+        mode_env["GMROBOT_V1E01_VISUAL_ONLY"] = "1"
     flags = validate_func_c_flags(
-        env={"GMROBOT_V1E01_TARGET_FULL": "1"},
+        env=mode_env,
         seed=seed,
         post_count=post_count,
     )
@@ -722,6 +795,8 @@ def build_capture_manifest(
         "asset_precheck": dict(asset_precheck),
         "post_count": int(post_count),
         "flags": flags,
+        "task_execution": bool(flags.get("mode_flags", {}).get("task_execution", True)),
+        "visual_dataset_only": bool(flags.get("mode_flags", {}).get("visual_dataset_only", False)),
         "visual_gate_ok": visual_ok,
         "verdict": verdict,
         "paper_claim": "视觉上已满或不可用于继续放置的目标容器候选场景。",

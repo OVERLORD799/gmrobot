@@ -9,6 +9,7 @@ TAG="${TAG:-gmdisturb:e01-func-c-20260722}"
 OUT_DISTURB="${REPO_ROOT}/results/paper_demo/v1e01_func_c_capture_20260722"
 MODE="${1:-capture}"
 RUNNER="${WS_ROOT}/GMRobot/scripts/capture_one_shot_runner.py"
+VISUAL_ONLY_ENV="${GMROBOT_V1E01_VISUAL_ONLY:-0}"
 
 HOST_GM="${WS_ROOT}/GMRobot"
 
@@ -44,6 +45,7 @@ case "${MODE}" in
       -e PRIVACY_CONSENT=Y \
       -e OMNI_KIT_ACCEPT_EULA=YES \
       -e GMROBOT_V1E01_TARGET_FULL=1 \
+      -e GMROBOT_V1E01_VISUAL_ONLY="${VISUAL_ONLY_ENV}" \
       -v "${REPO_ROOT}/results:/opt/projects/g1_ur10e_disturbance/results" \
       -v "${HOST_GM}/configs/ivj_v1e01_target_container_full.yaml:/opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml:ro" \
       -v "${HOST_GM}/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py:/opt/projects/GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py:ro" \
@@ -88,6 +90,7 @@ case "${MODE}" in
       -e PRIVACY_CONSENT=Y \
       -e OMNI_KIT_ACCEPT_EULA=YES \
       -e GMROBOT_V1E01_TARGET_FULL=1 \
+      -e GMROBOT_V1E01_VISUAL_ONLY="${VISUAL_ONLY_ENV}" \
       -v "${REPO_ROOT}/results:/opt/projects/g1_ur10e_disturbance/results" \
       -v "${HOST_GM}/configs/ivj_v1e01_target_container_full.yaml:/opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml:ro" \
       -v "${HOST_GM}/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py:/opt/projects/GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py:ro" \

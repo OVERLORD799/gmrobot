@@ -24,6 +24,7 @@ from shadow.v1e01_func_c_capture import (  # noqa: E402
     REVIEWER_APPROVED,
     SCENE_GROUP,
     audit_geometry_window,
+    audit_source_bin_task_part_occlusion,
     build_capture_manifest,
     build_frame_record,
     filled_content_roi,
@@ -44,6 +45,7 @@ from shadow.target_full_override import (  # noqa: E402
     resolve_box_scale,
     resolve_box_usd_name,
     resolve_part_usd_name,
+    resolve_v1e01_mode_flags,
     source_visual_contract,
     target_full_enabled,
 )
@@ -74,9 +76,26 @@ def test_func_c_enables_only_box_b_full():
     assert resolve_part_usd_name(env={}) == PART_USD_NAME
 
 
+def test_visual_only_mode_gate_and_task_flags():
+    assert resolve_v1e01_mode_flags({})["spawn_task_parts"] is True
+    full_only = {"GMROBOT_V1E01_TARGET_FULL": "1"}
+    assert resolve_v1e01_mode_flags(full_only)["spawn_task_parts"] is True
+    visual_env = {"GMROBOT_V1E01_TARGET_FULL": "1", "GMROBOT_V1E01_VISUAL_ONLY": "1"}
+    flags = resolve_v1e01_mode_flags(visual_env)
+    assert flags["gate_ok"] is True
+    assert flags["task_execution"] is False
+    assert flags["visual_dataset_only"] is True
+    assert flags["spawn_task_parts"] is False
+    bad_env = {"GMROBOT_V1E01_VISUAL_ONLY": "1"}
+    bad_flags = resolve_v1e01_mode_flags(bad_env)
+    assert bad_flags["gate_ok"] is False
+    assert "visual_only_requires_target_full" in bad_flags["gate_reasons"]
+
+
 def test_d1b_blocker_not_enabled_and_env_cfg_intact():
     text = ENV_CFG.read_text(encoding="utf-8")
     assert "GMROBOT_V1E01_TARGET_FULL" in text or "resolve_box_usd_name" in text
+    assert "GMROBOT_V1E01_VISUAL_ONLY" in text or "spawn_task_parts" in text
     assert "GMROBOT_V1D1B_FUNCTIONAL_BLOCK" in text
     assert 'PART_LOCATIONS[19] = "B@10"' in text
     # Func-C config must not enable D1B blocker
@@ -119,6 +138,16 @@ def test_asset_precheck_and_roi():
     assert filled["containment"]["filled_inside_target"] is True
     assert tgt["roi_source"] == "projected_box_b_aabb"
     assert "projected" in filled["roi_source"]
+
+
+def test_source_bin_task_part_occlusion_projection():
+    audit = audit_source_bin_task_part_occlusion()
+    assert audit["task_parts_total"] == 20
+    assert len(audit["part_locations"]) == 20
+    assert audit["slot_grid"]["x_slots"] == 5
+    assert audit["slot_grid"]["y_slots"] == 4
+    assert audit["parts_projected_inside_source_roi_aabb"] == 20
+    assert audit["occlusion_possible"] is True
 
 
 def test_source_visual_contract_locked_to_dyn_b_reference():
@@ -454,6 +483,8 @@ def test_part_initial_pose_numeric_gate():
     assert "PART_SLOT_COUNT=CONTAINER_X_SLOTS*CONTAINER_Y_SLOTS" in cfg_text.replace(" ", "")
     # PART_LOCATIONS has 20 entries
     assert "PART_LOCATIONS = [f\"A@{i}\" for i in range(1, PART_SLOT_COUNT + 1)]" in cfg_text
+    assert "if not bool(_V1E01_MODE_FLAGS.get(\"spawn_task_parts\", True)):" in cfg_text
+    assert "return assets" in cfg_text
     # Default (no D1B blocker): all 20 parts go to slots A@1..A@20
     assert 'PART_LOCATIONS[19] = "B@10"' in cfg_text  # D1B opt-in line present
     # In Func-C mode (default), D1B blocker is disabled, so part_20 stays in A@20.
