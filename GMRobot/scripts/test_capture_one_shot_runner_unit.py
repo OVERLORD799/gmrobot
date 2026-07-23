@@ -39,6 +39,37 @@ def _run_runner(result_dir: Path, cmd: list[str], *, timeout_sec: float | None =
     return proc.returncode, status, stdout, stderr
 
 
+def _run_runner_with_checks(
+    result_dir: Path,
+    cmd: list[str],
+    *,
+    forbid_patterns: list[str] | None = None,
+    require_paths: list[str] | None = None,
+):
+    status = result_dir / "meta" / "run_status.json"
+    stdout = result_dir / "meta" / "stdout.txt"
+    stderr = result_dir / "meta" / "stderr.txt"
+    argv = [
+        sys.executable,
+        str(RUNNER),
+        "--result-dir",
+        str(result_dir),
+        "--status-file",
+        str(status),
+        "--stdout-file",
+        str(stdout),
+        "--stderr-file",
+        str(stderr),
+    ]
+    for pat in forbid_patterns or []:
+        argv += ["--forbid-pattern", pat]
+    for path in require_paths or []:
+        argv += ["--require-path", path]
+    argv += ["--", *cmd]
+    proc = subprocess.run(argv, check=False, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+    return proc.returncode, status, stdout, stderr
+
+
 def test_success_and_argv_and_outputs():
     with tempfile.TemporaryDirectory() as td:
         result_dir = Path(td) / "ok"
@@ -137,6 +168,35 @@ def test_refuse_nonempty_result_dir():
         assert rc != 0
 
 
+def test_exit_zero_with_traceback_is_rejected():
+    with tempfile.TemporaryDirectory() as td:
+        result_dir = Path(td) / "traceback"
+        rc, status_path, _, _ = _run_runner_with_checks(
+            result_dir,
+            [sys.executable, "-c", "print('Traceback (most recent call last):'); print('fake')"],
+            forbid_patterns=[r"Traceback \(most recent call last\):"],
+        )
+        assert rc == 86
+        data = json.loads(status_path.read_text(encoding="utf-8"))
+        assert data["postcheck_failed"] is True
+        assert data["forbid_pattern_hits"]
+
+
+def test_exit_zero_with_missing_artifact_is_rejected():
+    with tempfile.TemporaryDirectory() as td:
+        result_dir = Path(td) / "artifact"
+        required = result_dir / "must_exist.txt"
+        rc, status_path, _, _ = _run_runner_with_checks(
+            result_dir,
+            [sys.executable, "-c", "print('ok')"],
+            require_paths=[str(required)],
+        )
+        assert rc == 86
+        data = json.loads(status_path.read_text(encoding="utf-8"))
+        assert data["postcheck_failed"] is True
+        assert str(required) in data["missing_required_paths"]
+
+
 def main():
     test_success_and_argv_and_outputs()
     test_argv_quoting_preserved()
@@ -144,6 +204,8 @@ def main():
     test_signal_exit_recorded()
     test_timeout_exit_and_status()
     test_refuse_nonempty_result_dir()
+    test_exit_zero_with_traceback_is_rejected()
+    test_exit_zero_with_missing_artifact_is_rejected()
     print("PASS test_capture_one_shot_runner_unit")
 
 

@@ -1,0 +1,68 @@
+{
+  "milestone": "V1-M1R",
+  "scene": "E01-Dyn-B",
+  "date": "2026-07-23",
+  "root_cause": {
+    "summary": "Isaac extension NumPy path mixing under cached runtime caused ABI/import breakage.",
+    "m1q_failure_log": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1q_20260723/meta/capture_stderr.txt",
+    "signals": [
+      "cannot import name 'broadcast_to' from 'numpy.lib.stride_tricks'",
+      "numpy.dtype size changed, may indicate binary incompatibility"
+    ],
+    "numpy_site_packages": "/isaac-sim/kit/python/lib/python3.11/site-packages/numpy",
+    "numpy_prebundle": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle/numpy"
+  },
+  "fix": {
+    "strategy": "invocation_environment_correction",
+    "pythonpath_guard": "prepend omni.usd.libs + omni.kit.pip_archive pip_prebundle",
+    "new_files": [
+      "g1_ur10e_disturbance/e01_dyn_b_runtime_guard.py",
+      "g1_ur10e_disturbance/scripts/isaac_abi_import_preflight.py",
+      "g1_ur10e_disturbance/scripts/run_e01_dyn_b_abi_preflight.sh",
+      "g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py"
+    ],
+    "runner_hardening": {
+      "file": "GMRobot/scripts/capture_one_shot_runner.py",
+      "flags": [
+        "--forbid-pattern",
+        "--require-path"
+      ],
+      "enforced_nonzero_on_postcheck_failure": 86
+    }
+  },
+  "tests": [
+    {
+      "path": "GMRobot/scripts/test_capture_one_shot_runner_unit.py",
+      "result": "pass"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_e01_dyn_b_offline_readiness_unit.py",
+      "result": "pass"
+    },
+    {
+      "path": "g1_ur10e_disturbance/scripts/test_e01_dyn_b_runtime_guard_unit.py",
+      "result": "pass"
+    }
+  ],
+  "smokes": {
+    "count": 1,
+    "kind": "import_config_only",
+    "post": 0,
+    "formal_capture": false,
+    "status_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1r_20260723/meta/run_status.json",
+    "import_report": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1r_20260723/meta/import_preflight_report.json",
+    "runner_exit_code": 0
+  },
+  "image": {
+    "tag": "gmdisturb:e01-func-c-m1j-20260723",
+    "id": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "new_image_built": false,
+    "new_tag_if_required": "gmdisturb:e01-dyn-b-m1r-20260723"
+  },
+  "next_one_shot_preflight": {
+    "milestone": "V1-M1S",
+    "go_no_go": "GO",
+    "gate": "fail if traceback/ABI keyword hit or required artifact missing"
+  },
+  "verdict": "GO_PRECHECK_ONLY"
+}

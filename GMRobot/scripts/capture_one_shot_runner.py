@@ -7,6 +7,7 @@ import argparse
 import datetime as dt
 import json
 import os
+import re
 import signal
 import subprocess
 import tempfile
@@ -68,8 +69,59 @@ def _build_parser() -> argparse.ArgumentParser:
     ap.add_argument("--stderr-file", type=Path, required=True)
     ap.add_argument("--timeout-sec", type=float, default=None)
     ap.add_argument("--refuse-nonempty-dir", action="store_true")
+    ap.add_argument(
+        "--forbid-pattern",
+        action="append",
+        default=[],
+        help="Regex pattern that must not appear in stdout/stderr (repeatable).",
+    )
+    ap.add_argument(
+        "--require-path",
+        action="append",
+        default=[],
+        help="File path that must exist after command (repeatable).",
+    )
     ap.add_argument("command", nargs=argparse.REMAINDER)
     return ap
+
+
+def _scan_forbidden_patterns(
+    stdout_file: Path, stderr_file: Path, patterns: list[str]
+) -> list[dict[str, Any]]:
+    if not patterns:
+        return []
+    out_text = stdout_file.read_text(encoding="utf-8", errors="replace")
+    err_text = stderr_file.read_text(encoding="utf-8", errors="replace")
+    findings: list[dict[str, Any]] = []
+    for pat in patterns:
+        rx = re.compile(pat, re.MULTILINE)
+        out_match = rx.search(out_text)
+        if out_match is not None:
+            findings.append(
+                {
+                    "pattern": pat,
+                    "stream": "stdout",
+                    "match": out_match.group(0),
+                }
+            )
+        err_match = rx.search(err_text)
+        if err_match is not None:
+            findings.append(
+                {
+                    "pattern": pat,
+                    "stream": "stderr",
+                    "match": err_match.group(0),
+                }
+            )
+    return findings
+
+
+def _missing_required_paths(paths: list[str]) -> list[str]:
+    missing: list[str] = []
+    for p in paths:
+        if not Path(p).exists():
+            missing.append(p)
+    return missing
 
 
 def _main() -> int:
@@ -122,6 +174,13 @@ def _main() -> int:
         signal_name = _signal_name(-rc)
 
     exit_code = _shell_observable_exit(rc if rc is not None else 125)
+    forbidden_hits = _scan_forbidden_patterns(
+        args.stdout_file, args.stderr_file, list(args.forbid_pattern)
+    )
+    missing_paths = _missing_required_paths(list(args.require_path))
+    postcheck_failed = bool(forbidden_hits or missing_paths)
+    if exit_code == 0 and postcheck_failed:
+        exit_code = 86
     final_status = {
         **pre_status,
         "phase": "finished",
@@ -131,6 +190,11 @@ def _main() -> int:
         "returncode_raw": rc,
         "timed_out": timed_out,
         "signal": signal_name,
+        "forbid_patterns": list(args.forbid_pattern),
+        "forbid_pattern_hits": forbidden_hits,
+        "required_paths": list(args.require_path),
+        "missing_required_paths": missing_paths,
+        "postcheck_failed": postcheck_failed,
     }
     try:
         _atomic_write_json(args.status_file, final_status)
