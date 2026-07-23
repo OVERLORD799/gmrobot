@@ -1,23 +1,47 @@
+# V1-M1Z2 build context filter for g1_ur10e_disturbance/
 .git
+.github
+.github_token
+**/*token*
 docker/context/
+
+# Python / tooling junk
 **/__pycache__/
 **/*.pyc
+**/*.pyo
+**/*.pyd
 .pytest_cache/
+**/.pytest_cache/
 *.egg-info/
-results/
-results/**
-results_paper_final_0320/
-results_paper_final_0320/**
-docs/evidence/
-docs/evidence/**
 **/.mypy_cache/
 **/.ruff_cache/
 **/.nox/
 **/.tox/
 **/.venv/
 **/venv/
-**/*.pyo
-**/*.pyd
+**/.env
+**/.env.*
+**/.DS_Store
+
+# Results / evidence / caches / build artifacts
+results/
+results/**
+results_paper_final_0320/
+results_paper_final_0320/**
+docs/cross-project/
+docs/cross-project/**
+docs/evidence/
+docs/evidence/**
+cache/
+**/cache/
+build/
+dist/
+tmp/
+**/*.tmp
+**/*.log
+**/*.sif
+
+# Heavy / non-runtime binaries
 **/*.so
 **/*.a
 **/*.o
@@ -34,7 +58,3 @@ docs/evidence/**
 **/*.tar.gz
 **/*.zip
 **/*.7z
-**/.DS_Store
-**/.env
-**/.env.*
-**/*token*

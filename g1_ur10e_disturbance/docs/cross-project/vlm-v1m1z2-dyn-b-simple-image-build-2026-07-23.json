@@ -1,0 +1,70 @@
+{
+  "doc": "vlm-v1m1z2-dyn-b-simple-image-build-2026-07-23",
+  "verdict": "M1Z2_CLEAN_IMAGE_SMOKE_PASS",
+  "next_gate": "ONE_REVIEWABLE_DYN_B_PREFLIGHT_MAY_BE_REQUESTED",
+  "formal_dyn_b_capture_run": false,
+  "allow_reviewable_dyn_b_preflight_request": true,
+  "dockerfile_copy_only": true,
+  "package_mutation_in_m1z2_layers": false,
+  "build_count": 1,
+  "smoke_count": 1,
+  "head_baseline": "315c48eec1a7afb424cbf23803651ab86669c5f8",
+  "base_image": {
+    "tag": "gmdisturb:b4-p010-20260721",
+    "id": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1z2-20260723",
+    "id": "sha256:84b0bdbfb50f3912abd3d55cc2cb9f17a43be82b9bae161df04fab2520777c28",
+    "created": "2026-07-23T15:31:43.133487074+08:00",
+    "dockerfile": "g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-b-clean-m1z2",
+    "build_exit": 0,
+    "build_elapsed_seconds": 1
+  },
+  "prebuild": {
+    "verdict": "PASS",
+    "summary_path": "g1_ur10e_disturbance/results/paper_demo/v1m1z2_prebuild_20260723/prebuild_summary.json",
+    "summary_sha256": "eebe9158c18fc48edb5a1a2d88d6ca1006e27f937a4704db3bd959828fb49cb3",
+    "host_tests": [
+      "test_e01_dyn_b_m1v1_source_closure_unit.py:PASS",
+      "test_e01_dyn_b_m1v1_docker_copy_coverage_unit.py:PASS",
+      "test_e01_dyn_b_m1y_camera_framing_unit.py:PASS",
+      "test_dyn_b_per_step_audit_analyzer_unit.py:PASS",
+      "test_e01_dyn_b_m1w1_command_construction_unit.py:PASS",
+      "test_run_sh_camera_env_forwarding_unit.py:PASS",
+      "test_e01_dyn_b_runtime_guard_unit.py:PASS",
+      "test_e01_dyn_b_m1z2_dockerfile_policy_unit.py:PASS"
+    ],
+    "import_closure_unresolved": 0,
+    "camera_design_pos": [0.45, 0.0, 2.7],
+    "camera_design_rot": [0.7071, 0.0, 0.7071, 0.0]
+  },
+  "smoke": {
+    "exit_code": 0,
+    "elapsed_monotonic_sec": 30.887633482,
+    "simulation_steps": 1,
+    "csv_path": "results/paper_demo/v1m1z2_dyn_b_clean_smoke_20260723/safety_logs/phase3.csv",
+    "csv_nonempty": true,
+    "scenario": "outer_lateral_patrol",
+    "post_count": 0,
+    "host_code_bind_mounted": false
+  },
+  "numpy_pre_post": {
+    "ok": true,
+    "single_root": true,
+    "version": "1.26.0",
+    "root": "/isaac-sim/extscache/omni.kit.pip_archive-0.0.0+69cbf6ad.lx64.cp311/pip_prebundle"
+  },
+  "typing_extensions_pre_post": {
+    "ParamSpec_available_pre": true,
+    "ParamSpec_available_post": true
+  },
+  "xid": {
+    "before_count": 0,
+    "after_count": 0,
+    "new_xid": false
+  },
+  "historical_results_overwritten": false,
+  "results_committed": false,
+  "note": "Host prebuild owns all behavioral gates; Dockerfile only copies filtered sources. Smoke PASS with 1 step; no formal Dyn-B capture."
+}

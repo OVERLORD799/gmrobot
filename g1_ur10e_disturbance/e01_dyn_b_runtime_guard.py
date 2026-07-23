@@ -53,6 +53,15 @@ M1Z_RESULT_ROOT = (
     "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z_20260723"
 )
 
+# V1-M1Z2: host-prebuild + copy-only image (no in-Dockerfile behavior tests).
+M1Z2_IMAGE_TAG = "gmdisturb:e01-dyn-b-clean-m1z2-20260723"
+M1Z2_DOCKERFILE = "docker/Dockerfile.e01-dyn-b-clean-m1z2"
+M1Z2_SMOKE_RESULT_ROOT = (
+    "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1m1z2_dyn_b_clean_smoke_20260723"
+)
+M1Z2_BASE_IMAGE = "gmdisturb:b4-p010-20260721"
+M1Z2_BASE_IMAGE_SHA = "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+
 
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
     preflight = Path(project_root) / "scripts" / "isaac_abi_import_preflight.py"
@@ -282,6 +291,74 @@ def build_m1z_dyn_b_preflight_outer_argv(
         host_results_dir,
         *payload,
     ]
+
+
+def build_m1z2_smoke_inner_command(*, result_root_in_container: str) -> str:
+    """One-step AppLauncher smoke (no camera capture, no network models)."""
+    rr = result_root_in_container.rstrip("/")
+    return (
+        "set -euo pipefail; "
+        "/isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py "
+        "--headless --seed 43 --scenario outer_lateral_patrol "
+        "--max_steps 1 --progress_interval 1 "
+        f"--output_csv {rr}/safety_logs/phase3.csv "
+        f"--numpy-origin-pre-json {rr}/meta/numpy_origin_pre.json "
+        f"--numpy-origin-post-json {rr}/meta/numpy_origin_post.json "
+        f"--typing-extensions-pre-json {rr}/meta/typing_extensions_pre.json "
+        f"--typing-extensions-post-json {rr}/meta/typing_extensions_post.json"
+    )
+
+
+def build_m1z2_smoke_outer_argv(
+    *,
+    run_sh_path: str,
+    image_tag: str = M1Z2_IMAGE_TAG,
+    host_results_dir: str,
+    result_root_in_container: str = M1Z2_SMOKE_RESULT_ROOT,
+) -> list[str]:
+    """Canonical: run.sh --tag IMAGE --results RESULTS bash -lc INNER."""
+    inner = build_m1z2_smoke_inner_command(
+        result_root_in_container=result_root_in_container
+    )
+    payload = ["bash", "-lc", inner]
+    assert_canonical_run_sh_payload(payload)
+    argv = [
+        run_sh_path,
+        "--tag",
+        image_tag,
+        "--results",
+        host_results_dir,
+        *payload,
+    ]
+    assert_no_host_code_bind_mount(argv)
+    if smoke_enables_network_models(inner):
+        raise AssertionError("smoke must not enable network models")
+    if "pip_prebundle" in inner or "PYTHONPATH" in inner:
+        raise AssertionError("smoke must not inject pip_prebundle/PYTHONPATH")
+    return argv
+
+
+def dockerfile_is_copy_only_m1z2(dockerfile_text: str) -> dict[str, bool]:
+    """M1Z2 Dockerfile may only FROM/WORKDIR/COPY/LABEL (optional ENV)."""
+    low = dockerfile_text.lower()
+    has_run = any(
+        line.strip().upper().startswith("RUN")
+        for line in dockerfile_text.splitlines()
+    )
+    return {
+        "from_b4": "FROM gmdisturb:b4-p010-20260721" in dockerfile_text,
+        "has_workdir": "WORKDIR /opt/projects/g1_ur10e_disturbance" in dockerfile_text,
+        "copy_tree": "COPY . /opt/projects/g1_ur10e_disturbance" in dockerfile_text,
+        "no_run": not has_run,
+        "no_pip": "pip install" not in low and "pip uninstall" not in low,
+        "no_conda": "conda " not in low,
+        "no_apt": "apt-get" not in low and "apt install" not in low,
+        "no_test_invocation": "pytest" not in low and "test_e01_" not in low,
+        "no_grep_gate": "grep -q" not in low and " rg " not in f" {low} ",
+        "no_import_gate": "dyn_b_source_closure" not in low,
+        "no_results_gate": "results/paper_demo" not in low,
+        "no_quarantine": "quarantine" not in low,
+    }
 
 
 def assert_no_host_code_bind_mount(docker_argv: list[str] | tuple[str, ...]) -> None:

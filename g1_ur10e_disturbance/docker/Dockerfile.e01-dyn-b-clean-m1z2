@@ -1,0 +1,14 @@
+# V1-M1Z2: Dyn-B clean image — copy sources only.
+# All behavioral/static source checks run on the host before docker build.
+# No package mutation. No in-image tests/grep/import gates.
+FROM gmdisturb:b4-p010-20260721
+
+WORKDIR /opt/projects/g1_ur10e_disturbance
+
+COPY . /opt/projects/g1_ur10e_disturbance
+
+LABEL gmdisturb.e01_dyn_b_clean_m1z2="20260723" \
+      gmdisturb.base_tag="gmdisturb:b4-p010-20260721" \
+      gmdisturb.base_id="sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68" \
+      gmdisturb.milestone="V1-M1Z2" \
+      gmdisturb.package_mutation="none"
