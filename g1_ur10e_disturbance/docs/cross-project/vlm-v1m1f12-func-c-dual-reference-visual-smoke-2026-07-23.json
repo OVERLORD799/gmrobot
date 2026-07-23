@@ -1,0 +1,98 @@
+{
+  "task": "V1-M1F12 Dual reference同源Func-C capture一次copy-only build+一次visual smoke",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "d2b5d09",
+    "actual_head": "d2b5d09f500a5bf3d7e029133bf7dc9a4432a883",
+    "origin_main_match": true,
+    "worktree_clean_before_run": true
+  },
+  "budget": {
+    "build": "1/1",
+    "smoke": "1/1",
+    "retry": "0"
+  },
+  "tag": "gmdisturb:e01-func-c-dual-reference-m1f12-20260723",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723",
+  "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/scene/frame_000000_env0.png",
+  "frame_present": false,
+  "reference_frame330_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+  "visual_verdict": "REVIEW_REQUIRED",
+  "overall_status": "STOP_NO_RETRY",
+  "smoke_exit_code": 0,
+  "failure_reason": "camera flag missing: A camera was spawned without the --enable_cameras flag",
+  "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/runtime_scene_assertions.json",
+  "runtime_scene_assertions_present": false,
+  "runtime_scene_assertions_passed": false,
+  "runtime_scene_assertions": null,
+  "camera": {
+    "pos": [
+      0.45,
+      0,
+      2.7
+    ],
+    "rot": [
+      0.7071,
+      0,
+      0.7071,
+      0
+    ]
+  },
+  "auto_gate": {
+    "exit0": true,
+    "png": false,
+    "double_green_box_roi": false,
+    "grid": false,
+    "content": false,
+    "assertions": false,
+    "POST0": true,
+    "noTraceback": false,
+    "device": true,
+    "xid": true,
+    "residual": true
+  },
+  "sha256": {
+    "image_id": "sha256:6fbba6b81106f5193d4ae03f446deafeae17e7bb324c33d1401d96baa250711e",
+    "frame_000000_env0_png": null,
+    "reference_frame_000330_env0_png": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "source_sha256": {
+      "g1_ur10e_disturbance/dual_env_cfg.py": "8d0e9ff9d6d062097b9aefca0b32f1054bffe146a86254b43d5df62bd763dc0f",
+      "g1_ur10e_disturbance/func_c_dual_reference_contract.py": "ba1c5142ffadf22621803f674f768959f11886bb27c82043c3ced3e856caa3ed",
+      "g1_ur10e_disturbance/func_c_dual_reference_runtime_assertions.py": "6ec358229cdd9fcf56a78873683221fa8b334ca971f5a0b48ced9de5fa11ece7",
+      "g1_ur10e_disturbance/configs/e01_func_c_dual_reference_capture.yaml": "a24dfac7e05fa8cd547b70e4ea5d2ea358750419a80cb4fab4cb4fbfd2414716",
+      "g1_ur10e_disturbance/scripts/run_e01_func_c_dual_reference_capture.py": "ba745402ae435954ec44ff31742bf559214c3b2a9b83585e04d07aec16feceeb"
+    },
+    "dockerfile_sha256": "8b0b7cce5d347344f429ba5833cb26aab1662d4c8b90d8ccc38518bb94a7bb64"
+  },
+  "gpu": "Thu Jul 23 18:39:13 2026       \n+-----------------------------------------------------------------------------------------+\n| NVIDIA-SMI 580.159.03             Driver Version: 580.159.03     CUDA Version: 13.0     |\n+-----------------------------------------+------------------------+----------------------+\n| GPU  Name                 Persistence-M | Bus-Id          Disp.A | Volatile Uncorr. ECC |\n",
+  "xid": {
+    "new_xid_detected": false
+  },
+  "manual_review": {
+    "verdict": "REVIEW_REQUIRED",
+    "checks": {
+      "scene_layout_match_reference": "REVIEW_REQUIRED",
+      "two_green_shells_and_white_grids_match_reference": "REVIEW_REQUIRED",
+      "left_reference_empty_box_no_white_tray": "REVIEW_REQUIRED",
+      "other_box_has_20_parts_inside_grid": "REVIEW_REQUIRED"
+    },
+    "note": "No frame generated in this failed smoke run."
+  },
+  "constraints": {
+    "formal_capture": false,
+    "network": false,
+    "models": false,
+    "task_execution": false,
+    "controller_enabled": false,
+    "seed": 51,
+    "env": {
+      "GMDISTURB_V1E01_FUNC_C_VISUAL": "1"
+    }
+  },
+  "logs": {
+    "build_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/build_stdout.txt",
+    "build_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/build_stderr.txt",
+    "smoke_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/smoke_stdout.txt",
+    "smoke_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/smoke_stderr.txt"
+  }
+}
