@@ -1,0 +1,270 @@
+{
+  "milestone": "V1-M1Z9",
+  "run_count": 1,
+  "analyzer_count": 1,
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-ttc-audit-m1z8-20260723",
+    "sha": "sha256:1707dec1b229b97eb493c433d7ad60f886a0f304a4bc6558e5792c52155dfc1d",
+    "digest": "gmdisturb@sha256:1707dec1b229b97eb493c433d7ad60f886a0f304a4bc6558e5792c52155dfc1d"
+  },
+  "preflight": {
+    "head": "df494d3b1ea950b8f044d9f8ded3ce45dcf5be0a",
+    "worktree_clean_at_start": true
+  },
+  "constraints": {
+    "review_window_fixed": [
+      159,
+      338
+    ],
+    "window_rows_observed": 180,
+    "step_180_exactly_once": true,
+    "non_allow_ranges": [
+      {
+        "start": 167,
+        "end": 167,
+        "length": 1,
+        "continuity": "contiguous"
+      },
+      {
+        "start": 212,
+        "end": 212,
+        "length": 1,
+        "continuity": "contiguous"
+      },
+      {
+        "start": 228,
+        "end": 228,
+        "length": 1,
+        "continuity": "contiguous"
+      }
+    ],
+    "non_allow_points_detailed": [
+      {
+        "sim_step": 167,
+        "attribution_status": "EXPLAINED",
+        "trigger_rule": "ttc",
+        "trigger_reason": "dynamic_ttc: 0.069s to potential contact",
+        "gate_effective": "STOP",
+        "ttc_observed_s": "0.068866",
+        "ttc_forecast_s": "0.059465",
+        "approach_rate_mps": "14.959372",
+        "relative_velocity_mps": "null",
+        "velocity_provenance": {
+          "approach_rate_source": "gate_result.metadata.approach_rate",
+          "relative_velocity_source": "not_exposed_in_runtime_gate_metadata"
+        },
+        "distance_source_phase_reason": {
+          "dist_min_for_gating_m": "1.0302",
+          "dist_min_g1_body_m": "1.043795",
+          "dist_min_proxy_m": "1.043795",
+          "distance_source": null,
+          "protocol_phase": "",
+          "trigger_reason": "dynamic_ttc: 0.069s to potential contact"
+        }
+      },
+      {
+        "sim_step": 212,
+        "attribution_status": "EXPLAINED",
+        "trigger_rule": "ttc",
+        "trigger_reason": "dynamic_ttc_warning: 0.987s",
+        "gate_effective": "SLOW_DOWN",
+        "ttc_observed_s": "0.987445",
+        "ttc_forecast_s": "1.010462",
+        "approach_rate_mps": "1.123983",
+        "relative_velocity_mps": "null",
+        "velocity_provenance": {
+          "approach_rate_source": "gate_result.metadata.approach_rate",
+          "relative_velocity_source": "not_exposed_in_runtime_gate_metadata"
+        },
+        "distance_source_phase_reason": {
+          "dist_min_for_gating_m": "1.1099",
+          "dist_min_g1_body_m": "1.118868",
+          "dist_min_proxy_m": "1.118868",
+          "distance_source": null,
+          "protocol_phase": "",
+          "trigger_reason": "dynamic_ttc_warning: 0.987s"
+        }
+      },
+      {
+        "sim_step": 228,
+        "attribution_status": "EXPLAINED",
+        "trigger_rule": "ttc",
+        "trigger_reason": "dynamic_ttc_warning: 0.564s",
+        "gate_effective": "SLOW_DOWN",
+        "ttc_observed_s": "0.564015",
+        "ttc_forecast_s": "0.486311",
+        "approach_rate_mps": "1.903555",
+        "relative_velocity_mps": "null",
+        "velocity_provenance": {
+          "approach_rate_source": "gate_result.metadata.approach_rate",
+          "relative_velocity_source": "not_exposed_in_runtime_gate_metadata"
+        },
+        "distance_source_phase_reason": {
+          "dist_min_for_gating_m": "1.0736",
+          "dist_min_g1_body_m": "1.083372",
+          "dist_min_proxy_m": "1.083372",
+          "distance_source": null,
+          "protocol_phase": "",
+          "trigger_reason": "dynamic_ttc_warning: 0.564s"
+        }
+      }
+    ]
+  },
+  "gate_metrics": {
+    "effective_allow": 177,
+    "stop": 1,
+    "slow": 2,
+    "replan_nonzero": 0,
+    "margin_min_m": 0.738,
+    "margin_gate_m": 0.1,
+    "steps_completed_341": false,
+    "policy_steps_last": 335
+  },
+  "phase_and_visual": {
+    "phase_220": "",
+    "phase_330": "",
+    "two_lateral_phases_correct": false,
+    "camera_pose": {
+      "pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    },
+    "keyframes": {
+      "219": {
+        "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.010059261450383682,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      },
+      "220": {
+        "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.010050027415302547,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      },
+      "221": {
+        "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.0100459133152407,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      },
+      "329": {
+        "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.011256034010586247,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      },
+      "330": {
+        "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.011271897452820687,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      },
+      "331": {
+        "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+        "valid_png": true,
+        "links_visible_margin_8": 8,
+        "roi_area_fraction": 0.011268587227663494,
+        "clipping_ratio": 0.0,
+        "gate_links_ge_4": true,
+        "gate_roi_ge_0_01": true,
+        "gate_clipping_le_0_5": true
+      }
+    },
+    "centroid_displacement_px_220_330": 24.297366596071075,
+    "centroid_gate_px": 20.0,
+    "workcell_anchor_visibility_pass": true,
+    "workcell_anchor_visibility": {
+      "container_A_center": {
+        "uv": [
+          269.0972719319176,
+          178.91672631830113
+        ],
+        "visible_with_margin": true
+      },
+      "container_B_center": {
+        "uv": [
+          370.9027280680824,
+          178.91672631830113
+        ],
+        "visible_with_margin": true
+      },
+      "table_far_left": {
+        "uv": [
+          218.1945438638352,
+          117.83345263660223
+        ],
+        "visible_with_margin": true
+      },
+      "table_far_right": {
+        "uv": [
+          421.8054561361648,
+          117.83345263660223
+        ],
+        "visible_with_margin": true
+      },
+      "table_near_left": {
+        "uv": [
+          218.1945438638352,
+          301.08327368169887
+        ],
+        "visible_with_margin": true
+      },
+      "table_near_right": {
+        "uv": [
+          421.8054561361648,
+          301.08327368169887
+        ],
+        "visible_with_margin": true
+      }
+    }
+  },
+  "safety_residual": {
+    "g1_fallen": false,
+    "red_proxy_any": true,
+    "post_count": 0,
+    "traceback_found": false,
+    "device_lost_found": false,
+    "new_xid": false,
+    "residual_container": false,
+    "residual_process": false
+  },
+  "labels": {
+    "dynamic": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "scripted_locomotion": true,
+    "human_hand_or_gesture_or_ppe": false,
+    "vlm_output": false
+  },
+  "verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY"
+}
