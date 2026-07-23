@@ -1,0 +1,199 @@
+{
+  "task": "V1-M1F13 Func-C Dual-reference copy-only build + one smoke",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "8899a47",
+    "actual_head": "8899a47ba885eda4a19ceb13352bb1a0c3c4223f",
+    "origin_main_match": true,
+    "worktree_clean_before_run": true
+  },
+  "budget": {
+    "build": "1/1",
+    "smoke": "1/1",
+    "retry": "0"
+  },
+  "tag": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723",
+  "copy_only": true,
+  "dependency_change": false,
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723",
+  "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/scene/frame_000000_env0.png",
+  "frame_present": true,
+  "canonical_inner_command": "set -euo pipefail; export GMDISTURB_V1E01_FUNC_C_VISUAL=1; export GMDISTURB_SCENE_CAMERA_OVERRIDE=1; export GMDISTURB_SCENE_CAMERA_POS=0.45,0.0,2.7; export GMDISTURB_SCENE_CAMERA_ROT=0.7071,0.0,0.7071,0.0; export GMROBOT_RUNTIME_SCENE_ASSERTIONS_PATH=/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/runtime_scene_assertions.json; /isaac-sim/python.sh /opt/projects/GMRobot/scripts/gm_state_machine_agent.py --task gm --headless --enable_cameras --enable_safety --safety_config /opt/projects/GMRobot/configs/ivj_v1e01_target_container_full.yaml --save_camera --camera_output_dir /opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/scene --camera_save_interval 1 --max_steps 1",
+  "canonical_enable_cameras_count": 1,
+  "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/runtime_scene_assertions.json",
+  "runtime_scene_assertions_present": true,
+  "runtime_scene_assertions_passed": true,
+  "runtime_scene_assertions": {
+    "contract": {
+      "opt_in_env": "GMDISTURB_V1E01_FUNC_C_VISUAL",
+      "opt_in_enabled": true,
+      "task_execution": false,
+      "visual_dataset_only": true,
+      "reference": {
+        "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+        "frame": "frame_000330_env0.png",
+        "camera_pos": [
+          0.45,
+          0.0,
+          2.7
+        ],
+        "camera_rot": [
+          0.7071,
+          0.0,
+          0.7071,
+          0.0
+        ],
+        "content_source": "part_assets_20_slots"
+      },
+      "part_locations": [
+        "B@1",
+        "B@2",
+        "B@3",
+        "B@4",
+        "B@5",
+        "B@6",
+        "B@7",
+        "B@8",
+        "B@9",
+        "B@10",
+        "B@11",
+        "B@12",
+        "B@13",
+        "B@14",
+        "B@15",
+        "B@16",
+        "B@17",
+        "B@18",
+        "B@19",
+        "B@20"
+      ],
+      "part_locations_unique": true,
+      "part_count": 20,
+      "target_slots_container": "B",
+      "other_box_empty": true
+    },
+    "observed": {
+      "container_pose": {
+        "container_a": [
+          0.75,
+          -0.25,
+          0.0
+        ],
+        "container_b": [
+          0.75,
+          0.25,
+          0.0
+        ],
+        "grid_a": [
+          0.47695,
+          -0.41637,
+          0.1
+        ],
+        "grid_b": [
+          0.47695,
+          0.08363,
+          0.1
+        ]
+      },
+      "camera_pose": {
+        "pos": [
+          0.45,
+          0.0,
+          2.7
+        ],
+        "rot": [
+          0.7071,
+          0.0,
+          0.7071,
+          0.0
+        ]
+      },
+      "part_locations": [
+        "B@1",
+        "B@2",
+        "B@3",
+        "B@4",
+        "B@5",
+        "B@6",
+        "B@7",
+        "B@8",
+        "B@9",
+        "B@10",
+        "B@11",
+        "B@12",
+        "B@13",
+        "B@14",
+        "B@15",
+        "B@16",
+        "B@17",
+        "B@18",
+        "B@19",
+        "B@20"
+      ]
+    },
+    "checks": {
+      "task_execution_false": true,
+      "visual_dataset_only_true": true,
+      "container_identity_present": true,
+      "grid_identity_present": true,
+      "camera_pose_reference_locked": true,
+      "part_count_20": true,
+      "part_slots_unique": true,
+      "part_slots_on_target_box": true,
+      "other_box_empty": true
+    },
+    "ok": true
+  },
+  "constraints": {
+    "formal_capture": false,
+    "network": false,
+    "models": false,
+    "task_execution": false,
+    "seed": 51,
+    "env": {
+      "GMDISTURB_V1E01_FUNC_C_VISUAL": "1"
+    }
+  },
+  "smoke_exit_code": 0,
+  "auto_gate": {
+    "exit0": true,
+    "png": true,
+    "assertions": true,
+    "double_boxes": true,
+    "grid": true,
+    "content": true,
+    "POST0": true,
+    "no_errors": true,
+    "xid": true,
+    "residual": true
+  },
+  "manual_review": {
+    "verdict": "REVIEW_REQUIRED",
+    "checks": {
+      "scene_layout_match_reference": "REVIEW_REQUIRED",
+      "two_green_shells_and_white_grids_match_reference": "REVIEW_REQUIRED",
+      "left_reference_empty_box_no_white_tray": "REVIEW_REQUIRED",
+      "other_box_has_20_parts_inside_grid": "REVIEW_REQUIRED"
+    }
+  },
+  "xid": {
+    "new_xid_detected": false
+  },
+  "residual": {
+    "container": false,
+    "process": false,
+    "process_lines": []
+  },
+  "overall_status": "PASS",
+  "next_gate": "NONE",
+  "logs": {
+    "build_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/build_stdout.txt",
+    "build_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/build_stderr.txt",
+    "smoke_stdout": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/smoke_stdout.txt",
+    "smoke_stderr": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f13_20260723/meta/smoke_stderr.txt"
+  },
+  "sha256": {
+    "frame_000000_env0_png": "f8046771b1f23f892ae4c46a9b7fc1a102310283f7bebfc80859342a022a9ae6",
+    "image_id": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723 sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68"
+  }
+}
