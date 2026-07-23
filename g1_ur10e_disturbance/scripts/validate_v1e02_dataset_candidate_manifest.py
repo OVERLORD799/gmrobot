@@ -28,8 +28,8 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
     for key in ("human_hand", "glove", "PPE", "learned_whole_body_control", "VLM_output", "reviewer_approved"):
         if flags.get(key) is not False:
             errors.append(f"global_flags.{key} must be false")
-    if flags.get("technical_review_status") != "pending_user_review":
-        errors.append("global_flags.technical_review_status must be pending_user_review")
+    if flags.get("technical_review_status") not in {"pending_user_review", "technical_temporal_pass_pending_user", "fail"}:
+        errors.append("global_flags.technical_review_status invalid")
 
     candidates = manifest.get("candidates", [])
     if len(candidates) < 2:
@@ -47,8 +47,8 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
             errors.append(f"{rid}: category must be provisional")
         if c.get("reviewer_approved") is not False:
             errors.append(f"{rid}: reviewer_approved must be false")
-        if c.get("technical_review_status") != "pending_user_review":
-            errors.append(f"{rid}: technical_review_status must be pending_user_review")
+        if c.get("technical_review_status") not in {"pending_user_review", "technical_temporal_pass_pending_user", "fail"}:
+            errors.append(f"{rid}: technical_review_status invalid")
 
         hv = c.get("historical_verdict_ref", {})
         if "verdict" not in hv:
@@ -71,6 +71,18 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
                 errors.append(f"{rid}: sha mismatch for {p.name}")
             if int(frame.get("width", 0)) <= 0 or int(frame.get("height", 0)) <= 0:
                 errors.append(f"{rid}: invalid resolution for {p.name}")
+
+        if c.get("risk_type") == "dynamic":
+            if c.get("semantic_identity") not in {None, "scripted_g1_locomotion"}:
+                errors.append(f"{rid}: semantic_identity must be scripted_g1_locomotion when set")
+            if c.get("human_motion") not in {None, False}:
+                errors.append(f"{rid}: human_motion must be false when set")
+            if c.get("human_hand") not in {None, False}:
+                errors.append(f"{rid}: human_hand must be false when set")
+            if c.get("PPE") not in {None, False}:
+                errors.append(f"{rid}: PPE must be false when set")
+            if c.get("motion_attribution") not in {None, "SCRIPTED_G1_MOTION_SUPPORTED", "INSUFFICIENT"}:
+                errors.append(f"{rid}: invalid motion_attribution")
     return errors
 
 

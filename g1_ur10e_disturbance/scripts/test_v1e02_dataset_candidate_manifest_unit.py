@@ -92,7 +92,32 @@ def test_validate_manifest_detects_errors() -> None:
         assert any("sha mismatch" in e for e in errors)
 
 
+def test_validate_manifest_dynamic_label_boundaries() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        dyn = manifest["candidates"][1]
+        dyn["semantic_identity"] = "scripted_g1_locomotion"
+        dyn["human_motion"] = False
+        dyn["human_hand"] = False
+        dyn["PPE"] = False
+        dyn["motion_attribution"] = "SCRIPTED_G1_MOTION_SUPPORTED"
+        manifest["global_flags"]["technical_review_status"] = "technical_temporal_pass_pending_user"
+        dyn["technical_review_status"] = "technical_temporal_pass_pending_user"
+        assert validate_manifest(manifest, repo_root) == []
+
+        bad = copy.deepcopy(manifest)
+        bad["candidates"][1]["semantic_identity"] = "wrong_identity"
+        bad["candidates"][1]["motion_attribution"] = "MAYBE"
+        errors = validate_manifest(bad, repo_root)
+        assert any("semantic_identity" in e for e in errors)
+        assert any("motion_attribution" in e for e in errors)
+
+
 if __name__ == "__main__":
     test_validate_manifest_ok()
     test_validate_manifest_detects_errors()
+    test_validate_manifest_dynamic_label_boundaries()
     print(json.dumps({"ok": True}))

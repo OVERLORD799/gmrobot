@@ -1,0 +1,236 @@
+{
+  "run_id": "v1e03_dyn_b_offline_temporal_evidence_20260723",
+  "date": "2026-07-23",
+  "semantic_identity": "scripted_g1_locomotion",
+  "human_motion": false,
+  "human_hand": false,
+  "PPE": false,
+  "scene_group": "e01_dyn_b_formal_m1z9_20260723",
+  "camera_pose": {
+    "override_enabled": true,
+    "pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "motion_source_label": "scripted_g1_outer_lateral_patrol",
+    "scenario": "outer_lateral_patrol",
+    "seed": 43,
+    "virtual_hand": false,
+    "vlm": false,
+    "save_camera": true
+  },
+  "thresholds": {
+    "min_visible_links": 4,
+    "min_roi_area_fraction": 0.01,
+    "max_clipping_ratio": 0.5,
+    "min_centroid_displacement_px": 20.0,
+    "min_roi_inner_change_ratio_220_330": 0.02,
+    "max_stability_change_ratio": 0.001,
+    "min_inner_outer_change_contrast": 1.2,
+    "pixel_diff_threshold": 10
+  },
+  "per_frame": {
+    "219": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.010059261450383682,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        302.4044727922799,
+        435.6693826303451
+      ],
+      "bbox_xyxy": [
+        272.6755472247349,
+        409.6828639573373,
+        332.1333983598248,
+        461.65590130335295
+      ]
+    },
+    "220": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.010050027415302547,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        303.53742741028896,
+        435.1268809527017
+      ],
+      "bbox_xyxy": [
+        273.80400015605125,
+        409.1681477432554,
+        333.27085466452667,
+        461.085614162148
+      ]
+    },
+    "221": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.0100459133152407,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        304.77477878400515,
+        434.5259170968069
+      ],
+      "bbox_xyxy": [
+        275.0336798299205,
+        408.5845037078264,
+        334.5158777380898,
+        460.46733048578744
+      ]
+    },
+    "329": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.011256034010586247,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        282.6757345359027,
+        424.2009235283856
+      ],
+      "bbox_xyxy": [
+        252.38561712380152,
+        395.6614695456928,
+        312.96585194800383,
+        452.74037751107846
+      ]
+    },
+    "330": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.011271897452820687,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        281.84580123911803,
+        424.17994633363855
+      ],
+      "bbox_xyxy": [
+        251.5642549032961,
+        395.5921815353608,
+        312.12734757494,
+        452.76771113191637
+      ]
+    },
+    "331": {
+      "visible_links": 8,
+      "roi_area_fraction": 0.011268587227663494,
+      "clipping_ratio": 0.0,
+      "centroid_uv": [
+        280.9176701868309,
+        424.18470001014634
+      ],
+      "bbox_xyxy": [
+        250.64138742031147,
+        395.6003620397804,
+        311.1939529533503,
+        452.7690379805123
+      ]
+    }
+  },
+  "per_group": {
+    "A": {
+      "steps": [
+        219,
+        220,
+        221
+      ],
+      "group_union_roi_area_fraction": 0.0114453125,
+      "adjacent_pairs": [
+        {
+          "steps": [
+            219,
+            220
+          ],
+          "roi_union_area_fraction": 0.01107421875,
+          "roi_inner_change_ratio": 0.0,
+          "roi_outer_change_ratio": 0.0,
+          "full_image_change_ratio": 0.0,
+          "ur10e_region_change_ratio": "not_available",
+          "ur10e_region_note": "not_available: reliable ur10e pixel segmentation is not guaranteed in fixed offline assets"
+        },
+        {
+          "steps": [
+            220,
+            221
+          ],
+          "roi_union_area_fraction": 0.01126953125,
+          "roi_inner_change_ratio": 0.0,
+          "roi_outer_change_ratio": 0.0,
+          "full_image_change_ratio": 0.0,
+          "ur10e_region_change_ratio": "not_available",
+          "ur10e_region_note": "not_available: reliable ur10e pixel segmentation is not guaranteed in fixed offline assets"
+        }
+      ],
+      "stability_pass": true
+    },
+    "B": {
+      "steps": [
+        329,
+        330,
+        331
+      ],
+      "group_union_roi_area_fraction": 0.012291666666666666,
+      "adjacent_pairs": [
+        {
+          "steps": [
+            329,
+            330
+          ],
+          "roi_union_area_fraction": 0.012099609375,
+          "roi_inner_change_ratio": 0.0,
+          "roi_outer_change_ratio": 0.0,
+          "full_image_change_ratio": 0.0,
+          "ur10e_region_change_ratio": "not_available",
+          "ur10e_region_note": "not_available: reliable ur10e pixel segmentation is not guaranteed in fixed offline assets"
+        },
+        {
+          "steps": [
+            330,
+            331
+          ],
+          "roi_union_area_fraction": 0.012291666666666666,
+          "roi_inner_change_ratio": 0.0,
+          "roi_outer_change_ratio": 0.0,
+          "full_image_change_ratio": 0.0,
+          "ur10e_region_change_ratio": "not_available",
+          "ur10e_region_note": "not_available: reliable ur10e pixel segmentation is not guaranteed in fixed offline assets"
+        }
+      ],
+      "stability_pass": true
+    }
+  },
+  "cross_frame_220_330": {
+    "steps": [
+      220,
+      330
+    ],
+    "roi_union_area_fraction": 0.0169921875,
+    "roi_inner_change_ratio": 0.317816091954023,
+    "roi_outer_change_ratio": 0.06957083250546393,
+    "full_image_change_ratio": 0.0737890625,
+    "ur10e_region_change_ratio": "not_available",
+    "ur10e_region_note": "not_available: reliable ur10e pixel segmentation is not guaranteed in fixed offline assets",
+    "centroid_displacement_px": 24.297366596071075,
+    "per_link_displacement_px": {
+      "head_link": 27.512094669472297,
+      "left_elbow_link": 25.440441544217286,
+      "left_shoulder_pitch_link": 19.764073836241078,
+      "left_wrist_pitch_link": 25.71242379444418,
+      "right_elbow_link": 22.416170553075094,
+      "right_shoulder_pitch_link": 16.01213524108708,
+      "right_wrist_pitch_link": 23.202168756440273,
+      "torso_link": 25.674612660301094
+    },
+    "common_links_count": 8
+  },
+  "gates": {
+    "frame_gate_ok": true,
+    "centroid_gate_ok": true,
+    "local_change_ok": true,
+    "temporal_stability_ok": true,
+    "not_hash_only_guard": true
+  },
+  "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED",
+  "technical_review_status": "technical_temporal_pass_pending_user"
+}

@@ -1,23 +1,28 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "2.0.0",
+  "manifest_version": "3.0.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-positive-dataset-acquisition-plan-2026-07-22.json",
       "immutable": true
+    },
+    {
+      "version": "2.0.0",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+      "immutable": true
     }
   ],
   "review_packet": {
-    "run_id": "v1e02_visual_dataset_review_packet_20260723",
+    "run_id": "v1e03_dyn_b_offline_temporal_evidence_20260723",
     "date": "2026-07-23",
-    "packet_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e02_visual_dataset_review_packet_20260723",
+    "packet_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e03_dyn_b_offline_temporal_evidence_20260723",
     "preflight": {
-      "head": "5e52299394c6fdd9b42af8380a301a490961152c",
-      "worktree_clean": true,
-      "note": "clean verified before offline docs/script edits"
+      "head": "98446d1a8f2243d21af27015755cdf33dfd56273",
+      "worktree_clean": true
     },
-    "offline_only": true
+    "offline_only": true,
+    "temporal_evidence_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e03_dyn_b_offline_temporal_evidence_20260723/dyn_b_temporal_evidence.json"
   },
   "global_flags": {
     "human_hand": false,
@@ -26,7 +31,7 @@
     "learned_whole_body_control": false,
     "VLM_output": false,
     "reviewer_approved": false,
-    "technical_review_status": "pending_user_review"
+    "technical_review_status": "technical_temporal_pass_pending_user"
   },
   "candidates": [
     {
@@ -109,7 +114,7 @@
       ],
       "temporal_pair_required": true,
       "reviewer_approved": false,
-      "technical_review_status": "pending_user_review",
+      "technical_review_status": "technical_temporal_pass_pending_user",
       "historical_verdict_ref": {
         "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1z9-dyn-b-formal-capture-2026-07-23.json",
         "verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL"
@@ -212,7 +217,28 @@
           "stream": "stability",
           "stability_only": true
         }
-      ]
+      ],
+      "semantic_identity": "scripted_g1_locomotion",
+      "human_motion": false,
+      "human_hand": false,
+      "PPE": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED",
+      "temporal_evidence": {
+        "run_id": "v1e03_dyn_b_offline_temporal_evidence_20260723",
+        "steps": [
+          219,
+          220,
+          221,
+          329,
+          330,
+          331
+        ],
+        "cross_step_pair": [
+          220,
+          330
+        ],
+        "report_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e03_dyn_b_offline_temporal_evidence_20260723/dyn_b_temporal_evidence.json"
+      }
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py"
