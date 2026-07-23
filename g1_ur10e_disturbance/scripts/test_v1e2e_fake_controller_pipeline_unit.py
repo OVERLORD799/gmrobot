@@ -10,7 +10,12 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 
-from motion_isolation import build_ur10_hold_action, compute_ur10_freeze_metrics  # noqa: E402
+from motion_isolation import (  # noqa: E402
+    build_ur10_hold_action,
+    compute_ur10_freeze_metrics,
+    hold_action_hash,
+    resolve_ur10_freeze_action_seed,
+)
 
 
 class _FakeUr10Controller:
@@ -23,10 +28,14 @@ class _FakeUr10Controller:
 
 def test_freeze_overrides_fake_controller_proposed_action() -> None:
     ctrl = _FakeUr10Controller()
-    initial_joint = np.array([0.1, -0.1, 0.0, -1.0, 1.1, 0.0, -0.2], dtype=np.float32)
-    hold = build_ur10_hold_action(initial_joint, initial_gripper=0.8)
     proposed = ctrl.get_action()
-    assert not np.allclose(proposed[:7], hold[:7])
+    initial_joint, gripper, source = resolve_ur10_freeze_action_seed(
+        ur10_state_action=proposed,
+        ur10_policy_obs={"ee_pos": np.zeros((1, 7), dtype=np.float32)},
+    )
+    hold = build_ur10_hold_action(initial_joint, initial_gripper=gripper)
+    assert source == "ur10_state_action.pose7+gripper"
+    assert np.allclose(proposed[:7], hold[:7])
     effective = hold.copy()  # mirrors run_phase3 freeze override before env.step(action)
     m = compute_ur10_freeze_metrics(
         effective_action=effective,
@@ -35,6 +44,7 @@ def test_freeze_overrides_fake_controller_proposed_action() -> None:
     )
     assert abs(m["ur10_action_norm"] - float(np.linalg.norm(initial_joint))) < 1e-6
     assert m["ur10_joint_delta_max_abs"] == 0.0
+    assert hold_action_hash(hold) == hold_action_hash(hold.copy())
 
 
 if __name__ == "__main__":

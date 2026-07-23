@@ -1,0 +1,70 @@
+{
+  "milestone": "V1-E2F.1",
+  "date": "2026-07-23",
+  "task": "UR10 freeze observation schema fix (offline only)",
+  "status": "offline_fix_complete",
+  "precondition": {
+    "required_head": "c689876b96691f4f52f09e5289dde1645af476c2",
+    "clean_required": true
+  },
+  "root_cause": {
+    "error": "KeyError: 'joint_pos'",
+    "failing_path": "scripts/run_phase3.py freeze init",
+    "reason": "ur10e_policy observation group has no joint_pos key"
+  },
+  "schema_observation": {
+    "ur10e_policy_contains_joint_pos": false,
+    "ur10e_policy_pose_key": "ee_pos",
+    "safety_joint_pos_key": "safety.joint_pos",
+    "safety_joint_pos_dof": 6
+  },
+  "implementation": {
+    "helpers_added": [
+      "motion_isolation.resolve_ur10_freeze_action_seed",
+      "motion_isolation.extract_ur10_pose7_from_policy_obs"
+    ],
+    "freeze_seed_priority": [
+      "ur10_state_action.pose7+gripper",
+      "ur10_policy_obs.ee_pos[explicit_indices]"
+    ],
+    "guessing_forbidden": true,
+    "zero_fallback_forbidden": true,
+    "fail_closed": true,
+    "provenance_logged": true
+  },
+  "fixtures_and_tests": {
+    "fixture_added": "scripts/fixtures/ur10_observation_manager_snapshot.json",
+    "tests_updated": [
+      "scripts/test_motion_isolation_unit.py",
+      "scripts/test_v1e2e_fake_controller_pipeline_unit.py"
+    ],
+    "assertions": [
+      "extract 7 pose dims + gripper from runtime/action path",
+      "missing schema fails explicitly",
+      "hold action hash stable",
+      "default command path unchanged"
+    ]
+  },
+  "offline_validation": {
+    "py_compile": "pass",
+    "unit": {
+      "test_motion_isolation_unit.py": "pass",
+      "test_v1e2e_fake_controller_pipeline_unit.py": "pass",
+      "test_v1e2b1_dyn_c_import_closure_unit.py": "pass",
+      "test_v1e2e_dyn_c_motion_preflight_config_unit.py": "pass",
+      "test_v1e02_dataset_candidate_manifest_unit.py": "pass",
+      "test_held_critical_wiring_unit.py": "pass",
+      "test_v1e2e_dyn_c_motion_preflight_unit.py": "pass"
+    },
+    "diffcheck": "pass"
+  },
+  "raw_failure_evidence_retained": {
+    "doc": "docs/cross-project/vlm-v1e2f-dyn-c-motion-preflight-2026-07-23.md",
+    "json": "docs/cross-project/vlm-v1e2f-dyn-c-motion-preflight-2026-07-23.json"
+  },
+  "next_step_budget": {
+    "source_only_rebuild_allowed": 1,
+    "replacement_motion_preflight_allowed": 1,
+    "formal_capture_allowed": 0
+  }
+}

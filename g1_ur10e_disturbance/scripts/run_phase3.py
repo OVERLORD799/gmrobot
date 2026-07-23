@@ -426,6 +426,8 @@ from motion_isolation import (
     build_ur10_hold_action,
     hold_action_hash,
     compute_ur10_freeze_metrics,
+    resolve_ur10_freeze_action_seed,
+    extract_ur10_pose7_from_policy_obs,
 )
 from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
@@ -1342,10 +1344,11 @@ def main():
 
     ur10e.reset(obs["ur10e_policy"])
     disturb.reset()
-    _ur10_joint0 = (
-        obs["ur10e_policy"]["joint_pos"][0].detach().cpu().numpy().astype(np.float32)
+    _ur10_seed_action = ur10e.get_action(obs["ur10e_policy"], advance=False)
+    _ur10_joint0, _ur10_hold_gripper0, _ur10_hold_seed_provenance = resolve_ur10_freeze_action_seed(
+        ur10_state_action=_ur10_seed_action,
+        ur10_policy_obs=obs["ur10e_policy"],
     )
-    _ur10_hold_gripper0 = float(ur10e.get_action(obs["ur10e_policy"], advance=False)[7])
     _ur10_hold_action = build_ur10_hold_action(_ur10_joint0, _ur10_hold_gripper0)
     _ur10_hold_hash = hold_action_hash(_ur10_hold_action)
     _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
@@ -1357,7 +1360,8 @@ def main():
         print(
             f"[phase3] UR10 freeze enabled: initial_joint_pose="
             f"{[round(float(v), 6) for v in _ur10_joint0.tolist()]} "
-            f"hold_hash={_ur10_hold_hash[:16]}…"
+            f"hold_hash={_ur10_hold_hash[:16]}… "
+            f"seed={_ur10_hold_seed_provenance}"
         )
 
     # Inject initial zero-velocity command so the first env.step() starts
@@ -2429,9 +2433,7 @@ def main():
 
         if args_cli.freeze_ur10e:
             ur10e_action = _ur10_hold_action.copy()
-        _ur10_joint_now = (
-            obs["ur10e_policy"]["joint_pos"][0].detach().cpu().numpy().astype(np.float32)
-        )
+        _ur10_joint_now, _ = extract_ur10_pose7_from_policy_obs(obs["ur10e_policy"])
         _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
             effective_action=ur10e_action,
             current_joint_pose=_ur10_joint_now,
