@@ -1,0 +1,24 @@
+# E01-Dyn-C mirrored outer patrol profile (default OFF).
+scene: E01-Dyn-C
+scenario: mirrored_outer_lateral_patrol
+motion_source: scripted_g1_mirrored_outer_lateral_patrol
+seed: 44
+enable_capture: false
+execute_capture: false
+task_execution: false
+visual_dataset_only: true
+virtual_hand: false
+vlm: false
+perception: false
+five_stage: false
+camera:
+  override: true
+  pos: [0.45, 0.0, 2.7]
+  rot: [0.7071, 0.0, 0.7071, 0.0]
+capture_steps: [240, 310]
+adjacent_groups:
+  A: [239, 240, 241]
+  B: [309, 310, 311]
+geometry_window: [220, 330]
+min_centroid_displacement_px: 30
+results_dir: results/paper_demo/v1e2a_dyn_c_formal_capture_20260723

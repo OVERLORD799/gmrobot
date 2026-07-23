@@ -40,7 +40,15 @@ parser.add_argument(
     "--scenario",
     type=str,
     default=None,
-    choices=[None, "arm_collision", "arm_wave", "constrained_wander", "vlm_explore", "outer_lateral_patrol"],
+    choices=[
+        None,
+        "arm_collision",
+        "arm_wave",
+        "constrained_wander",
+        "vlm_explore",
+        "outer_lateral_patrol",
+        "mirrored_outer_lateral_patrol",
+    ],
     help="Scripted disturbance scenario (default: random wander).",
 )
 parser.add_argument(

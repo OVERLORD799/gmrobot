@@ -52,8 +52,6 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
     for c in candidates:
         rid = c.get("id", "<missing>")
         risk_type = c.get("risk_type")
-        if risk_type in seen_risk_types:
-            errors.append(f"{rid}: duplicated risk_type {risk_type}")
         seen_risk_types.add(risk_type)
         if c.get("category") != "provisional":
             errors.append(f"{rid}: category must be provisional")
@@ -177,6 +175,8 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
             errors.append("dataset_sufficiency.functional_formal_visual_group_count must be >= 1")
         if int(suff.get("dynamic_technical_candidate_group_count", 0)) < 1:
             errors.append("dataset_sufficiency.dynamic_technical_candidate_group_count must be >= 1")
+    if not {"functional", "dynamic"}.issubset(seen_risk_types):
+        errors.append("candidates must include at least functional and dynamic risk types")
     return errors
 
 

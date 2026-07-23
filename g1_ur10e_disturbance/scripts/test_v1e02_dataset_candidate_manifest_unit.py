@@ -84,12 +84,21 @@ def test_validate_manifest_detects_errors() -> None:
         manifest = _base_manifest(tmpdir, repo_root)
         bad = copy.deepcopy(manifest)
         bad["global_flags"]["human_hand"] = True
-        bad["candidates"][1]["risk_type"] = "functional"
         bad["candidates"][0]["frames"][0]["sha256"] = "deadbeef"
         errors = validate_manifest(bad, repo_root)
         assert any("global_flags.human_hand" in e for e in errors)
-        assert any("duplicated risk_type functional" in e for e in errors)
         assert any("sha mismatch" in e for e in errors)
+
+
+def test_validate_manifest_requires_functional_and_dynamic() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["candidates"][1]["risk_type"] = "functional"
+        errors = validate_manifest(manifest, repo_root)
+        assert any("at least functional and dynamic risk types" in e for e in errors)
 
 
 def test_validate_manifest_dynamic_label_boundaries() -> None:

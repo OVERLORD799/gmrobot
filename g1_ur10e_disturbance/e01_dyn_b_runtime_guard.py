@@ -61,6 +61,9 @@ M1Z2_SMOKE_RESULT_ROOT = (
 )
 M1Z2_BASE_IMAGE = "gmdisturb:b4-p010-20260721"
 M1Z2_BASE_IMAGE_SHA = "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+E2A_DYN_C_RESULT_ROOT = (
+    "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e2a_dyn_c_formal_capture_20260723"
+)
 
 
 def import_preflight_command(project_root: str = "/opt/projects/g1_ur10e_disturbance") -> str:
@@ -336,6 +339,63 @@ def build_m1z2_smoke_outer_argv(
     if "pip_prebundle" in inner or "PYTHONPATH" in inner:
         raise AssertionError("smoke must not inject pip_prebundle/PYTHONPATH")
     return argv
+
+
+def build_e2a_dyn_c_prebuild_inner_command(
+    *,
+    result_root_in_container: str = E2A_DYN_C_RESULT_ROOT,
+    camera_pos: tuple[float, float, float] = (0.45, 0.0, 2.7),
+    camera_rot: tuple[float, float, float, float] = (0.7071, 0.0, 0.7071, 0.0),
+) -> str:
+    rr = result_root_in_container.rstrip("/")
+    cpos = ",".join(str(float(x)) for x in camera_pos)
+    crot = ",".join(str(float(x)) for x in camera_rot)
+    return (
+        "set -euo pipefail; "
+        "export GMDISTURB_SCENE_CAMERA_OVERRIDE=1; "
+        f"export GMDISTURB_SCENE_CAMERA_POS={cpos}; "
+        f"export GMDISTURB_SCENE_CAMERA_ROT={crot}; "
+        "/isaac-sim/python.sh /opt/projects/g1_ur10e_disturbance/scripts/run_phase3.py "
+        "--headless --seed 44 --scenario mirrored_outer_lateral_patrol "
+        "--motion_source_label scripted_g1_mirrored_outer_lateral_patrol "
+        "--max_steps 331 --progress_interval 50 "
+        f"--output_csv {rr}/safety_logs/phase3.csv "
+        "--save_camera "
+        f"--camera_output_dir {rr}/scene "
+        "--camera_save_steps 239,240,241,309,310,311 "
+        f"--camera_pose_json {rr}/meta/camera_pose.json "
+        f"--body_pose_jsonl {rr}/meta/body_poses.jsonl "
+        f"--numpy-origin-pre-json {rr}/meta/numpy_origin_pre.json "
+        f"--numpy-origin-post-json {rr}/meta/numpy_origin_post.json "
+        f"--typing-extensions-pre-json {rr}/meta/typing_extensions_pre.json "
+        f"--typing-extensions-post-json {rr}/meta/typing_extensions_post.json"
+    )
+
+
+def build_e2a_dyn_c_prebuild_outer_argv(
+    *,
+    run_sh_path: str,
+    image_tag: str,
+    host_results_dir: str,
+    result_root_in_container: str = E2A_DYN_C_RESULT_ROOT,
+    camera_pos: tuple[float, float, float] = (0.45, 0.0, 2.7),
+    camera_rot: tuple[float, float, float, float] = (0.7071, 0.0, 0.7071, 0.0),
+) -> list[str]:
+    inner = build_e2a_dyn_c_prebuild_inner_command(
+        result_root_in_container=result_root_in_container,
+        camera_pos=camera_pos,
+        camera_rot=camera_rot,
+    )
+    payload = ["bash", "-lc", inner]
+    assert_canonical_run_sh_payload(payload)
+    return [
+        run_sh_path,
+        "--tag",
+        image_tag,
+        "--results",
+        host_results_dir,
+        *payload,
+    ]
 
 
 def dockerfile_is_copy_only_m1z2(dockerfile_text: str) -> dict[str, bool]:

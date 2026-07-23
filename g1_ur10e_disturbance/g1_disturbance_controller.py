@@ -119,6 +119,18 @@ OUTER_LATERAL_PATROL_PHASES: list[ScriptedPhase] = [
     ScriptedPhase("idle", 9999, vx=0.0, vy=0.0),
 ]
 
+# V1-E2A Dyn-C: mirrored outer-lane lateral patrol.
+# Scripted locomotion only; mirrored waypoint/phase schedule to ensure
+# trajectory identity differs from Dyn-B.
+MIRRORED_OUTER_LATERAL_PATROL_PHASES: list[ScriptedPhase] = [
+    ScriptedPhase("approach_outer_lane_mirror", 150, vx=0.36, vy=0.00),
+    ScriptedPhase("settle_heading_mirror", 30, vx=0.03, vy=0.00),
+    ScriptedPhase("lateral_negative_sweep_mirror", 70, vx=0.02, vy=-0.24),
+    ScriptedPhase("lateral_positive_sweep_mirror", 70, vx=-0.02, vy=0.24),
+    ScriptedPhase("retreat_outer_lane_mirror", 90, vx=-0.30, vy=0.00),
+    ScriptedPhase("idle", 9999, vx=0.0, vy=0.0),
+]
+
 # M5 fix: TABLE_BUMP_PHASES, OBJECT_PUSH_PHASES, CIRCULATE_PHASES, COMBINED_PHASES
 # removed — phases were defined but no CLI execution path existed and physical arm
 # control is not supported by the current walk policy (0121_walk.pt).
@@ -133,6 +145,7 @@ SCENARIOS: dict[str, list[ScriptedPhase] | None] = {
     "arm_collision":      ARM_COLLISION_PHASES,
     "arm_wave":           ARM_WAVE_PHASES,
     "outer_lateral_patrol": OUTER_LATERAL_PATROL_PHASES,
+    "mirrored_outer_lateral_patrol": MIRRORED_OUTER_LATERAL_PATROL_PHASES,
     "constrained_wander": None,   # same as default (no phases, random wander)
     "vlm_explore":        None,   # placeholder (VLM guides behaviour, no fixed script)
 }
