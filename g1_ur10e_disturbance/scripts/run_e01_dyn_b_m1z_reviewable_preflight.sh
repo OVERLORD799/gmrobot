@@ -7,11 +7,11 @@ DIST_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 WS_ROOT="$(cd "${DIST_ROOT}/.." && pwd)"
 REPO_ROOT="${WS_ROOT}"
 RUNNER="${WS_ROOT}/GMRobot/scripts/capture_one_shot_runner.py"
-TAG="gmdisturb:e01-dyn-b-clean-m1z-20260723"
+TAG="gmdisturb:e01-dyn-b-clean-m1z1-20260723"
 RESULTS_HOST_ROOT="${DIST_ROOT}/results"
-OUT_DIR="${DIST_ROOT}/results/paper_demo/v1e01_dyn_b_preflight_m1z_20260723"
+OUT_DIR="${DIST_ROOT}/results/paper_demo/v1e01_dyn_b_preflight_m1z1_20260723"
 META_DIR="${OUT_DIR}/meta"
-DOC_BASE="${DIST_ROOT}/docs/cross-project/vlm-v1m1z-dyn-b-reviewable-preflight-2026-07-23"
+DOC_BASE="${DIST_ROOT}/docs/cross-project/vlm-v1m1z1-dyn-b-hermetic-reviewable-preflight-2026-07-23"
 CAM_POS="0.45,0.0,2.7"
 CAM_ROT="0.7071,0,0.7071,0"
 
@@ -35,7 +35,7 @@ meta = Path(sys.argv[5])
 sys.path.insert(0, str(dist_root))
 from e01_dyn_b_runtime_guard import build_m1z_dyn_b_preflight_outer_argv  # noqa: E402
 
-result_root_in_container = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z_20260723"
+result_root_in_container = "/opt/projects/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z1_20260723"
 argv = build_m1z_dyn_b_preflight_outer_argv(
     run_sh_path=str(dist_root / "docker" / "run.sh"),
     image_tag=tag,
@@ -290,7 +290,7 @@ new_xid = xid_post > xid_pre
 docker_ps = (meta / "docker_ps_after.txt").read_text(encoding="utf-8", errors="replace")
 residual_container = tag in docker_ps
 procs = (meta / "process_ps_after.txt").read_text(encoding="utf-8", errors="replace")
-residual_process = "run_phase3.py" in procs and "v1e01_dyn_b_preflight_m1z_20260723" in procs
+residual_process = "run_phase3.py" in procs and "v1e01_dyn_b_preflight_m1z1_20260723" in procs
 
 runner_exit = int(status.get("exit_code", 1))
 elapsed = float(status.get("elapsed_monotonic_sec") or 0.0)
@@ -321,8 +321,8 @@ pass_ok = (
 verdict = "DYN_B_REVIEWABLE_PREFLIGHT_PASS" if pass_ok else "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL"
 next_gate = "HUMAN_DYNAMIC_LABEL_REVIEW" if pass_ok else "STOP_NO_RETRY"
 report = {
-    "doc": "vlm-v1m1z-dyn-b-reviewable-preflight-2026-07-23",
-    "milestone": "V1-M1Z",
+    "doc": "vlm-v1m1z1-dyn-b-hermetic-reviewable-preflight-2026-07-23",
+    "milestone": "V1-M1Z1",
     "build_count": 1,
     "run_count": 1,
     "image": {
@@ -392,7 +392,7 @@ report = {
 
 doc_json.write_text(json.dumps(report, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
 md_lines = [
-    "# V1-M1Z Dyn-B reviewable preflight (2026-07-23)",
+    "# V1-M1Z1 Dyn-B hermetic reviewable preflight (2026-07-23)",
     "",
     f"- verdict: **{verdict}**",
     f"- next_gate: `{next_gate}`",

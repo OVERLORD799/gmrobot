@@ -1,0 +1,81 @@
+{
+  "doc": "vlm-v1m1z1-dyn-b-hermetic-reviewable-preflight-2026-07-23",
+  "milestone": "V1-M1Z1",
+  "based_on_commit": "979482c451b6dda7f7777042f7b6b7217027f6e0",
+  "principle": "Docker build must be hermetic and source-or-fixture only.",
+  "build_count": 1,
+  "run_count": 0,
+  "budget": {
+    "max_builds": 1,
+    "max_runs_after_successful_build": 1,
+    "retry_allowed": false
+  },
+  "build": {
+    "attempted": true,
+    "success": false,
+    "image_tag": "gmdisturb:e01-dyn-b-clean-m1z1-20260723",
+    "image_id": null,
+    "failure_stage": "docker RUN static checks",
+    "failure_reason": "Dockerfile static grep expected scripted_g1_outer_lateral_patrol in run_phase3.py; literal not present.",
+    "base_image": "gmdisturb:b4-p010-20260721",
+    "base_image_sha": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+  },
+  "static_checks": {
+    "host_offline_tests": {
+      "test_e01_dyn_b_m1v1_source_closure_unit": "PASS",
+      "test_e01_dyn_b_m1v1_docker_copy_coverage_unit": "PASS",
+      "test_e01_dyn_b_m1y_camera_framing_unit": "PASS",
+      "test_e01_dyn_b_m1z_build_hermetic_policy_unit": "PASS",
+      "test_e01_dyn_b_m1w1_command_construction_unit": "PASS",
+      "test_e01_dyn_b_m1z_image_policy_unit": "PASS",
+      "test_e01_dyn_b_runtime_guard_unit": "PASS"
+    },
+    "docker_build_embedded_tests_before_fail": [
+      "test_e01_dyn_b_m1v1_source_closure_unit",
+      "test_e01_dyn_b_m1v1_docker_copy_coverage_unit",
+      "test_e01_dyn_b_m1y_camera_framing_unit",
+      "test_e01_dyn_b_m1z_build_hermetic_policy_unit",
+      "test_e01_dyn_b_m1w1_command_construction_unit"
+    ],
+    "camera_override_baked_check": "NOT_REACHED",
+    "per_step_logger_baked_check": "NOT_REACHED",
+    "analyzer_baked_check": "NOT_REACHED",
+    "outer_patrol_baked_check": "PARTIAL"
+  },
+  "capture": {
+    "attempted": false,
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z1_20260723/",
+    "reason_not_attempted": "Build failed; policy requires successful build/static checks before one-shot preflight."
+  },
+  "hashes": {
+    "image_sha256": null,
+    "frame_sha256": {
+      "219": null,
+      "220": null,
+      "221": null,
+      "329": null,
+      "330": null,
+      "331": null
+    }
+  },
+  "telemetry_visual_metrics": {
+    "steps_190_340_unique_count": null,
+    "allow_count": null,
+    "stop_count": null,
+    "slow_count": null,
+    "replan_count": null,
+    "margin_min_m": null,
+    "phase_220": null,
+    "phase_330": null,
+    "links_visible_ge_4": null,
+    "clip_le_0_50": null,
+    "roi_ge_0_01": null,
+    "g1_displacement_px_ge_20": null,
+    "workcell_visible": null,
+    "post_count": null,
+    "xid_errors": null,
+    "residual_process_or_container": null
+  },
+  "verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY"
+}

@@ -24,6 +24,8 @@ def test_m1z_dockerfile_policy() -> None:
     assert "test_e01_dyn_b_m1y_camera_framing_unit.py" in text
     assert "test_e01_dyn_b_m1w1_command_construction_unit.py" in text
     assert "dyn_b_source_closure.py" in text
+    assert "results/paper_demo" not in low
+    assert "body_poses.jsonl" not in low
 
 
 def main() -> None:
