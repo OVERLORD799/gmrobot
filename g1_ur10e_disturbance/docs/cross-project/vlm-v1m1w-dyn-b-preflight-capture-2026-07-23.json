@@ -1,0 +1,177 @@
+{
+  "doc": "vlm-v1m1w-dyn-b-preflight-capture-2026-07-23",
+  "milestone": "V1-M1W",
+  "scene": "E01-Dyn-B",
+  "date": "2026-07-23",
+  "anchor_commit": "a62119c",
+  "repo_head_at_run": "a62119c00086b2ba1b75aa2e427fcc366e001b36",
+  "run_policy": {
+    "formal_run_count": 1,
+    "rerun_allowed": false,
+    "retry_count": 0,
+    "concurrent_docker_runs_allowed": false,
+    "host_source_mount_allowed": false,
+    "post_target": 0
+  },
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1v1-20260723",
+    "id_expected": "sha256:19112b9c1e8f63c04e8ef777840da823f0323b55f950f432f27ea8ba9d4cf14f",
+    "id_actual": "sha256:19112b9c1e8f63c04e8ef777840da823f0323b55f950f432f27ea8ba9d4cf14f",
+    "rebuilt": false
+  },
+  "artifacts": {
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723",
+    "meta_dir": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta",
+    "status_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/run_status.json",
+    "stdout_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/capture_stdout.txt",
+    "stderr_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/capture_stderr.txt",
+    "command_file": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/formal_command.txt"
+  },
+  "runner": {
+    "tool": "GMRobot/scripts/capture_one_shot_runner.py",
+    "phase": "finished",
+    "exit_code": 1,
+    "returncode_raw": 1,
+    "postcheck_failed": true,
+    "start_time_utc": "2026-07-23T06:42:21.641+00:00",
+    "end_time_utc": "2026-07-23T06:42:21.953+00:00",
+    "elapsed_monotonic_sec": 0.312463794
+  },
+  "runtime_error": {
+    "traceback": false,
+    "module_error": false,
+    "abi_error": false,
+    "paramspec_error": false,
+    "extension_error": false,
+    "device_error": false,
+    "post_keyword_count_stdout_stderr": 0,
+    "stderr_primary": "File \"/isaac-sim/python.sh\", line 21 -> SyntaxError: invalid syntax"
+  },
+  "required_frames": {
+    "219": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000219_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    },
+    "220": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000220_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    },
+    "221": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000221_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    },
+    "329": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000329_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    },
+    "330": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000330_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    },
+    "331": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/scene/frame_000331_env0.png",
+      "exists": false,
+      "valid_png": false,
+      "sha256": null
+    }
+  },
+  "required_artifacts": {
+    "safety_csv": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/safety_logs/phase3.csv",
+      "exists": false
+    },
+    "camera_pose_json": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/camera_pose.json",
+      "exists": false
+    },
+    "body_pose_jsonl": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/body_poses.jsonl",
+      "exists": false
+    },
+    "numpy_origin_pre_json": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/numpy_origin_pre.json",
+      "exists": false
+    },
+    "numpy_origin_post_json": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/numpy_origin_post.json",
+      "exists": false
+    },
+    "typing_extensions_pre_json": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/typing_extensions_pre.json",
+      "exists": false
+    },
+    "typing_extensions_post_json": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1w_20260723/meta/typing_extensions_post.json",
+      "exists": false
+    }
+  },
+  "runtime_phases": {
+    "required": [
+      "lateral_positive_sweep",
+      "lateral_negative_sweep"
+    ],
+    "observed_step_220_phase": null,
+    "observed_step_330_phase": null,
+    "exact_match": false
+  },
+  "roi_and_displacement": {
+    "g1_roi_visible_step_220": null,
+    "g1_roi_visible_step_330": null,
+    "centroid_displacement_px_220_330": null,
+    "gate_min_displacement_px": 20,
+    "pass": false
+  },
+  "safety_window_190_340": {
+    "required_steps": 151,
+    "observed_steps": 0,
+    "allow_count": null,
+    "stop_count": null,
+    "slow_count": null,
+    "replan_count": null,
+    "all_allow_zero_stop_slow_replan": false,
+    "conservative_separation_margin_m_min": null,
+    "conservative_separation_margin_gate_m": 0.1,
+    "separation_margin_pass": false,
+    "g1_not_fallen": null,
+    "red_ball_or_proxy_present": null
+  },
+  "xid_audit": {
+    "xid_pre_count": 0,
+    "xid_post_count": 0,
+    "new_xid": false
+  },
+  "residue_audit": {
+    "residual_container_for_image": false,
+    "residual_process_for_capture": false
+  },
+  "provenance_labels": {
+    "dynamic": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "scripted_locomotion": true,
+    "human_hand_gesture_ppe": false,
+    "vlm_output": false
+  },
+  "verdict": "DYN_B_PREFLIGHT_CAPTURE_FAIL",
+  "next_gate": "STOP_NO_RETRY",
+  "fail_reasons": [
+    "runner_exit_nonzero",
+    "container_command_invocation_invalid_python_entry",
+    "required_frames_missing",
+    "required_pose_and_safety_artifacts_missing",
+    "runtime_phases_not_observable",
+    "roi_and_displacement_not_observable",
+    "safety_window_not_observable"
+  ],
+  "timestamp_utc": "2026-07-23T06:52:00Z"
+}
