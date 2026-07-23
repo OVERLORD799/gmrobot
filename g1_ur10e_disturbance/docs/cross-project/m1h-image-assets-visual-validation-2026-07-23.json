@@ -1,0 +1,37 @@
+{
+  "task": "M1H image assets and visual validation",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "start_head": "a5ee529",
+  "verdict": "M1H_BUILD_FAIL",
+  "non_formal_sample": true,
+  "stage_a": {
+    "dockerfile": "GMRobot/docker/Dockerfile.e01-func-c-m1h",
+    "base_image": "gmdisturb:e01-func-c-m1e-20260723",
+    "base_resolved_digest": "sha256:3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+    "target_tag": "gmdisturb:e01-func-c-m1h-20260723",
+    "build_command": "docker build -f GMRobot/docker/Dockerfile.e01-func-c-m1h -t gmdisturb:e01-func-c-m1h-20260723 .",
+    "build_executed_times": 1,
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/m1h_visual_validation_20260723/meta/build.stdout.log",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/m1h_visual_validation_20260723/meta/build.stderr.log",
+    "exit_file": "g1_ur10e_disturbance/results/paper_demo/m1h_visual_validation_20260723/meta/build.exit",
+    "real_exit_code": 1,
+    "elapsed_seconds": 1,
+    "image_created": null,
+    "image_sha": null,
+    "gate": {
+      "container_fixed_generated": true,
+      "part_fixed_generated": true,
+      "container_fixed_sha256": "acb2151a26baee9ff27dcdfe9c8c5bf2919182747389160f3f621347dc2a057d",
+      "part_fixed_sha256": "ccf516872c8501169efa5274cebe4f9740b091914cdd6ff9e52082ddbfe10441",
+      "failure_reason": "AttributeError: 'Prim' object has no attribute 'GetDescendants'"
+    }
+  },
+  "stage_b": {
+    "executed": false,
+    "reason": "Blocked by stage A failure; docker run forbidden by gate."
+  },
+  "warnings": [
+    "No tee/pipe was used in build execution path."
+  ]
+}
