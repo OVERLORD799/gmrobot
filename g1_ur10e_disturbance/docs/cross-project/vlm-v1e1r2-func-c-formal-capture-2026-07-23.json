@@ -1,0 +1,98 @@
+{
+  "task": "V1-E1R2 Func-C formal replacement capture",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head": "8c36e10bb11cd3d46ea7c5b8e8bb4514773a4446",
+    "actual_head": "8c36e10bb11cd3d46ea7c5b8e8bb4514773a4446",
+    "origin_main_match": true,
+    "worktree_clean": true
+  },
+  "fixed_image": {
+    "tag": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723",
+    "inspect_line": "gmdisturb@sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68 sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68"
+  },
+  "e1r_failure_root_cause_record": {
+    "root_cause": "manual_network_none_blocked_isaac_remote_default_environment_usd",
+    "not_root_cause": "scene_or_image_pipeline_failure"
+  },
+  "run_policy": {
+    "build_or_rebuild": false,
+    "formal_isaac_applauncher_runs_allowed": 1,
+    "formal_isaac_applauncher_runs_used": 1,
+    "retried": false,
+    "network_none_used": false,
+    "network_semantics_meta": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723/meta/network_semantics.json",
+    "forbidden_features_enabled": {
+      "vlm": false,
+      "perception": false,
+      "gdino": false,
+      "sam2": false,
+      "five_stage": false,
+      "inference_post": false,
+      "credentials": false
+    },
+    "seed_label": 51,
+    "camera_save_interval": 100,
+    "max_steps": 201,
+    "camera_pose": {
+      "override": 1,
+      "pos": [
+        0.45,
+        0.0,
+        2.7
+      ],
+      "rot": [
+        0.7071,
+        0.0,
+        0.7071,
+        0.0
+      ]
+    }
+  },
+  "evidence": {
+    "command_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723/meta/command.txt",
+    "stdout_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723/meta/capture_stdout.txt",
+    "stderr_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723/meta/capture_stderr.txt",
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1r2_func_c_formal_capture_20260723",
+    "raw_exit_code": 0,
+    "elapsed_seconds": 46
+  },
+  "gate_evaluation": {
+    "frame_100_exists": true,
+    "frame_200_exists": true,
+    "frames_sha256": {
+      "frame_000100_env0.png": "97c1998fa08e6ead3ade1ed7bd49d3fe4640f724bb5f557ca7e7a808b3e8b934",
+      "frame_000200_env0.png": "626e8c6be85324b64b7756cda58d52d5933df2c6b6d682fa14a7da7a4e480417"
+    },
+    "runtime_assertions_present": false,
+    "runtime_assertions_ok": false,
+    "dual_identity_Aempty_B20": false,
+    "dual_green_bins_with_white_grid": false,
+    "no_artifact_visual_failure": false,
+    "inference_post_hits": 0,
+    "traceback_found": false,
+    "device_lost_found": false,
+    "xid_found": false,
+    "residual_found": false
+  },
+  "artifact_manifest": {
+    "jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r2-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl",
+    "summary": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1r2-func-c-formal-capture-2026-07-23.artifact-summary.json",
+    "group_count": 1
+  },
+  "candidate_manifest_update": {
+    "status": "FAIL_FINAL",
+    "reviewer_approved": false,
+    "consumed": true,
+    "formal_recapture": false,
+    "next_gate": "FORMAL_CAPTURE_ROUTE_STOP"
+  },
+  "dataset_sufficiency": {
+    "overall_sufficiency_claimed": false,
+    "reason": "required_primary_frames_and_assertions_missing"
+  },
+  "verdict": "FAIL_FINAL",
+  "rerun": false,
+  "generated_at_utc": "2026-07-23T11:23:22.255363+00:00"
+}
