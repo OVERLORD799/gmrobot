@@ -1,0 +1,47 @@
+{
+  "task": "M1JR human visual review archive",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "head": "02b2662",
+  "branch": "main",
+  "worktree_clean": true,
+  "verdict": "M1JR_HUMAN_VISUAL_GATE_PASS",
+  "source_validation": {
+    "stage_ref": "m1j_visual_validation_20260723",
+    "one_step_validation_only": true,
+    "formal_func_c_positive_sample": false
+  },
+  "evidence": {
+    "frame_path": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/scene/frame_000000_env0.png",
+    "frame_sha256": "1c68b10b21aa8c19bea375cb647dbd7548a040e2fd4e0df9896825bde1832a77",
+    "png_valid": true,
+    "shape": [
+      480,
+      640,
+      3
+    ],
+    "dtype": "uint8",
+    "build_exit_code": 0,
+    "run_exit_code": 0,
+    "new_xid_lines": 0
+  },
+  "human_visual_conclusions": {
+    "white_sector_disappeared": true,
+    "containerA_and_20_source_parts_orderly": true,
+    "containerB_scale_and_light_green_slot_complete": true,
+    "filled_contents_clear_and_inside_target_box": true,
+    "no_explosion_scatter_huge_scale_or_garbled_artifacts": true
+  },
+  "gate_boundary": {
+    "allow_next_step_formal_func_c_single_recapture_on_fixed_image": true,
+    "approve_vlm_evaluation": false,
+    "approve_dataset_entry": false,
+    "formal_capture_requires_independent_gate": true
+  },
+  "constraints": {
+    "docker_run_executed": false,
+    "simulation_executed": false,
+    "code_image_asset_modified": false,
+    "existing_m1j_docs_modified": false
+  }
+}
