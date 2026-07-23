@@ -44,6 +44,7 @@ from shadow.target_full_override import (  # noqa: E402
     resolve_box_scale,
     resolve_box_usd_name,
     resolve_part_usd_name,
+    source_visual_contract,
     target_full_enabled,
 )
 
@@ -63,8 +64,8 @@ def test_switch_default_off_and_box_b_unchanged():
 
 def test_func_c_enables_only_box_b_full():
     env = {"GMROBOT_V1E01_TARGET_FULL": "1"}
-    # box_A → container_fixed.usd (normalized single RigidBodyAPI, kinematic)
-    assert resolve_box_usd_name("A", env=env) == CONTAINER_FIXED_USD_NAME
+    # box_A must remain the canonical Dyn-B left-source empty container identity.
+    assert resolve_box_usd_name("A", env=env) == CONTAINER_USD_NAME
     # box_B → container_full_visual.usd (visual-only)
     assert resolve_box_usd_name("B", env=env) == CONTAINER_FULL_SPAWN_USD_NAME
     assert resolve_box_scale("B", default_scale=(0.01, 0.01, 0.01), env=env) == (1.0, 1.0, 1.0)
@@ -118,6 +119,17 @@ def test_asset_precheck_and_roi():
     assert filled["containment"]["filled_inside_target"] is True
     assert tgt["roi_source"] == "projected_box_b_aabb"
     assert "projected" in filled["roi_source"]
+
+
+def test_source_visual_contract_locked_to_dyn_b_reference():
+    contract = source_visual_contract(ASSETS)
+    assert contract["source_visual_asset_name"] == "container.usd"
+    assert contract["source_visual_material_path"] == "/Root/Container/Ref/Looks/DefaultMaterial"
+    assert contract["source_visual_default_prim"] == "/Root"
+    assert contract["source_visual_prim_path"] == "{ENV_REGEX_NS}/ContainerA"
+    assert tuple(contract["source_visual_scale"]) == (0.01, 0.01, 0.01)
+    assert tuple(contract["source_visual_orientation_quat_wxyz"]) == (0.5, 0.5, 0.5, 0.5)
+    assert contract["matches_dyn_b_reference"] is True
 
 
 def test_roi_identity_evidence_on_m1m_frames_if_present():
@@ -479,6 +491,7 @@ def main():
     test_seed_camera_steps_labels()
     test_network_rejected()
     test_asset_precheck_and_roi()
+    test_source_visual_contract_locked_to_dyn_b_reference()
     test_roi_identity_evidence_on_m1m_frames_if_present()
     test_human_label_approval_provenance_and_grouping_if_present()
     test_geometry_manifest_roundtrip_and_b0b4()

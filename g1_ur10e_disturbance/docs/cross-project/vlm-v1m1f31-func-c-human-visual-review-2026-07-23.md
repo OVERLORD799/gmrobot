@@ -1,6 +1,7 @@
 # V1-M1F3.1 Func-C Human Visual Review（2026-07-23）
 
 结论：**TECHNICAL_ARTIFACT_REMOVAL_PASS_SEMANTIC_CLARITY_PENDING_USER**
+补充结论：**user_rejected（参考锁定到 Dyn-B 左侧绿色空箱）**
 
 ## 复核对象
 - 新图绝对路径：`/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png`

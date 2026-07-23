@@ -168,10 +168,28 @@ def test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos() -> N
         assert any("semantic_clarity must be user_review_required" in e for e in errors)
 
 
+def test_validate_manifest_accepts_reference_locked_rework_state() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "visual_rework_in_progress_reference_locked"
+        func["formal_recapture_allowed"] = False
+        func["reviewer_approved"] = False
+        func["reference_locked"] = {
+            "reference_frame_sha256": "a" * 64,
+            "rejected_frame_sha256": "b" * 64,
+        }
+        assert validate_manifest(manifest, repo_root) == []
+
+
 if __name__ == "__main__":
     test_validate_manifest_ok()
     test_validate_manifest_detects_errors()
     test_validate_manifest_dynamic_label_boundaries()
     test_validate_manifest_accepts_func_c_semantic_clarity_pending_state()
     test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos()
+    test_validate_manifest_accepts_reference_locked_rework_state()
     print(json.dumps({"ok": True}))

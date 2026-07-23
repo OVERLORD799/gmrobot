@@ -48,17 +48,25 @@
       ],
       "temporal_pair_required": false,
       "reviewer_approved": false,
-      "technical_review_status": "artifact_removed_semantic_clarity_pending_user",
+      "technical_review_status": "visual_rework_in_progress_reference_locked",
       "formal_recapture_allowed": false,
       "semantic_clarity": "user_review_required",
+      "reference_locked": {
+        "reference_scene_group": "e01_dyn_b_formal_m1z9_20260723",
+        "reference_frame": "frame_000330_env0.png",
+        "reference_frame_sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+        "rejected_scene_group": "e01_func_c_visual_smoke_m1f3r_20260723",
+        "rejected_frame": "frame_000000_env0.png",
+        "rejected_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5"
+      },
       "historical_verdict_ref": {
         "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e01-func-c-final-m1m-capture-2026-07-23.json",
         "verdict": "CAPTURE_PASS_PROVISIONAL_FUNCTIONAL_FINAL"
       },
       "technical_gate_notes": [
         "target_container_and_contents_visually_clear",
-        "left_source_container_visual_corruption_removed_in_m1f3r_smoke_frame",
-        "artifact_removal_technical_passed_by_human_visual_review",
+        "reference_locked_to_dyn_b_frame_000330_env0_left_green_empty_box",
+        "func_c_left_source_visual_rework_required",
         "semantic_clarity_user_confirmation_pending"
       ],
       "provenance": {

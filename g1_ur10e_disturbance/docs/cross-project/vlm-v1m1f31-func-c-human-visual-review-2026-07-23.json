@@ -19,6 +19,8 @@
   "artifact_removal_technical_pass": true,
   "semantic_clarity": "user_review_required",
   "semantic_clarity_note": "左箱颜色低对比且“箱子”语义清晰度有限",
+  "user_rejected": true,
+  "user_rejected_reason": "reference_locked_to_dyn_b_left_green_empty_box",
   "reviewer_approved": false,
   "candidate_manifest_updates": {
     "func_c": {

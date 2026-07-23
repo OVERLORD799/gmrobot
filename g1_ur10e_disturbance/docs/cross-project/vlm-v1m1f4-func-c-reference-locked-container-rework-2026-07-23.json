@@ -1,0 +1,65 @@
+{
+  "task": "V1-M1F4 Func-C left source container reference-locked rework",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "head_required": "a6f8107c3aa7846a56512675d60eef5e18bb638c",
+    "origin_main_required_same": true,
+    "worktree_clean_required": true
+  },
+  "reference_lock": {
+    "reference_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+    "reference_frame_sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a",
+    "rejected_frame_abs_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_visual_smoke_m1f3r_20260723/scene/frame_000000_env0.png",
+    "rejected_frame_sha256": "a5155db466dcca5c9cff64a1828843b325ba1b89766c5f2f36450bd716fcb5c5"
+  },
+  "dyn_b_left_source_container_identity": {
+    "usd_asset_abs_path": "/home/czz/GMrobot/GMRobot/source/GMRobot/GMRobot/assets/container.usd",
+    "usd_asset_sha256": "ee307082665bb316eb53965861f8ca635a8e922aa8f90805126faf9cc75493a9",
+    "default_prim": "/Root",
+    "material_path": "/Root/Container/Ref/Looks/DefaultMaterial",
+    "material_shader_input_diffuse_color_constant": [
+      0.011175547,
+      0.05019307,
+      0.0067828465
+    ],
+    "prim_path_contract": "{ENV_REGEX_NS}/ContainerA",
+    "spawn_scale": [
+      0.01,
+      0.01,
+      0.01
+    ],
+    "spawn_orientation_quat_wxyz": [
+      0.5,
+      0.5,
+      0.5,
+      0.5
+    ],
+    "spawn_config_source": {
+      "dual_env_cfg": "g1_ur10e_disturbance/dual_env_cfg.py",
+      "gmrobot_env_cfg": "GMRobot/source/GMRobot/GMRobot/tasks/manager_based/gmrobot/gmrobot_env_cfg.py"
+    }
+  },
+  "func_c_rework_result": {
+    "box_a_resolved_asset_when_target_full_enabled": "container.usd",
+    "box_b_semantics_unchanged": "container_full_visual.usd spawn + container_full.usd semantic source",
+    "part_mapping_b0_b4_changed": false,
+    "collision_or_part_regex_side_effect": "none (source container is existing physical canonical asset; no overlay introduced)",
+    "fallback_blocked": {
+      "source_container_fixed_forbidden": true,
+      "source_container_full_visual_forbidden": true,
+      "white_holder_forbidden": true
+    }
+  },
+  "manifest_updates": {
+    "m1f31_user_rejected": true,
+    "candidate_func_c_status": "visual_rework_in_progress_reference_locked",
+    "candidate_func_c_reviewer_approved": false,
+    "candidate_func_c_formal_recapture_allowed": false
+  },
+  "offline_gate_contracts": {
+    "source_visual_asset_path_sha_material_scale_orientation_prim_locked": true,
+    "validator_accepts_reference_locked_status": true
+  },
+  "allowed_next_step_only": "source-only build plus single visual smoke"
+}

@@ -26,6 +26,7 @@ from shadow.target_full_override import (
     SCENE_GROUP,
     d1b_blocker_enabled,
     resolve_box_scale,
+    source_visual_contract,
     resolve_box_usd_name,
     target_full_enabled,
 )
@@ -260,6 +261,7 @@ def validate_func_c_flags(
         reasons.append(f"expected_risk_type={expected_risk_type}")
     # Default-off box resolution checks
     assert resolve_box_usd_name("A", env={}) == CONTAINER_USD_NAME
+    assert resolve_box_usd_name("A", env={"GMROBOT_V1E01_TARGET_FULL": "1"}) == CONTAINER_USD_NAME
     assert resolve_box_usd_name("B", env={}) == CONTAINER_USD_NAME
     assert resolve_box_usd_name("B", env={"GMROBOT_V1E01_TARGET_FULL": "1"}) == "container_full_visual.usd"
     assert resolve_box_scale("B", default_scale=(0.01, 0.01, 0.01), env={}) == (0.01, 0.01, 0.01)
@@ -726,6 +728,10 @@ def build_capture_manifest(
         "not_vlm_positive": True,
         "not_accepted": True,
     }
+    contract = source_visual_contract(Path(__file__).resolve().parents[1] / "assets")
+    out["source_container_visual_contract"] = contract
+    if not contract.get("matches_dyn_b_reference", False):
+        out["verdict"] = "REFERENCE_IDENTITY_BLOCKED"
     if extra:
         out.update(dict(extra))
     return out

@@ -13,6 +13,7 @@ ALLOWED_TECHNICAL_REVIEW_STATUS = {
     "pending_user_review",
     "technical_temporal_pass_pending_user",
     "artifact_removed_semantic_clarity_pending_user",
+    "visual_rework_in_progress_reference_locked",
     "fail",
 }
 ALLOWED_SEMANTIC_CLARITY = {"user_review_required"}
@@ -64,8 +65,24 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
                 errors.append(f"{rid}: formal_recapture_allowed must be false under semantic_clarity pending status")
             if c.get("semantic_clarity") not in ALLOWED_SEMANTIC_CLARITY:
                 errors.append(f"{rid}: semantic_clarity must be user_review_required under semantic_clarity pending status")
-        elif "semantic_clarity" in c:
-            errors.append(f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user")
+        elif "semantic_clarity" in c and c.get("technical_review_status") != "visual_rework_in_progress_reference_locked":
+            errors.append(
+                f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user "
+                "or visual_rework_in_progress_reference_locked"
+            )
+        if c.get("technical_review_status") == "visual_rework_in_progress_reference_locked":
+            if c.get("reviewer_approved") is not False:
+                errors.append(f"{rid}: reviewer_approved must be false under reference-locked rework status")
+            if c.get("formal_recapture_allowed") is not False:
+                errors.append(f"{rid}: formal_recapture_allowed must be false under reference-locked rework status")
+            ref = c.get("reference_locked", {})
+            if not isinstance(ref, dict):
+                errors.append(f"{rid}: reference_locked object required under reference-locked rework status")
+            else:
+                if not str(ref.get("reference_frame_sha256") or ""):
+                    errors.append(f"{rid}: reference_locked.reference_frame_sha256 required")
+                if not str(ref.get("rejected_frame_sha256") or ""):
+                    errors.append(f"{rid}: reference_locked.rejected_frame_sha256 required")
 
         hv = c.get("historical_verdict_ref", {})
         if "verdict" not in hv:
