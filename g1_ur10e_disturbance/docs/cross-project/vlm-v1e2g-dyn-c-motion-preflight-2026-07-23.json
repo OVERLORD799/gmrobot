@@ -1,0 +1,114 @@
+{
+  "milestone": "V1-E2G",
+  "date": "2026-07-23",
+  "task": "Dyn-C replacement motion preflight (copy-only build + single run, no retry)",
+  "status": "motion_preflight_fail",
+  "gate": "STOP_NO_FORMAL_CAPTURE",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2g_dyn_c_motion_preflight_20260723",
+  "preflight": {
+    "required_head": "da24a10",
+    "head_ok": true,
+    "origin_main_aligned": true,
+    "worktree_clean": true,
+    "e2f1_tests_import_config": {
+      "test_v1e2e_dyn_c_motion_preflight_unit.py": "pass",
+      "test_v1e2e_dyn_c_motion_preflight_config_unit.py": "pass",
+      "import_preflight_host_python": "fail: ModuleNotFoundError gymnasium (host env)",
+      "import_preflight_in_container": "pass"
+    }
+  },
+  "build": {
+    "attempts": 1,
+    "retry": 0,
+    "copy_only": true,
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2g-20260723",
+    "image_id": "sha256:52b726f2aecc5ac0836f36b58d4f231fd02705d34553e5e5d8803ea3cd9f0884",
+    "repo_digests": [
+      "gmdisturb@sha256:52b726f2aecc5ac0836f36b58d4f231fd02705d34553e5e5d8803ea3cd9f0884"
+    ]
+  },
+  "run": {
+    "attempts": 1,
+    "retry": 0,
+    "exit_code": 0,
+    "runtime_seconds": 55.782,
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "freeze_ur10e": true,
+    "max_steps": 260,
+    "capture_steps": [
+      149,
+      150,
+      219,
+      220
+    ],
+    "no_models_post_scan": {
+      "POST": 0,
+      "/analyze": 0,
+      "/ground": 0,
+      "enable_vlm": 0,
+      "enable_perception": 0
+    },
+    "runtime_errors": {
+      "traceback": false,
+      "keyerror": false,
+      "xid": false,
+      "residual": false
+    }
+  },
+  "artifacts": {
+    "runtime_telemetry_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2g_dyn_c_motion_preflight_20260723/safety_logs/phase3_runtime_telemetry.csv",
+    "runtime_telemetry_sha256": "2e7a8572c93013baa84efc58223918b41e7a39fe6347b188e25b7b07dba91f58",
+    "runtime_telemetry_rows": 264,
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2g_dyn_c_motion_preflight_20260723/safety_logs/phase3_steps.csv",
+    "steps_rows": 6,
+    "body_pose_jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2g_dyn_c_motion_preflight_20260723/meta/body_poses.jsonl",
+    "body_pose_rows": 4,
+    "events_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2g_dyn_c_motion_preflight_20260723/safety_logs/phase3_events.csv",
+    "events_rows": 0,
+    "diagnostic_frames_saved": 4
+  },
+  "metrics": {
+    "ur10_hold_hash_unique": 1,
+    "ur10_joint_delta_norm_max": 0.387263,
+    "ur10_joint_delta_max_abs_max": 0.278264,
+    "g1_commanded_root_displacement_xy_m": [
+      1.1164,
+      -0.2928
+    ],
+    "g1_actual_root_displacement_xy_m": [
+      1.059859,
+      -0.287552
+    ],
+    "g1_commanded_vs_actual_direction_dot": 1.2674218132,
+    "projected_displacement_px_metric_available": false,
+    "roi_area_fraction_metric_available": false,
+    "fall_flag_metric_available": false,
+    "phase3_g1_fell": false,
+    "frame_sync": {
+      "runtime_frame_ids": 4,
+      "scene_png_count": 4,
+      "body_pose_rows": 4,
+      "body_frames_all_in_scene": true
+    }
+  },
+  "gates": {
+    "exit0": true,
+    "ur10_action_joint_delta_hash": "FAIL_JOINT_DELTA_NOT_NEAR_ZERO",
+    "g1_commanded_vs_actual_root_link_displacement": "PASS_DIRECTION_AND_MAGNITUDE_CONSISTENT",
+    "projected_displacement_px_ge_40": "FAIL_METRIC_NOT_EXPORTED",
+    "roi_area_fraction_ge_0_012": "FAIL_METRIC_NOT_EXPORTED",
+    "no_fall": "PASS_PHASE3_G1_FELL_FALSE_ONLY",
+    "direction_consistent": "PASS",
+    "frame_sync": "PASS",
+    "post0_no_models_or_errors": "PASS"
+  },
+  "command_vs_actual": {
+    "command": "scripted_g1_mirrored_outer_lateral_patrol with seed44/camera override/freeze-ur10e",
+    "actual": "G1 root displacement follows commanded direction; UR10 freeze hash stable but pose drift exceeds near-zero tolerance; projected/ROI/fall telemetry fields absent",
+    "disposition": "STOP as required; formal capture forbidden"
+  },
+  "next": "formal capture blocked",
+  "generated_at_utc": "2026-07-23T12:43:14Z"
+}
