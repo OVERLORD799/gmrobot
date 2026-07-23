@@ -1,6 +1,6 @@
 {
   "index_id": "vlm-v1e02-visual-dataset-review-packet-index",
-  "version": "2.0.0",
+  "version": "2.1.0",
   "date": "2026-07-23",
   "artifacts": [
     {
@@ -22,6 +22,22 @@
     {
       "kind": "review_doc_json_v1e03",
       "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e03-dyn-b-offline-temporal-evidence-2026-07-23.json"
+    },
+    {
+      "kind": "func_c_formal_capture_doc_md",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.md"
+    },
+    {
+      "kind": "func_c_formal_capture_doc_json",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.json"
+    },
+    {
+      "kind": "func_c_formal_capture_artifact_manifest_jsonl",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl"
+    },
+    {
+      "kind": "func_c_formal_capture_artifact_summary_json",
+      "path": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.artifact-summary.json"
     }
   ],
   "results_large_files_included": false

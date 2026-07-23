@@ -1,0 +1,148 @@
+{
+  "task": "V1-E1 Func-C formal visual data capture",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "preflight": {
+    "required_head": "896b59d6c9e6b643a593c1212bca7796866a24ca",
+    "actual_head": "896b59d6c9e6b643a593c1212bca7796866a24ca",
+    "origin_main_match": true,
+    "worktree_clean": true
+  },
+  "fixed_image": {
+    "tag": "gmdisturb:e01-func-c-dual-reference-m1f13-20260723",
+    "sha_actual": "sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68",
+    "sha_reported_in_m1f13": "sha256:afc9120b374adfc83b6fde7d49e77c80b60047c3fe6b7ac0b36bfca316dedb68",
+    "sha_match": true
+  },
+  "approval_provenance": {
+    "reviewer_approved": true,
+    "approval_source": "user_explicit_2026-07-23",
+    "approval_scope": "reference_bin_visual_contract_and_formal_capture_go",
+    "scope_limits": {
+      "vlm_recognition_success": false,
+      "live_control_evidence": false
+    }
+  },
+  "run_policy": {
+    "build_or_rebuild": false,
+    "formal_isaac_applauncher_runs_allowed": 1,
+    "formal_isaac_applauncher_runs_used": 1,
+    "retried": false,
+    "network_mode": "none",
+    "forbidden_features_enabled": {
+      "POST": false,
+      "VLM": false,
+      "GDINO": false,
+      "SAM2": false,
+      "perception": false,
+      "five_stage": false,
+      "credentials": false
+    }
+  },
+  "scene_contract": {
+    "opt_in_env": "GMDISTURB_V1E01_FUNC_C_VISUAL=1",
+    "seed_label": 51,
+    "task_execution_expected": false,
+    "visual_dataset_only_expected": true,
+    "parts_expected": [
+      "B@1",
+      "B@2",
+      "B@3",
+      "B@4",
+      "B@5",
+      "B@6",
+      "B@7",
+      "B@8",
+      "B@9",
+      "B@10",
+      "B@11",
+      "B@12",
+      "B@13",
+      "B@14",
+      "B@15",
+      "B@16",
+      "B@17",
+      "B@18",
+      "B@19",
+      "B@20"
+    ],
+    "A_expected_empty": true,
+    "camera_pos_expected": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "camera_rot_expected": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "required_steps": [
+      100,
+      200
+    ],
+    "optional_stability_steps": [
+      99,
+      101,
+      199,
+      201
+    ],
+    "max_steps_expected_min": 201
+  },
+  "evidence_pre_run": {
+    "head_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/head.txt",
+    "image_sha_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/image_sha.txt",
+    "config_sha_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/safety_config_sha256.txt",
+    "asset_sha_files": [
+      "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/asset_container_usd_sha256.txt",
+      "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/asset_part_fixed_usd_sha256.txt"
+    ],
+    "reference_frame_sha_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/reference_frame330_sha256.txt",
+    "m1f13_frame_sha_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/m1f13_frame0_sha256.txt",
+    "command_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/command.txt",
+    "gpu_pre": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/gpu_pre.txt",
+    "gpu_xid_pre": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/gpu_xid_pre.txt"
+  },
+  "run_result": {
+    "raw_exit_code": 1,
+    "elapsed_seconds": 0,
+    "stdout_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/capture_stdout.txt",
+    "stderr_file": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723/meta/capture_stderr.txt",
+    "runtime_assertions_present": false,
+    "runtime_assertions_ok": false,
+    "runtime_assertions": null,
+    "error_summary": "/isaac-sim/kit/python/bin/python3: can't open file '/opt/projects/GMRobot/scripts/gm_state_machine_agent.py': [Errno 2] No such file or directory"
+  },
+  "gate_evaluation": {
+    "raw_exit0": false,
+    "main_frames_exist_100_200": false,
+    "png_valid_non_black": false,
+    "frames_sha_and_resolution_recorded": false,
+    "dual_green_shell_white_grid_visible": false,
+    "A_empty_B_20_in_slots": false,
+    "no_white_tray_stairs_fan": false,
+    "static_consistency_explainable": false,
+    "POST0": true,
+    "no_traceback_device_lost_newxid_residual": true,
+    "runtime_assertions_pass": false
+  },
+  "artifact_manifest": {
+    "jsonl": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.artifact-manifest.jsonl",
+    "summary": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e1-func-c-formal-capture-2026-07-23.artifact-summary.json",
+    "group_count": 1,
+    "split_frames_into_groups": false
+  },
+  "candidate_manifest_update": {
+    "status": "func_c_formal_capture_fail_final",
+    "formal_recapture_allowed": false,
+    "consumed": true,
+    "func_c_formal_capture_pass_applied": false
+  },
+  "dataset_sufficiency": {
+    "E0_update": "func_c_formal_capture_failed_no_new_primary_frames",
+    "overall_sufficiency_claimed": false
+  },
+  "verdict": "FAIL_FINAL",
+  "rerun": false
+}

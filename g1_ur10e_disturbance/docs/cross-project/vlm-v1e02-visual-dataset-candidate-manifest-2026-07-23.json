@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.1.1",
+  "manifest_version": "3.1.2",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -14,6 +14,11 @@
     },
     {
       "version": "3.1.0",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+      "immutable": true
+    },
+    {
+      "version": "3.1.1",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
       "immutable": true
     }
@@ -76,7 +81,8 @@
         "target_container_and_contents_visually_clear",
         "reference_locked_to_dyn_b_frame_000330_env0_left_green_empty_box",
         "func_c_left_source_visual_rework_required",
-        "semantic_clarity_user_confirmation_pending"
+        "semantic_clarity_user_confirmation_pending",
+        "v1e1_formal_capture_single_run_consumed_fail_final_no_rerun"
       ],
       "provenance": {
         "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_final_m1m_20260723/manifest/capture_manifest.json",
@@ -113,10 +119,42 @@
           "stability_only": false
         }
       ],
-      "status": "dual_reference_scene_rework_pending",
+      "status": "func_c_formal_capture_fail_final",
       "formal": false,
       "m1f10_user_rejected": true,
-      "m1f10_route_status": "ABANDONED_WASTEFUL_LOOP"
+      "m1f10_route_status": "ABANDONED_WASTEFUL_LOOP",
+      "consumed": true,
+      "formal_capture_attempt": {
+        "run_id": "v1e1_func_c_formal_capture_20260723",
+        "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e1_func_c_formal_capture_20260723",
+        "raw_exit_code": 1,
+        "elapsed_seconds": 0,
+        "runtime_assertions_pass": false,
+        "main_frames_ready": false,
+        "final_status": "FAIL_FINAL",
+        "retriable": false
+      },
+      "provenance_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-23",
+        "approval_scope": "reference_bin_visual_contract_and_formal_capture_go",
+        "scope_limit_not_vlm_or_live_control": true
+      },
+      "label_contract": {
+        "synthetic": false,
+        "human_hand": false,
+        "glove": false,
+        "PPE": false,
+        "learned_whole_body_control": false,
+        "VLM_output": false,
+        "geometry": false,
+        "live_control_evidence": false,
+        "risk_tags": [
+          "functional",
+          "provisional",
+          "reviewer_approved_visual_ground_truth"
+        ]
+      }
     },
     {
       "id": "E02-DYN-B-M1Z9-STEP220-330",
