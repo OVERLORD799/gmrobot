@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Mapping, Sequence
 
 from shadow.target_full_override import (
+    CONTAINER_FULL_CONTENT_SPAWN_USD_NAME,
     CAMERA_POS,
     CAMERA_ROT,
     CONTAINER_FULL_SCALE,
@@ -28,6 +29,7 @@ from shadow.target_full_override import (
     resolve_v1e01_mode_flags,
     resolve_box_scale,
     source_visual_contract,
+    resolve_box_b_content_overlay_usd_name,
     resolve_box_usd_name,
     target_full_enabled,
 )
@@ -89,14 +91,16 @@ def precheck_container_full_asset(assets_dir: Path | str) -> dict[str, Any]:
     empty = root / CONTAINER_USD_NAME
     full = root / CONTAINER_FULL_USD_NAME
     full_visual = root / CONTAINER_FULL_SPAWN_USD_NAME
+    full_content_visual = root / CONTAINER_FULL_CONTENT_SPAWN_USD_NAME
     out: dict[str, Any] = {
         "ok": False,
         "verdict": "ASSET_SEMANTIC_DISTINCTION_UNPROVEN",
         "empty_path": str(empty),
         "full_path": str(full),
         "full_visual_path": str(full_visual),
+        "full_content_visual_path": str(full_content_visual),
     }
-    if not empty.is_file() or not full.is_file() or not full_visual.is_file():
+    if not empty.is_file() or not full.is_file() or not full_visual.is_file() or not full_content_visual.is_file():
         out["reason"] = "missing_usd"
         return out
     out["empty_sha256"] = sha256_file(empty)
@@ -157,7 +161,7 @@ def precheck_container_full_asset(assets_dir: Path | str) -> dict[str, Any]:
     if not distinct:
         out["reason"] = "no_extra_filled_geometry"
         return out
-    # Spawn payload sanity gate for visual corruption prevention (offline/static only).
+    # Spawn payload sanity gate for legacy visual composition prevention (offline/static only).
     # Enforces no instance/prototype arcs, no Part_* prim naming, and stable root ops.
     stage_v = Usd.Stage.Open(str(full_visual))
     if stage_v is None:
@@ -213,6 +217,55 @@ def precheck_container_full_asset(assets_dir: Path | str) -> dict[str, Any]:
     }
     if not visual_ok:
         out["reason"] = "visual_spawn_sanity_fail"
+        return out
+    # Content-only overlay sanity gate for M1F9 composition mode.
+    stage_c = Usd.Stage.Open(str(full_content_visual))
+    if stage_c is None:
+        out["reason"] = "content_visual_open_failed"
+        return out
+    content_filled_count = 0
+    content_part_numeric_count = 0
+    content_container_name_hits = 0
+    content_inst_related_count = 0
+    content_composed_arc_count = 0
+    content_mesh_count = 0
+    for prim in stage_c.TraverseAll():
+        if prim.IsA(UsdGeom.Mesh):
+            content_mesh_count += 1
+        if prim.IsInstance() or prim.IsInstanceable():
+            content_inst_related_count += 1
+        if prim.HasAuthoredReferences() or prim.HasAuthoredPayloads() or prim.HasAuthoredInherits():
+            content_composed_arc_count += 1
+        name = prim.GetName()
+        if name.startswith("FilledContent_"):
+            content_filled_count += 1
+        if name.startswith("Part_") and name[5:].isdigit():
+            content_part_numeric_count += 1
+        if "Container" in name:
+            content_container_name_hits += 1
+    content_ok = (
+        str(stage_c.GetDefaultPrim().GetPath()) == "/FilledContentOnly"
+        and float(stage_c.GetMetadata("metersPerUnit")) == 1.0
+        and content_filled_count == 20
+        and content_mesh_count == 20
+        and content_part_numeric_count == 0
+        and content_container_name_hits == 0
+        and content_inst_related_count == 0
+        and content_composed_arc_count == 0
+    )
+    out["full_content_visual_stats"] = {
+        "default_prim": str(stage_c.GetDefaultPrim().GetPath()) if stage_c.GetDefaultPrim() else None,
+        "metersPerUnit": float(stage_c.GetMetadata("metersPerUnit")),
+        "filled_content_count": int(content_filled_count),
+        "mesh_count": int(content_mesh_count),
+        "part_numeric_count": int(content_part_numeric_count),
+        "container_name_hits": int(content_container_name_hits),
+        "instance_related_count": int(content_inst_related_count),
+        "composed_arc_count": int(content_composed_arc_count),
+        "content_spawn_gate_ok": bool(content_ok),
+    }
+    if not content_ok:
+        out["reason"] = "content_visual_spawn_sanity_fail"
         return out
     out["ok"] = True
     out["verdict"] = "ASSET_DISTINCTION_OK"
@@ -276,6 +329,16 @@ def validate_func_c_flags(
     assert resolve_box_usd_name("A", env={"GMROBOT_V1E01_TARGET_FULL": "1"}) == CONTAINER_USD_NAME
     assert resolve_box_usd_name("B", env={}) == CONTAINER_USD_NAME
     assert resolve_box_usd_name("B", env={"GMROBOT_V1E01_TARGET_FULL": "1"}) == "container_full_visual.usd"
+    assert (
+        resolve_box_usd_name("B", env={"GMROBOT_V1E01_TARGET_FULL": "1", "GMROBOT_V1E01_VISUAL_ONLY": "1"})
+        == "container.usd"
+    )
+    assert (
+        resolve_box_b_content_overlay_usd_name(
+            env={"GMROBOT_V1E01_TARGET_FULL": "1", "GMROBOT_V1E01_VISUAL_ONLY": "1"}
+        )
+        == CONTAINER_FULL_CONTENT_SPAWN_USD_NAME
+    )
     assert resolve_box_scale("B", default_scale=(0.01, 0.01, 0.01), env={}) == (0.01, 0.01, 0.01)
     assert resolve_box_scale(
         "B", default_scale=(0.01, 0.01, 0.01), env={"GMROBOT_V1E01_TARGET_FULL": "1"}
@@ -579,13 +642,13 @@ def _project_world_to_uv_pinhole(pos: Sequence[float]) -> tuple[float, float] | 
     cx, cy, cz = [float(v) for v in CAMERA_POS]
     rel_x, rel_y, rel_z = (px - cx, py - cy, pz - cz)
     # For camera quat ~= (0.7071, 0, 0.7071, 0) with convention="world":
-    # +u aligns with +world_y, +v aligns with -world_x, looking down (-world_z).
+    # +u aligns with -world_y, +v aligns with -world_x, looking down (-world_z).
     depth = -rel_z
     if depth <= 1e-6:
         return None
     fx = (float(CAMERA_FOCAL_LENGTH) / float(CAMERA_H_APERTURE)) * float(CAMERA_WIDTH)
     fy = fx
-    u = 0.5 * float(CAMERA_WIDTH) + fx * (rel_y / depth)
+    u = 0.5 * float(CAMERA_WIDTH) - fx * (rel_y / depth)
     v = 0.5 * float(CAMERA_HEIGHT) - fy * (rel_x / depth)
     return (float(u), float(v))
 
@@ -638,17 +701,17 @@ def target_identity_evidence(rgb_path: Path | str, target_roi: Mapping[str, Any]
     # Box_A should be distinctly greener than full target box_B.
     greener_source = float(s["green_ratio"]) > float(t["green_ratio"]) + 0.15
     darker_target = float(t["dark_ratio"]) > 0.35
-    right_of_source = float(target_roi.get("centroid_uv", [0.0, 0.0])[0]) > float(source.get("centroid_uv", [1e9, 0.0])[0])
+    left_of_source = float(target_roi.get("centroid_uv", [1e9, 0.0])[0]) < float(source.get("centroid_uv", [0.0, 0.0])[0])
     out.update(
         {
-            "ok": bool(greener_source and darker_target and right_of_source),
+            "ok": bool(greener_source and darker_target and left_of_source),
             "target_stats": t,
             "source_stats": s,
             "source_roi": source,
             "checks": {
                 "source_greener_than_target": bool(greener_source),
                 "target_contains_dark_content": bool(darker_target),
-                "target_right_of_source": bool(right_of_source),
+                "target_left_of_source": bool(left_of_source),
             },
         }
     )
@@ -787,7 +850,8 @@ def build_capture_manifest(
         "capture_steps": list(E01_FUNC_C_CAPTURE_STEPS),
         "camera_pos": list(CAMERA_POS),
         "box_A_usd": CONTAINER_USD_NAME,
-        "box_B_usd": CONTAINER_FULL_USD_NAME,
+        "box_B_usd": CONTAINER_USD_NAME,
+        "box_B_content_overlay_usd": CONTAINER_FULL_CONTENT_SPAWN_USD_NAME,
         "d1b_blocker_enabled": False,
         "frames": [dict(fr) for fr in frames],
         "geometry_window": dict(geometry_window),
@@ -799,6 +863,8 @@ def build_capture_manifest(
         "visual_dataset_only": bool(flags.get("mode_flags", {}).get("visual_dataset_only", False)),
         "visual_gate_ok": visual_ok,
         "verdict": verdict,
+        "manifest_status": "target_full_composition_rework_pending",
+        "formal_recapture_required": False,
         "paper_claim": "视觉上已满或不可用于继续放置的目标容器候选场景。",
         "not_vlm_positive": True,
         "not_accepted": True,

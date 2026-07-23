@@ -20,10 +20,17 @@ def test_fake_stage_pass() -> None:
     container_assets = {
         "box_A": {"usd_path": "/tmp/container.usd"},
         "grid_A": {"usd_path": "/tmp/grid.usd"},
-        "box_B": {"usd_path": "/tmp/container_full_visual.usd"},
+        "box_B": {"usd_path": "/tmp/container.usd"},
+        "grid_B": {"usd_path": "/tmp/grid.usd"},
+        "filled_content_B": {"usd_path": "/tmp/container_full_content_visual.usd"},
     }
     part_assets = {}
-    prims = ["/World/envs/env_0/ContainerA", "/World/envs/env_0/GridA", "/World/envs/env_0/ContainerB"]
+    prims = [
+        "/World/envs/env_0/ContainerA",
+        "/World/envs/env_0/GridA",
+        "/World/envs/env_0/ContainerB",
+        "/World/envs/env_0/GridB",
+    ] + [f"/World/envs/env_0/ContainerBFilledContent/FilledContents/FilledContent_{i:02d}" for i in range(20)]
     out = evaluate_runtime_scene_assertions(
         env=env,
         container_assets=container_assets,
@@ -38,10 +45,14 @@ def test_fake_stage_fail_with_parts() -> None:
     container_assets = {
         "box_A": {"usd_path": "/tmp/container.usd"},
         "grid_A": {"usd_path": "/tmp/grid.usd"},
-        "box_B": {"usd_path": "/tmp/container_full_visual.usd"},
+        "box_B": {"usd_path": "/tmp/container.usd"},
+        "grid_B": {"usd_path": "/tmp/grid.usd"},
+        "filled_content_B": {"usd_path": "/tmp/container_full_content_visual.usd"},
     }
     part_assets = {"part_1": {"dummy": 1}}
-    prims = ["/World/envs/env_0/Part_1"]
+    prims = ["/World/envs/env_0/Part_1"] + [
+        f"/World/envs/env_0/ContainerBFilledContent/FilledContents/FilledContent_{i:02d}" for i in range(20)
+    ]
     out = evaluate_runtime_scene_assertions(
         env=env,
         container_assets=container_assets,
@@ -57,7 +68,9 @@ def test_file_written_and_machine_readable() -> None:
     container_assets = {
         "box_A": {"usd_path": "/tmp/container.usd"},
         "grid_A": {"usd_path": "/tmp/grid.usd"},
-        "box_B": {"usd_path": "/tmp/container_full_visual.usd"},
+        "box_B": {"usd_path": "/tmp/container.usd"},
+        "grid_B": {"usd_path": "/tmp/grid.usd"},
+        "filled_content_B": {"usd_path": "/tmp/container_full_content_visual.usd"},
     }
     with tempfile.TemporaryDirectory() as td:
         out_path = Path(td) / "runtime_scene_assertions.json"
@@ -66,7 +79,8 @@ def test_file_written_and_machine_readable() -> None:
             env=env,
             container_assets=container_assets,
             part_assets={},
-            stage=["/World/envs/env_0/ContainerA"],
+            stage=["/World/envs/env_0/ContainerA"]
+            + [f"/World/envs/env_0/FilledContents/FilledContent_{i:02d}" for i in range(20)],
         )
         assert out_path.is_file()
         disk = json.loads(out_path.read_text(encoding="utf-8"))

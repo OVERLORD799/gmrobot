@@ -44,7 +44,8 @@ e01_func_c:
   geometry_window: [100, 200]
   camera_pos: [0.35, 0.0, 2.5]
   box_A_usd: container.usd
-  box_B_usd: container_full.usd
+  box_B_usd: container.usd
+  box_B_content_overlay_usd: container_full_content_visual.usd
   d1b_blocker: false
   virtual_hand_motion: false
   vlm: false

@@ -38,6 +38,7 @@ def evaluate_runtime_scene_assertions(
     part_count_cfg = len([k for k in part_assets.keys() if str(k).startswith("part_")])
     prim_paths = [str(p) for p in stage_prim_paths]
     part_count_stage = sum(1 for p in prim_paths if "/Part_" in p or p.endswith("Part_"))
+    filled_content_stage = sum(1 for p in prim_paths if str(p).split("/")[-1].startswith("FilledContent_"))
     result = {
         "mode_flags": {
             "task_execution": bool(flags.get("task_execution", True)),
@@ -48,13 +49,17 @@ def evaluate_runtime_scene_assertions(
             "box_A": "box_A" in container_assets,
             "grid_A": "grid_A" in container_assets,
             "box_B": "box_B" in container_assets,
+            "grid_B": "grid_B" in container_assets,
+            "filled_content_B": "filled_content_B" in container_assets,
         },
         "asset_identity": {
             "box_A_usd": str(container_assets.get("box_A", {}).get("usd_path", "")),
             "box_B_usd": str(container_assets.get("box_B", {}).get("usd_path", "")),
+            "filled_content_B_usd": str(container_assets.get("filled_content_B", {}).get("usd_path", "")),
         },
         "part_count_cfg": int(part_count_cfg),
         "part_count_stage": int(part_count_stage),
+        "filled_content_stage": int(filled_content_stage),
         "stage_prim_total": len(prim_paths),
     }
     checks = {
@@ -62,9 +67,14 @@ def evaluate_runtime_scene_assertions(
         "visual_dataset_only_true": result["mode_flags"]["visual_dataset_only"] is True,
         "spawn_task_parts_false": result["mode_flags"]["spawn_task_parts"] is False,
         "part_count_cfg_zero": result["part_count_cfg"] == 0,
+        "part_count_stage_zero": result["part_count_stage"] == 0,
         "containers_exist": all(result["container_presence"].values()),
         "box_a_identity_container": result["asset_identity"]["box_A_usd"].endswith("container.usd"),
-        "box_b_identity_full_visual": result["asset_identity"]["box_B_usd"].endswith("container_full_visual.usd"),
+        "box_b_identity_container": result["asset_identity"]["box_B_usd"].endswith("container.usd"),
+        "filled_content_identity_content_only": result["asset_identity"]["filled_content_B_usd"].endswith(
+            "container_full_content_visual.usd"
+        ),
+        "filled_content_stage_expected": result["filled_content_stage"] == 20,
     }
     result["checks"] = checks
     result["ok"] = all(checks.values())

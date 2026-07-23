@@ -44,10 +44,12 @@ PART_FIXED_USD = os.path.join(_ASSETS_DIR, "part/part_fixed.usd")
 
 from ....shadow.target_full_override import (  # noqa: E402
     assert_v1e01_mode_gate,
+    resolve_box_b_content_overlay_usd_name,
     resolve_box_scale,
     resolve_box_usd_name,
     resolve_part_usd_name,
     resolve_v1e01_mode_flags,
+    target_full_visual_composition_enabled,
     target_full_enabled,
 )
 
@@ -206,19 +208,38 @@ def build_container_grid_assets() -> dict[str, AssetBaseCfg]:
             spawn=spawn_cfg,
         )
 
-        # Full target already includes filled content; skip extra grid_B.
-        if not (container_name == "B" and usd_name == "container_full_visual.usd"):
-            assets[f"grid_{container_name}"] = AssetBaseCfg(
-                prim_path=f"{{ENV_REGEX_NS}}/Grid{container_name}",
-                init_state=AssetBaseCfg.InitialStateCfg(pos=grid_pos, rot=grid_rot),
-                spawn=sim_utils.UsdFileCfg(usd_path=DIVIDER_USD),
-            )
+        assets[f"grid_{container_name}"] = AssetBaseCfg(
+            prim_path=f"{{ENV_REGEX_NS}}/Grid{container_name}",
+            init_state=AssetBaseCfg.InitialStateCfg(pos=grid_pos, rot=grid_rot),
+            spawn=sim_utils.UsdFileCfg(usd_path=DIVIDER_USD),
+        )
+
+        if container_name == "B":
+            overlay_name = resolve_box_b_content_overlay_usd_name()
+            if overlay_name is not None:
+                overlay_path = os.path.join(_ASSETS_DIR, overlay_name)
+                assets["filled_content_B"] = AssetBaseCfg(
+                    prim_path="{ENV_REGEX_NS}/ContainerBFilledContent",
+                    init_state=AssetBaseCfg.InitialStateCfg(pos=box_pos, rot=box_rot),
+                    spawn=sim_utils.UsdFileCfg(
+                        usd_path=overlay_path,
+                        scale=(1.0, 1.0, 1.0),
+                        rigid_props=sim_utils.RigidBodyPropertiesCfg(
+                            rigid_body_enabled=False,
+                            kinematic_enabled=True,
+                        ),
+                        collision_props=sim_utils.CollisionPropertiesCfg(collision_enabled=False),
+                    ),
+                )
 
     return assets
 
 
 def build_part_assets() -> dict[str, RigidObjectCfg]:
     assets: dict[str, RigidObjectCfg] = {}
+    if target_full_visual_composition_enabled():
+        # target_full + visual_only: visual composition mode forbids task parts.
+        return assets
     if not bool(_V1E01_MODE_FLAGS.get("spawn_task_parts", True)):
         # Capture-only visual mode: forbid spawning 20 task parts.
         return assets

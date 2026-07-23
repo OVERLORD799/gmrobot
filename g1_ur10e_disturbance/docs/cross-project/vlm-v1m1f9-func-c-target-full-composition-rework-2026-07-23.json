@@ -1,0 +1,132 @@
+{
+  "task": "V1-M1F9 Func-C target-full composition rework",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "c1bdc60",
+    "actual_head": "c1bdc60cac0a0417c1436adbfd8fcd558d4d37a3",
+    "worktree_clean": true
+  },
+  "offline_only": true,
+  "network_or_runtime_actions": {
+    "docker": false,
+    "isaac": false,
+    "build": false,
+    "capture": false,
+    "post": false
+  },
+  "left_right_mapping_evidence": {
+    "camera_pos": [
+      0.35,
+      0.0,
+      2.5
+    ],
+    "camera_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "world_to_image_rule": "u aligns with -world_y; v aligns with -world_x",
+    "containerA_world": [
+      0.75,
+      -0.25,
+      0.0
+    ],
+    "containerB_world": [
+      0.75,
+      0.25,
+      0.0
+    ],
+    "containerA_uv": [
+      374.974946313529,
+      152.0400858983536
+    ],
+    "containerB_uv": [
+      265.025053686471,
+      152.0400858983536
+    ],
+    "source_box_a_roi": {
+      "bbox_xyxy": [
+        341,
+        80,
+        415,
+        211
+      ],
+      "centroid_uv": [
+        378.0,
+        145.5
+      ]
+    },
+    "target_box_b_roi": {
+      "bbox_xyxy": [
+        224,
+        80,
+        298,
+        211
+      ],
+      "centroid_uv": [
+        261.0,
+        145.5
+      ]
+    },
+    "conclusion": "screen-left maps to ContainerB, not source ContainerA"
+  },
+  "m1f8_attribution": {
+    "withdrawn_claim": "left side is source A",
+    "actual_white_object_expected_prim": "ContainerB",
+    "actual_white_object_expected_asset": "container_full_visual.usd",
+    "cross_validation_from_m1d_hide_container_b": true,
+    "user_rejected_visual": true
+  },
+  "composition_rework": {
+    "scope": "TARGET_FULL + VISUAL_ONLY opt-in only",
+    "box_A_usd": "container.usd",
+    "box_B_usd": "container.usd",
+    "grid_A_present": true,
+    "grid_B_present": true,
+    "box_B_content_overlay_usd": "container_full_content_visual.usd",
+    "forbid_box_b_shell_full_visual": true,
+    "appearance_reference": "两箱绿色壳+白格，B仅增加格内内容"
+  },
+  "content_only_asset": {
+    "path": "GMRobot/source/GMRobot/GMRobot/assets/container_full_content_visual.usd",
+    "generator": "GMRobot/scripts/generate_container_full_content_visual_usd.py",
+    "generator_unit": "GMRobot/scripts/test_generate_container_full_content_visual_usd_unit.py",
+    "frozen_source_asset": "part/part_5000.usd",
+    "frozen_source_sha256": "71fd48abb018275ae5bf9634216898136c028d0c883deb50caa7467481991aa6",
+    "output_sha256": "5ca656f996c783c0ab9717cae265c8461054d98bd487b08d9b5770f3bb36f935",
+    "constraints": {
+      "filled_content_count": 20,
+      "forbid_part_numeric_names": true,
+      "forbid_container_shell_prims": true,
+      "rigid_body_count": 0,
+      "collision_api_count": 0,
+      "mass_api_count": 0,
+      "slot_positions_match_5x4": true
+    }
+  },
+  "runtime_assertions_expected": {
+    "box_A_usd_suffix": "container.usd",
+    "box_B_usd_suffix": "container.usd",
+    "requires_grid_A": true,
+    "requires_grid_B": true,
+    "requires_filled_content_B": true,
+    "filled_content_stage_expected": 20,
+    "task_part_count_expected": 0
+  },
+  "m1f8_runtime_assertions_missing_root_cause": {
+    "source_confirmed": true,
+    "details": "runtime_scene_assertions.json is emitted only when GMROBOT_RUNTIME_SCENE_ASSERTIONS_PATH is set and TARGET_FULL=1 and VISUAL_ONLY=1 all match in gm_state_machine_agent.py"
+  },
+  "manifest": {
+    "status": "target_full_composition_rework_pending",
+    "formal_recapture_required": false
+  },
+  "offline_checks": {
+    "py_compile": "pass",
+    "test_generate_container_full_content_visual_usd_unit": "pass",
+    "test_runtime_scene_assertions_unit": "pass",
+    "test_e01_func_c_capture_unit": "pass"
+  },
+  "blocked": false
+}
