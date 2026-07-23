@@ -270,6 +270,11 @@ parser.add_argument(
          "off (same as --no-safety when combined).  Default: active.",
 )
 parser.add_argument(
+    "--freeze-ur10e",
+    action="store_true",
+    help="Freeze UR10e at initial joint pose via explicit hold action (default: off).",
+)
+parser.add_argument(
     "--numpy-origin-pre-json",
     type=str,
     default="",
@@ -417,6 +422,12 @@ from g1_vlm_client import G1VLMClient, _ensure_tunnel, init_vlm_config
 from ur10e_controller import UR10eController
 from safety_adapter import G1EnvelopeAdapter
 from seed_utils import apply_episode_seeds, seed_manifest, write_seed_sidecar
+from motion_isolation import (
+    build_ur10_hold_action,
+    hold_action_hash,
+    compute_ur10_freeze_metrics,
+)
+from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
 from mat_event_detector import MatEventDetector
 from g1_disturbance_controller import (
@@ -478,6 +489,19 @@ def _quat_tilt_angle(quat_xyzw: np.ndarray) -> float:
     # Dot with world Z (0,0,1) = zz
     zz_clamped = max(-1.0, min(1.0, zz))
     return float(np.arccos(zz_clamped))
+
+
+def _quat_yaw(quat_wxyz: np.ndarray) -> float:
+    """Return world yaw (radians) from quaternion (w,x,y,z)."""
+    w, x, y, z = (
+        float(quat_wxyz[0]),
+        float(quat_wxyz[1]),
+        float(quat_wxyz[2]),
+        float(quat_wxyz[3]),
+    )
+    siny_cosp = 2.0 * (w * z + x * y)
+    cosy_cosp = 1.0 - 2.0 * (y * y + z * z)
+    return float(np.arctan2(siny_cosp, cosy_cosp))
 
 
 def inject_disturbance_velocity(env, cmd: np.ndarray, device: str) -> None:
@@ -977,11 +1001,18 @@ def main():
     )
     _dyn_b_per_step_audit_fh = None
     _dyn_b_per_step_audit_writer = None
+    _runtime_telemetry_fh = None
+    _runtime_telemetry_writer = None
+    _runtime_telemetry_path = args_cli.output_csv.replace(".csv", "_runtime_telemetry.csv")
     if args_cli.dyn_b_per_step_audit_csv:
         _dyn_b_per_step_audit_fh, _dyn_b_per_step_audit_writer = (
             init_dyn_b_per_step_audit_writer(
                 args_cli.dyn_b_per_step_audit_csv,
             )
+        )
+    if args_cli.freeze_ur10e or args_cli.save_camera:
+        _runtime_telemetry_fh, _runtime_telemetry_writer = init_runtime_telemetry_writer(
+            _runtime_telemetry_path
         )
     if _dynamic_audit_fh is not None:
         _dynamic_audit_fh.write(DYNAMIC_AUDIT_HEADER)
@@ -1311,6 +1342,23 @@ def main():
 
     ur10e.reset(obs["ur10e_policy"])
     disturb.reset()
+    _ur10_joint0 = (
+        obs["ur10e_policy"]["joint_pos"][0].detach().cpu().numpy().astype(np.float32)
+    )
+    _ur10_hold_gripper0 = float(ur10e.get_action(obs["ur10e_policy"], advance=False)[7])
+    _ur10_hold_action = build_ur10_hold_action(_ur10_joint0, _ur10_hold_gripper0)
+    _ur10_hold_hash = hold_action_hash(_ur10_hold_action)
+    _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
+        effective_action=_ur10_hold_action,
+        current_joint_pose=_ur10_joint0,
+        initial_joint_pose=_ur10_joint0,
+    )
+    if args_cli.freeze_ur10e:
+        print(
+            f"[phase3] UR10 freeze enabled: initial_joint_pose="
+            f"{[round(float(v), 6) for v in _ur10_joint0.tolist()]} "
+            f"hold_hash={_ur10_hold_hash[:16]}…"
+        )
 
     # Inject initial zero-velocity command so the first env.step() starts
     # with a known command (instead of UniformVelocityCommand's random init).
@@ -2379,6 +2427,16 @@ def main():
             ur10e_action = ur10e_proposed
             gate_decision = None
 
+        if args_cli.freeze_ur10e:
+            ur10e_action = _ur10_hold_action.copy()
+        _ur10_joint_now = (
+            obs["ur10e_policy"]["joint_pos"][0].detach().cpu().numpy().astype(np.float32)
+        )
+        _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
+            effective_action=ur10e_action,
+            current_joint_pose=_ur10_joint_now,
+            initial_joint_pose=_ur10_joint0,
+        )
         prev_ur10e_action = ur10e_action[:7].copy()
 
         # ── 5b. Replan check (GMRobot L1WarnReplanTrigger + GeometryReplanV0) ──
@@ -2631,6 +2689,8 @@ def main():
             grasp_rewound=grasp_rewound,
             replan_force_advance=_replan_force_advance,
         )
+        if args_cli.freeze_ur10e:
+            should_advance = False
         if _enforcement_mode == "shadow":
             if _evaluated_gate_name in ("STOP", "SLOW_DOWN"):
                 metrics.shadow_nonallow_evaluated_steps += 1
@@ -2781,6 +2841,42 @@ def main():
         action[0, 19] = torch.tensor(
             ur10e_action[7], dtype=torch.float32, device=device
         )
+        if _runtime_telemetry_writer is not None:
+            _rt_links = {}
+            for _lk in (
+                "torso_link",
+                "head_link",
+                "left_ankle_roll_link",
+                "right_ankle_roll_link",
+            ):
+                try:
+                    _li = g1.find_bodies(_lk)[0][0]
+                    _lp = g1.data.body_link_pos_w[0, _li].cpu().numpy()
+                    _rt_links[_lk] = [float(_lp[0]), float(_lp[1]), float(_lp[2])]
+                except Exception:
+                    continue
+            _root_quat_now = g1.data.root_quat_w[0].cpu().numpy()
+            _runtime_telemetry_writer.writerow(
+                {
+                    "sim_step": int(step),
+                    "frame_id": "",
+                    "scenario_phase": str(disturb.scenario_name),
+                    "commanded_vx": f"{float(disturb_cmd[0]):.6f}",
+                    "commanded_vy": f"{float(disturb_cmd[1]):.6f}",
+                    "commanded_yaw": f"{float(disturb_cmd[2]):.6f}",
+                    "actual_root_x": f"{float(g1_root[0]):.6f}",
+                    "actual_root_y": f"{float(g1_root[1]):.6f}",
+                    "actual_root_z": f"{float(g1_root[2]):.6f}",
+                    "actual_root_yaw": f"{float(_quat_yaw(_root_quat_now)):.6f}",
+                    "key_body_links_json": json.dumps(_rt_links, sort_keys=True, ensure_ascii=True),
+                    "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
+                    "ur10_hold_hash": _ur10_hold_hash,
+                    "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
+                    "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
+                    "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                }
+            )
+            _runtime_telemetry_fh.flush()
 
         # ── 9. Step simulation ────────────────────────────────────────
         obs, reward, terminated, truncated, info = env.step(action)
@@ -2794,6 +2890,7 @@ def main():
                 _do_cam = (step % ival == 0)
         if _do_cam:
             scene_rgb = obs.get("ur10e_camera", {}).get("scene_rgb")
+            _frame_id = ""
             if scene_rgb is not None:
                 from PIL import Image as _PILImage
 
@@ -2804,6 +2901,7 @@ def main():
                     _arr = _arr[..., :3]
                 _frame_path = os.path.join(_cam_out, f"frame_{step:06d}_env0.png")
                 _PILImage.fromarray(_arr).save(_frame_path)
+                _frame_id = os.path.basename(_frame_path)
                 print(f"  [camera] saved {_frame_path}")
             if _body_pose_fh is not None:
                 from safety_adapter import TRACKED_BODIES as _TRACKED
@@ -2820,13 +2918,25 @@ def main():
                 _ee_now = ur10e_robot.data.body_link_pos_w[0, _ee_body_idx].cpu().numpy() + _ee_offset
                 _rec = {
                     "step": int(step),
+                    "sim_step": int(step),
+                    "frame_id": _frame_id,
                     "phase": str(disturb.scenario_name),
+                    "commanded_vx": float(disturb_cmd[0]),
+                    "commanded_vy": float(disturb_cmd[1]),
+                    "commanded_yaw": float(disturb_cmd[2]),
                     "g1_root": [float(v) for v in _root_now],
+                    "g1_root_yaw": float(_quat_yaw(g1.data.root_quat_w[0].cpu().numpy())),
                     "ur10e_ee": [float(v) for v in _ee_now],
                     "g1_bodies": _bodies,
                     "camera_pos": list(_cam_pos),
                     "motion_source_label": args_cli.motion_source_label or "",
                     "gate": gate_decision.name if gate_decision is not None else "NONE",
+                    "ur10_freeze_enabled": bool(args_cli.freeze_ur10e),
+                    "ur10_initial_joint_pose": [float(v) for v in _ur10_joint0.tolist()],
+                    "ur10_hold_hash": _ur10_hold_hash,
+                    "ur10_action_norm": _ur10_freeze_last_metrics["ur10_action_norm"],
+                    "ur10_joint_delta_norm": _ur10_freeze_last_metrics["ur10_joint_delta_norm"],
+                    "ur10_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_joint_delta_max_abs"],
                 }
                 # Prefer live closest-body dist from adapter when available.
                 if adapter is not None:
@@ -2834,6 +2944,42 @@ def main():
                     _rec["closest_g1_body"] = str(adapter.closest_body_name or "")
                 _body_pose_fh.write(json.dumps(_rec) + "\n")
                 _body_pose_fh.flush()
+            if _runtime_telemetry_writer is not None:
+                _key_links = {}
+                for _lk in (
+                    "torso_link",
+                    "head_link",
+                    "left_ankle_roll_link",
+                    "right_ankle_roll_link",
+                ):
+                    try:
+                        _li = g1.find_bodies(_lk)[0][0]
+                        _lp = g1.data.body_link_pos_w[0, _li].cpu().numpy()
+                        _key_links[_lk] = [float(_lp[0]), float(_lp[1]), float(_lp[2])]
+                    except Exception:
+                        continue
+                _root_quat_now = g1.data.root_quat_w[0].cpu().numpy()
+                _runtime_telemetry_writer.writerow(
+                    {
+                        "sim_step": int(step),
+                        "frame_id": _frame_id,
+                        "scenario_phase": str(disturb.scenario_name),
+                        "commanded_vx": f"{float(disturb_cmd[0]):.6f}",
+                        "commanded_vy": f"{float(disturb_cmd[1]):.6f}",
+                        "commanded_yaw": f"{float(disturb_cmd[2]):.6f}",
+                        "actual_root_x": f"{float(_root_now[0]):.6f}",
+                        "actual_root_y": f"{float(_root_now[1]):.6f}",
+                        "actual_root_z": f"{float(_root_now[2]):.6f}",
+                        "actual_root_yaw": f"{float(_quat_yaw(_root_quat_now)):.6f}",
+                        "key_body_links_json": json.dumps(_key_links, sort_keys=True, ensure_ascii=True),
+                        "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
+                        "ur10_hold_hash": _ur10_hold_hash,
+                        "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
+                        "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
+                        "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                    }
+                )
+                _runtime_telemetry_fh.flush()
 
         # ── 9. Metrics ─────────────────────────────────────────────────
         g1_ur10e_dist = float(np.linalg.norm(g1_root[:2] - ur10e_ee[:2]))
@@ -3248,6 +3394,8 @@ def main():
         _trajectory_fh.close()
     if _dyn_b_per_step_audit_fh is not None:
         _dyn_b_per_step_audit_fh.close()
+    if _runtime_telemetry_fh is not None:
+        _runtime_telemetry_fh.close()
     _cleanup_sim(env, simulation_app)
 
 

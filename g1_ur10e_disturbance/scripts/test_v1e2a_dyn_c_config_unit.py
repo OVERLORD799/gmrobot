@@ -25,6 +25,7 @@ def test_dyn_c_config_default_off() -> None:
     assert data["execute_capture"] is False
     assert data["task_execution"] is False
     assert data["visual_dataset_only"] is True
+    assert data["freeze_ur10e"] is False
     assert data["camera"]["pos"] == [0.45, 0.0, 2.7]
     assert data["camera"]["rot"] == [0.7071, 0.0, 0.7071, 0.0]
     assert data["capture_steps"] == [240, 310]

@@ -7,6 +7,7 @@ enable_capture: false
 execute_capture: false
 task_execution: false
 visual_dataset_only: true
+freeze_ur10e: false
 camera:
   override: true
   pos: [0.45, 0.0, 2.7]
