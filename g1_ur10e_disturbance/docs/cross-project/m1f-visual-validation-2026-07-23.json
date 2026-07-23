@@ -1,0 +1,57 @@
+{
+  "doc": "m1f-visual-validation-2026-07-23",
+  "verdict": "M1F_VISUAL_GATE_FAIL",
+  "not_formal_func_c_positive": true,
+  "formal_func_c_capture_run": false,
+  "allow_formal_func_c_recapture": false,
+  "head": "2741c7af63c106f99dd228cd6dbcad03edb967d2",
+  "image": {
+    "tag": "gmdisturb:e01-func-c-m1e-20260723",
+    "id": "sha256:3364f5165f35136ccbd93d3a7b46ca67f5e106b862c852f7167322572850feee",
+    "created": "2026-07-23T03:56:55.537309693+08:00",
+    "entrypoint": ["/opt/projects/g1_ur10e_disturbance/docker/entrypoint.sh"]
+  },
+  "runtime": {
+    "docker_runs": 1,
+    "rerun_forbidden": true,
+    "exit_code": 1,
+    "elapsed_seconds": 0,
+    "stdout_excerpt": "There was an error running python",
+    "stderr_excerpt": "File \"/isaac-sim/python.sh\", line 21 ... SyntaxError: invalid syntax",
+    "failure_class": "DOCKER_ENTRYPOINT_ARGV_MISPARSE",
+    "agent_reached": false,
+    "post_count": 0,
+    "code_modified": false,
+    "host_visual_usd_bind_mounted": false
+  },
+  "xid": {
+    "before_count": 0,
+    "after_count": 0,
+    "new_xid": false
+  },
+  "counts": {
+    "traceback": 0,
+    "device_lost": 0,
+    "nested_rigidbodyapi_warning": 0
+  },
+  "frame": {
+    "path": "g1_ur10e_disturbance/results/paper_demo/m1f_visual_validation_20260723/scene/frame_000000_env0.png",
+    "exists": false,
+    "sha256": null,
+    "shape": null
+  },
+  "gates": {
+    "exit_zero": false,
+    "png_valid_480x640x3": false,
+    "no_traceback_device_lost_new_xid": true,
+    "nested_rigidbodyapi_warning_zero": null,
+    "white_fan_gone": null,
+    "both_boxes_normal_scale": null,
+    "container_a_and_source_parts_ok": null,
+    "container_b_full_contents_visible": null,
+    "png_actually_read_for_vision": false
+  },
+  "results_dir": "g1_ur10e_disturbance/results/paper_demo/m1f_visual_validation_20260723",
+  "results_committed": false,
+  "note": "仍不是正式 Func-C 正样本；未运行正式 capture。唯一一次 Docker 运行因 entrypoint 将 python.sh 误解析为 Python 源而失败，禁止重跑。"
+}
