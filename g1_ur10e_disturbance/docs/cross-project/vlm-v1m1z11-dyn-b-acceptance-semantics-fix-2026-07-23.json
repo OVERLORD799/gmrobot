@@ -1,0 +1,71 @@
+{
+  "milestone": "V1-M1Z11",
+  "policy_constraints": {
+    "ttc_nonallow_fail_closed_preserved": true,
+    "dyn_b_capture_frozen": true,
+    "no_live_control_evidence_upgrade": true,
+    "rgb_evidence_scope": "provisional_visual_dataset_only"
+  },
+  "historical_replay": [
+    {
+      "historical_doc": "V1-M1Z5",
+      "raw_historical_verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL",
+      "audited_semantics": {
+        "step_completion": {
+          "total_steps": 341,
+          "policy_steps_last": 341,
+          "max_steps": 341,
+          "steps_completed_by_total": true,
+          "policy_step_lag": 0,
+          "task_completed": false,
+          "termination_reason": "MAX_STEPS_REACHED",
+          "policy_steps_role": "diagnostic_only"
+        },
+        "proxy_semantics": {
+          "proxy_telemetry_present": false,
+          "proxy_telemetry_rows_nonzero": 0,
+          "red_proxy_any_legacy_compat": false,
+          "visual_red_proxy_detected": null,
+          "visual_red_proxy_evaluation": "not_evaluated"
+        },
+        "nonallow_fail_closed": {
+          "nonallow_points": 2,
+          "fail_closed_triggered": true,
+          "overall": "FAIL_NONALLOW_GEOMETRY",
+          "raw_historical_verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL"
+        },
+        "overall": "FAIL_NONALLOW_GEOMETRY"
+      }
+    },
+    {
+      "historical_doc": "V1-M1Z9",
+      "raw_historical_verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL",
+      "audited_semantics": {
+        "step_completion": {
+          "total_steps": 341,
+          "policy_steps_last": 335,
+          "max_steps": 341,
+          "steps_completed_by_total": true,
+          "policy_step_lag": 6,
+          "task_completed": false,
+          "termination_reason": "MAX_STEPS_REACHED",
+          "policy_steps_role": "diagnostic_only"
+        },
+        "proxy_semantics": {
+          "proxy_telemetry_present": true,
+          "proxy_telemetry_rows_nonzero": 0,
+          "red_proxy_any_legacy_compat": true,
+          "visual_red_proxy_detected": null,
+          "visual_red_proxy_evaluation": "not_evaluated"
+        },
+        "nonallow_fail_closed": {
+          "nonallow_points": 3,
+          "fail_closed_triggered": true,
+          "overall": "FAIL_NONALLOW_GEOMETRY",
+          "raw_historical_verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL"
+        },
+        "overall": "FAIL_NONALLOW_GEOMETRY"
+      }
+    }
+  ]
+}

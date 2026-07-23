@@ -11,6 +11,8 @@ from pathlib import Path
 from statistics import median
 from typing import Any
 
+from dyn_b_acceptance_semantics import derive_proxy_semantics, derive_step_completion
+
 
 TARGET_STEPS = (167, 212, 228)
 
@@ -137,20 +139,19 @@ def build_report(base_dir: Path, script_path: Path) -> dict[str, Any]:
     total_steps = int(summary["total_steps"])
     policy_steps = int(summary["policy_steps"])
     max_steps = 341
-
-    # M1Z9 red_proxy_any is derived from non-zero proxy center in script logic.
-    red_proxy_any = False
-    proxy_rows = 0
-    for r in steps_rows:
-        s = int(r["step"])
-        if 159 <= s <= 338:
-            vals = (r.get("proxy_center_x", ""), r.get("proxy_center_y", ""), r.get("proxy_center_z", ""))
-            if any(str(v).strip() not in {"", "0", "0.0", "nan", "NaN", "inf"} for v in vals):
-                red_proxy_any = True
-                proxy_rows += 1
-
-    policy_lag = total_steps - policy_steps
-    termination_reason = "MAX_STEPS_REACHED" if total_steps == max_steps else "UNKNOWN"
+    completion = derive_step_completion(
+        total_steps=total_steps,
+        policy_steps=policy_steps,
+        max_steps=max_steps,
+        task_completed=summary.get("task_completed"),
+    )
+    proxy = derive_proxy_semantics(
+        steps_rows=steps_rows,
+        window_start=159,
+        window_end=338,
+        legacy_red_proxy_any=None,
+        visual_red_proxy_detected=None,
+    )
 
     return {
         "milestone": "V1-M1Z10",
@@ -166,12 +167,15 @@ def build_report(base_dir: Path, script_path: Path) -> dict[str, Any]:
                 ],
             },
             "B_red_proxy_any_semantics": {
-                "classification": "ACCEPTER_PROXY_PRESENCE_FLAG_NOT_PIXEL_RED_DETECTOR",
+                "classification": "ACCEPTER_PROXY_TELEMETRY_FLAG_NOT_PIXEL_RED_DETECTOR",
                 "confidence": 0.95,
                 "definition_source": f"{script_path}: red_proxy_any set true when proxy_center_(x,y,z) any non-zero string in step window",
                 "detector_type": "telemetry-presence, not color segmentation",
-                "window_proxy_rows_nonzero": proxy_rows,
-                "red_proxy_any": red_proxy_any,
+                "window_proxy_rows_nonzero": proxy["proxy_telemetry_rows_nonzero"],
+                "proxy_telemetry_present": proxy["proxy_telemetry_present"],
+                "red_proxy_any": proxy["red_proxy_any_legacy_compat"],
+                "visual_red_proxy_detected": proxy["visual_red_proxy_detected"],
+                "visual_red_proxy_evaluation": proxy["visual_red_proxy_evaluation"],
                 "events_csv_rows": len(events_rows),
                 "unknowns": [
                     "no pixel-level red-proxy detector is executed in M1Z9 flow",
@@ -179,20 +183,21 @@ def build_report(base_dir: Path, script_path: Path) -> dict[str, Any]:
                 ],
             },
             "C_termination_boundary": {
-                "classification": termination_reason,
+                "classification": completion["termination_reason"],
                 "confidence": 0.83,
                 "evidence": {
-                    "total_steps": total_steps,
-                    "policy_steps_last": policy_steps,
-                    "max_steps": max_steps,
-                    "policy_step_lag": policy_lag,
-                    "task_completed": summary["task_completed"],
+                    "total_steps": completion["total_steps"],
+                    "policy_steps_last": completion["policy_steps_last"],
+                    "max_steps": completion["max_steps"],
+                    "steps_completed_by_total": completion["steps_completed_by_total"],
+                    "policy_step_lag": completion["policy_step_lag"],
+                    "task_completed": completion["task_completed"],
                     "g1_fell": summary["g1_fell"],
                     "episode_length_note": "episode_length_s configured to cover max_steps in run_phase3",
                 },
                 "distinction": {
                     "total_sim_steps": "EpisodeMetrics.total_steps increments once per env.step",
-                    "policy_steps": "metrics.policy_steps tracks ur10e.time_step and can lag under safety gate holds",
+                    "policy_steps": "metrics.policy_steps tracks ur10e.time_step and can lag under safety gate holds; it is diagnostic-only for completion",
                 },
                 "unknowns": [
                     "capture_stdout lacks final termination print lines; reason inferred from final CSV counters and loop contract",
