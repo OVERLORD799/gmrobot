@@ -1,0 +1,209 @@
+{
+  "doc": "vlm-v1m1z5-dyn-b-formal-reviewable-preflight-2026-07-23",
+  "milestone": "V1-M1Z5",
+  "base_head": "59cf2497e2139a0b517c4a4205c98215d87dcbf6",
+  "run_count": 1,
+  "image": {
+    "tag": "gmdisturb:e01-dyn-b-clean-m1z4-20260723",
+    "sha_expected": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83",
+    "sha_actual": "sha256:962de1e3f5e9c761d5106c660af7e7dfdbc79319194839a284a06e64dfb45e83"
+  },
+  "camera": {
+    "expected_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "expected_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "actual_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "actual_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "pos_match": true,
+    "rot_match": true,
+    "forwarded_env": {
+      "GMDISTURB_SCENE_CAMERA_OVERRIDE": "1",
+      "GMDISTURB_SCENE_CAMERA_POS": "0.45,0.0,2.7",
+      "GMDISTURB_SCENE_CAMERA_ROT": "0.7071,0,0.7071,0"
+    }
+  },
+  "frames": {
+    "219": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000219_env0.png",
+      "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.010059261450383682,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    },
+    "220": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000220_env0.png",
+      "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.010050027415302547,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    },
+    "221": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000221_env0.png",
+      "sha256": "e6ab4e22dbf7d4c440d2bf532adbdf2ebf608cbc2e6f11179fc37da638ae6f98",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.0100459133152407,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    },
+    "329": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000329_env0.png",
+      "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.011256034010586247,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    },
+    "330": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000330_env0.png",
+      "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.011271897452820687,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    },
+    "331": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_preflight_m1z5_20260723/scene/frame_000331_env0.png",
+      "sha256": "2df0205a4d4d302590de563600a88ee646f46d203c41bd8af744b21ef44c1135",
+      "valid_png": true,
+      "links_visible_margin_8": 8,
+      "clipping_ratio": 0.0,
+      "roi_area_fraction": 0.011268587227663494,
+      "gate_links_ge_4": true,
+      "gate_clipping_le_0_5": true,
+      "gate_roi_ge_0_01": true
+    }
+  },
+  "visual": {
+    "all_key_frames_pass": true,
+    "centroid_displacement_px_220_330": 24.297366596071075,
+    "centroid_displacement_gate_px": 20.0,
+    "workcell_anchor_visibility_pass": true,
+    "container_A_visible": true,
+    "container_B_visible": true,
+    "workcell_anchor_visibility": {
+      "container_A_center": {
+        "uv": [
+          269.0972719319176,
+          178.91672631830113
+        ],
+        "visible_with_margin": true
+      },
+      "container_B_center": {
+        "uv": [
+          370.9027280680824,
+          178.91672631830113
+        ],
+        "visible_with_margin": true
+      },
+      "table_far_left": {
+        "uv": [
+          218.1945438638352,
+          117.83345263660223
+        ],
+        "visible_with_margin": true
+      },
+      "table_far_right": {
+        "uv": [
+          421.8054561361648,
+          117.83345263660223
+        ],
+        "visible_with_margin": true
+      },
+      "table_near_left": {
+        "uv": [
+          218.1945438638352,
+          301.08327368169887
+        ],
+        "visible_with_margin": true
+      },
+      "table_near_right": {
+        "uv": [
+          421.8054561361648,
+          301.08327368169887
+        ],
+        "visible_with_margin": true
+      }
+    }
+  },
+  "per_step_window_190_340": {
+    "expected_rows": 151,
+    "observed_rows": 151,
+    "allow_count": 149,
+    "stop_nonzero_count": 0,
+    "slow_nonzero_count": 2,
+    "replan_nonzero_count": 0,
+    "margin_min_m": 0.79187,
+    "margin_gate_m": 0.1,
+    "phase_220": "lateral_positive_sweep",
+    "phase_330": "lateral_negative_sweep",
+    "phase_pass": true,
+    "analyzer_exit": 1,
+    "analyzer_pass": false,
+    "analyzer_errors": [
+      "non-ALLOW effective gate in window: [212, 228]",
+      "slow_flag != 0 at steps: [212, 228]"
+    ]
+  },
+  "safety_flags": {
+    "g1_fallen_any": false,
+    "red_proxy_any": false
+  },
+  "runner": {
+    "exit_code": 0,
+    "run_exit_code": 0,
+    "elapsed_sec": 66.388360989
+  },
+  "post_and_xid": {
+    "post_count_stdout_stderr": 0,
+    "device_error_count_stdout_stderr": 0,
+    "xid_pre_count": 0,
+    "xid_post_count": 0,
+    "new_xid": false,
+    "residual_container": false,
+    "residual_process": false
+  },
+  "provenance": {
+    "dynamic": true,
+    "provisional": true,
+    "reviewer_approved": false,
+    "scripted_locomotion": true,
+    "human_hand_or_gesture_or_ppe": false,
+    "vlm_output": false
+  },
+  "verdict": "DYN_B_REVIEWABLE_PREFLIGHT_FAIL_FINAL",
+  "next_gate": "STOP_NO_RETRY"
+}
