@@ -1,0 +1,88 @@
+{
+  "task": "V1-M1F2.1 Func-C canonical visual provenance gate fix",
+  "date": "2026-07-23",
+  "mode": "offline_only",
+  "precheck": {
+    "head_expected": "7bc00bd5fd5ff589ff09e49c23777b90056680ef",
+    "head_actual": "7bc00bd5fd5ff589ff09e49c23777b90056680ef",
+    "workspace_clean": true
+  },
+  "root_cause": {
+    "type": "test_gate_regex_bug",
+    "details": "Regex used \\\\s instead of \\s, so generator FROZEN_SOURCE_SHA256 declaration was not matched."
+  },
+  "provenance_chain": {
+    "source_asset": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container_full.usd",
+      "sha256_actual": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0"
+    },
+    "generator": {
+      "path": "GMRobot/scripts/generate_container_full_visual_usd.py",
+      "frozen_source_sha256_declared": "ff4d02a29701726baedea0dcd9cdc0cba92d7fa5dfa4121468974e495b3e0ba0",
+      "matches_source_sha256": true
+    },
+    "canonical_visual_asset": {
+      "path": "GMRobot/source/GMRobot/GMRobot/assets/container_full_visual.usd",
+      "sha256_actual": "f392dff221a280f0cd831ab1b37f5d9b22fab3da4b246fb65ed9b7498c3c9c6e",
+      "structural_fingerprint_expected": "bb90e8cbf865dd9bdeb0c2fc0eea25f0ac1cc74a48f68f5d09709c079820920d"
+    }
+  },
+  "changes": [
+    {
+      "path": "GMRobot/scripts/test_e01_func_c_capture_unit.py",
+      "kind": "update",
+      "summary": "Fix provenance regex to match FROZEN_SOURCE_SHA256 declaration correctly."
+    },
+    {
+      "path": "GMRobot/scripts/test_generate_container_full_visual_usd_unit.py",
+      "kind": "update",
+      "summary": "Add fail-closed test when source bytes drift under --freeze-hash."
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1f21-func-c-provenance-gate-fix-2026-07-23.md",
+      "kind": "add"
+    },
+    {
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1f21-func-c-provenance-gate-fix-2026-07-23.json",
+      "kind": "add"
+    }
+  ],
+  "tests": [
+    {
+      "cmd": "python -m pytest GMRobot/scripts/test_e01_func_c_capture_unit.py::test_container_full_visual_provenance_chain -q",
+      "result": "pass"
+    },
+    {
+      "cmd": "python -m pytest GMRobot/scripts/test_e01_func_c_capture_unit.py -q",
+      "result": "pass",
+      "detail": "16 passed"
+    },
+    {
+      "cmd": "GMROBOT_TEST_M1E_GENERATOR=1 python -m pytest GMRobot/scripts/test_generate_container_full_visual_usd_unit.py::TestGeneratorFull::test_source_hash_matches_frozen GMRobot/scripts/test_generate_container_full_visual_usd_unit.py::TestGeneratorFull::test_freeze_hash_fail_closed_on_source_change -q",
+      "result": "pass",
+      "detail": "2 passed"
+    }
+  ],
+  "m1f2_audit": {
+    "cmd": "python GMRobot/scripts/audit_func_c_visual_usd.py --json-out g1_ur10e_disturbance/docs/cross-project/vlm-v1m1f21-func-c-provenance-gate-fix-2026-07-23.audit.json",
+    "result": "pass",
+    "gate_passed": true
+  },
+  "m1f3_not_run_evidence": {
+    "doc_found": false,
+    "note": "No m1f3 NOT_RUN document was found under g1_ur10e_disturbance/docs/cross-project; the evidence gap is recorded in this milestone doc."
+  },
+  "status_constraints": {
+    "func_c_status": "visual_corruption_confirmed_fix_pending",
+    "reviewer_approved": false
+  },
+  "forbidden_ops": {
+    "docker": "not_run",
+    "isaac": "not_run",
+    "build": "not_run",
+    "capture": "not_run",
+    "network": "not_run",
+    "post": "not_run"
+  },
+  "next_step_request": "May re-apply for one strict build+visual smoke run to verify provenance gate persistence."
+}

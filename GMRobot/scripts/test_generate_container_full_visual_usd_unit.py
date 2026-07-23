@@ -118,6 +118,36 @@ class TestGeneratorFull:
         actual = hashlib.sha256(SOURCE_USD.read_bytes()).hexdigest()
         assert actual == frozen_hash, f"Source hash mismatch: {actual} != {frozen_hash}"
 
+    def test_freeze_hash_fail_closed_on_source_change(self):
+        """Freeze-hash gate must fail closed when source bytes differ."""
+        with tempfile.NamedTemporaryFile(suffix=".usd", delete=False) as src_tmp, \
+             tempfile.NamedTemporaryFile(suffix=".usd", delete=False) as out_tmp:
+            src_path, out_path = Path(src_tmp.name), Path(out_tmp.name)
+
+        try:
+            src_path.write_bytes(SOURCE_USD.read_bytes() + b"\n# provenance tamper sentinel\n")
+            result = subprocess.run(
+                [
+                    sys.executable,
+                    str(GENERATOR),
+                    "--source",
+                    str(src_path),
+                    "--output",
+                    str(out_path),
+                    "--freeze-hash",
+                    "--quiet",
+                ],
+                capture_output=True,
+                text=True,
+                timeout=300,
+            )
+            assert result.returncode != 0, "freeze-hash gate must reject tampered source"
+            combined = f"{result.stdout}\n{result.stderr}"
+            assert "Source hash mismatch" in combined, combined
+        finally:
+            src_path.unlink(missing_ok=True)
+            out_path.unlink(missing_ok=True)
+
     def test_generation_creates_output(self):
         with tempfile.NamedTemporaryFile(suffix=".usd", delete=False) as tmp:
             tmp_path = Path(tmp.name)

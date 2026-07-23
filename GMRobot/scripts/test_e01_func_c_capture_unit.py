@@ -264,7 +264,7 @@ def test_container_full_visual_provenance_chain():
 
     generator_path = ROOT / "scripts" / "generate_container_full_visual_usd.py"
     gen_text = generator_path.read_text(encoding="utf-8")
-    m = re.search(r'FROZEN_SOURCE_SHA256\\s*=\\s*"([0-9a-f]{64})"', gen_text)
+    m = re.search(r'FROZEN_SOURCE_SHA256\s*=\s*"([0-9a-f]{64})"', gen_text)
     assert m is not None, "generator missing FROZEN_SOURCE_SHA256"
     assert m.group(1) == expected_source_sha, (
         f"generator freeze hash mismatch: {m.group(1)} != {expected_source_sha}"
