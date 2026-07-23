@@ -1,0 +1,57 @@
+{
+  "milestone": "V1-E2G.1",
+  "date": "2026-07-23",
+  "status": "offline_fix_implemented_pending_single_rebuild_and_final_preflight",
+  "scope": "UR10 hold baseline from articulation actual joint state; add postrun projected/ROI analyzer",
+  "constraints": {
+    "head_required": "101f915",
+    "worktree_clean_required": true,
+    "offline_only": true
+  },
+  "changes": {
+    "hold_baseline_sampling": {
+      "source": "env.unwrapped.scene['robot_ur10e'].data.joint_pos",
+      "layout": "ARM_JOINT_NAMES(6) + gripper_actual(1) => hold_target7",
+      "timing": "sampled after env.reset and before first env.step",
+      "provenance_logged": true,
+      "forbidden_sources": [
+        "controller proposed action",
+        "zero vector"
+      ]
+    },
+    "joint_delta_gate": {
+      "baseline": "same articulation hold_target7",
+      "settling_window_steps": 5,
+      "formal_gate": "near-zero evaluated after settling window"
+    },
+    "postrun_analyzer": {
+      "script": "scripts/v1e2g1_postrun_analyzer.py",
+      "inputs": [
+        "meta/body_poses.jsonl",
+        "meta/frame_inventory.json",
+        "meta/camera_pose.json"
+      ],
+      "outputs_per_frame": [
+        "visible_links",
+        "clipped_links",
+        "roi_area_fraction",
+        "projected_actual_displacement_px",
+        "actual_link_displacement_m"
+      ],
+      "runtime_csv_field_dependency": "none"
+    },
+    "tests_added": [
+      "scripts/test_motion_isolation_unit.py (fake articulation mapping, missing joint fail, gripper mapping, controller differs but actual wins)",
+      "scripts/test_v1e2g1_postrun_analyzer_unit.py"
+    ]
+  },
+  "evidence_preserved": {
+    "e2g_raw_fail_doc": "docs/cross-project/vlm-v1e2g-dyn-c-motion-preflight-2026-07-23.md",
+    "g1_actual_movement_evidence_source": "meta/body_poses.jsonl + postrun analyzer projected/actual displacement outputs"
+  },
+  "next_step_budget": {
+    "rebuild_allowed": 1,
+    "final_motion_preflight_allowed": 1,
+    "formal_capture_allowed": 0
+  }
+}

@@ -426,8 +426,7 @@ from motion_isolation import (
     build_ur10_hold_action,
     hold_action_hash,
     compute_ur10_freeze_metrics,
-    resolve_ur10_freeze_action_seed,
-    extract_ur10_pose7_from_policy_obs,
+    resolve_ur10_hold_target_from_articulation,
 )
 from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
@@ -1344,24 +1343,30 @@ def main():
 
     ur10e.reset(obs["ur10e_policy"])
     disturb.reset()
-    _ur10_seed_action = ur10e.get_action(obs["ur10e_policy"], advance=False)
-    _ur10_joint0, _ur10_hold_gripper0, _ur10_hold_seed_provenance = resolve_ur10_freeze_action_seed(
-        ur10_state_action=_ur10_seed_action,
-        ur10_policy_obs=obs["ur10e_policy"],
+    _ur10_hold_target7, _ur10_hold_joint_provenance, _ur10_hold_gripper0 = resolve_ur10_hold_target_from_articulation(
+        env.unwrapped.scene["robot_ur10e"]
     )
-    _ur10_hold_action = build_ur10_hold_action(_ur10_joint0, _ur10_hold_gripper0)
+    _ur10_joint0 = _ur10_hold_target7.copy()
+    _ur10_hold_seed_provenance = "env.unwrapped.scene.robot_ur10e.data.joint_pos[ARM_JOINT_NAMES+gripper]"
+    _ur10_hold_action = build_ur10_hold_action(_ur10_hold_target7, _ur10_hold_gripper0)
     _ur10_hold_hash = hold_action_hash(_ur10_hold_action)
     _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
         effective_action=_ur10_hold_action,
-        current_joint_pose=_ur10_joint0,
+        current_joint_pose=_ur10_hold_target7,
         initial_joint_pose=_ur10_joint0,
     )
+    _UR10_SETTLING_STEPS = 5
+    _ur10_joint_delta_max_abs_settled = 0.0
     if args_cli.freeze_ur10e:
         print(
             f"[phase3] UR10 freeze enabled: initial_joint_pose="
             f"{[round(float(v), 6) for v in _ur10_joint0.tolist()]} "
             f"hold_hash={_ur10_hold_hash[:16]}… "
             f"seed={_ur10_hold_seed_provenance}"
+        )
+        print(
+            "[phase3] UR10 hold provenance="
+            f"{json.dumps(_ur10_hold_joint_provenance, ensure_ascii=True, sort_keys=True)}"
         )
 
     # Inject initial zero-velocity command so the first env.step() starts
@@ -2433,12 +2438,17 @@ def main():
 
         if args_cli.freeze_ur10e:
             ur10e_action = _ur10_hold_action.copy()
-        _ur10_joint_now, _ = extract_ur10_pose7_from_policy_obs(obs["ur10e_policy"])
+        _ur10_joint_now, _, _ = resolve_ur10_hold_target_from_articulation(ur10e_robot)
         _ur10_freeze_last_metrics = compute_ur10_freeze_metrics(
             effective_action=ur10e_action,
             current_joint_pose=_ur10_joint_now,
             initial_joint_pose=_ur10_joint0,
         )
+        if step >= _UR10_SETTLING_STEPS:
+            _ur10_joint_delta_max_abs_settled = max(
+                float(_ur10_joint_delta_max_abs_settled),
+                float(_ur10_freeze_last_metrics["ur10_joint_delta_max_abs"]),
+            )
         prev_ur10e_action = ur10e_action[:7].copy()
 
         # ── 5b. Replan check (GMRobot L1WarnReplanTrigger + GeometryReplanV0) ──
@@ -2873,9 +2883,11 @@ def main():
                     "key_body_links_json": json.dumps(_rt_links, sort_keys=True, ensure_ascii=True),
                     "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
                     "ur10_hold_hash": _ur10_hold_hash,
+                    "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                     "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                     "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                    "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                 }
             )
             _runtime_telemetry_fh.flush()
@@ -2936,9 +2948,11 @@ def main():
                     "ur10_freeze_enabled": bool(args_cli.freeze_ur10e),
                     "ur10_initial_joint_pose": [float(v) for v in _ur10_joint0.tolist()],
                     "ur10_hold_hash": _ur10_hold_hash,
+                    "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
                     "ur10_action_norm": _ur10_freeze_last_metrics["ur10_action_norm"],
                     "ur10_joint_delta_norm": _ur10_freeze_last_metrics["ur10_joint_delta_norm"],
                     "ur10_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_joint_delta_max_abs"],
+                    "ur10_joint_delta_max_abs_settled": float(_ur10_joint_delta_max_abs_settled),
                 }
                 # Prefer live closest-body dist from adapter when available.
                 if adapter is not None:
@@ -2976,9 +2990,11 @@ def main():
                         "key_body_links_json": json.dumps(_key_links, sort_keys=True, ensure_ascii=True),
                         "ur10_freeze_enabled": int(bool(args_cli.freeze_ur10e)),
                         "ur10_hold_hash": _ur10_hold_hash,
+                        "ur10_hold_provenance_json": json.dumps(_ur10_hold_joint_provenance, sort_keys=True, ensure_ascii=True),
                         "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                         "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                         "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
+                        "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                     }
                 )
                 _runtime_telemetry_fh.flush()

@@ -21,9 +21,11 @@ RUNTIME_TELEMETRY_FIELDNAMES = [
     "key_body_links_json",
     "ur10_freeze_enabled",
     "ur10_hold_hash",
+    "ur10_hold_provenance_json",
     "ur10_action_norm",
     "ur10_joint_delta_norm",
     "ur10_joint_delta_max_abs",
+    "ur10_joint_delta_max_abs_settled",
 ]
 
 

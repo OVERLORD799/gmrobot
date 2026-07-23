@@ -8,6 +8,30 @@ from typing import Any, Sequence
 
 import numpy as np
 
+try:
+    from dual_env_cfg import ARM_JOINT_NAMES as _CFG_ARM_JOINT_NAMES
+    from dual_env_cfg import GRIPPER_JOINT_NAMES as _CFG_GRIPPER_JOINT_NAMES
+except Exception:
+    _CFG_ARM_JOINT_NAMES = (
+        "shoulder_pan_joint",
+        "shoulder_lift_joint",
+        "elbow_joint",
+        "wrist_1_joint",
+        "wrist_2_joint",
+        "wrist_3_joint",
+    )
+    _CFG_GRIPPER_JOINT_NAMES = (
+        "finger_joint",
+        "right_outer_knuckle_joint",
+        "right_inner_finger_joint",
+        "right_inner_finger_knuckle_joint",
+        "left_inner_finger_knuckle_joint",
+        "left_inner_finger_joint",
+    )
+
+ARM_JOINT_NAMES = tuple(str(x) for x in _CFG_ARM_JOINT_NAMES)
+GRIPPER_JOINT_NAMES = tuple(str(x) for x in _CFG_GRIPPER_JOINT_NAMES)
+
 
 def build_ur10_hold_action(initial_joint_pose: np.ndarray, initial_gripper: float) -> np.ndarray:
     """Build explicit hold action from initial joints + gripper."""
@@ -114,3 +138,60 @@ def compute_ur10_freeze_metrics(
         "ur10_joint_delta_norm": float(np.linalg.norm(delta)),
         "ur10_joint_delta_max_abs": float(np.max(np.abs(delta))),
     }
+
+
+def _first_name_to_index(joint_names: Sequence[str]) -> dict[str, int]:
+    out: dict[str, int] = {}
+    for i, name in enumerate(joint_names):
+        if name not in out:
+            out[str(name)] = int(i)
+    return out
+
+
+def resolve_ur10_hold_target_from_articulation(articulation: Any) -> tuple[np.ndarray, list[dict[str, Any]], float]:
+    """Resolve 7D hold target from articulation actual state.
+
+    The returned 7D vector layout is `[ARM_JOINT_NAMES(6), gripper_actual]`.
+    """
+    if articulation is None:
+        raise ValueError("articulation is required")
+    if not hasattr(articulation, "joint_names"):
+        raise ValueError("articulation missing joint_names")
+    if not hasattr(articulation, "data") or not hasattr(articulation.data, "joint_pos"):
+        raise ValueError("articulation missing data.joint_pos")
+    joint_names = [str(n) for n in articulation.joint_names]
+    name_to_idx = _first_name_to_index(joint_names)
+    joint_pos_full = _to_float32_1d(articulation.data.joint_pos[0], context="articulation.data.joint_pos[0]")
+    if joint_pos_full.shape[0] < len(joint_names):
+        raise ValueError(
+            f"articulation joint_pos shorter than joint_names: {joint_pos_full.shape[0]} < {len(joint_names)}"
+        )
+
+    provenance: list[dict[str, Any]] = []
+    arm_values: list[float] = []
+    for jn in ARM_JOINT_NAMES:
+        if jn not in name_to_idx:
+            raise KeyError(f"missing UR10 arm joint in articulation: {jn}")
+        jidx = int(name_to_idx[jn])
+        jval = float(joint_pos_full[jidx])
+        arm_values.append(jval)
+        provenance.append({"kind": "arm", "joint_name": jn, "joint_id": jidx, "value": jval})
+
+    grip_name = None
+    grip_idx = None
+    grip_val = None
+    for cand in GRIPPER_JOINT_NAMES:
+        if cand in name_to_idx:
+            grip_name = cand
+            grip_idx = int(name_to_idx[cand])
+            grip_val = float(joint_pos_full[grip_idx])
+            break
+    if grip_name is None or grip_idx is None or grip_val is None:
+        raise KeyError(
+            "missing UR10 gripper joint in articulation: "
+            f"expected one of {tuple(str(n) for n in GRIPPER_JOINT_NAMES)}"
+        )
+    provenance.append({"kind": "gripper", "joint_name": grip_name, "joint_id": grip_idx, "value": grip_val})
+
+    hold_target7 = np.asarray(arm_values + [grip_val], dtype=np.float32)
+    return hold_target7, provenance, grip_val
