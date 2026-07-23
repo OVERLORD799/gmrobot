@@ -55,7 +55,7 @@
       "reviewer_approved": false,
       "technical_review_status": "reference_visual_pass_pending_user_confirmation",
       "formal_recapture_allowed": false,
-      "semantic_clarity": "user_review_required",
+      "semantic_clarity": "user_confirmation_required",
       "artifact_removal_technical_pass": true,
       "reference_bin_visual_contract_pass": true,
       "m1f5_user_rejected": true,

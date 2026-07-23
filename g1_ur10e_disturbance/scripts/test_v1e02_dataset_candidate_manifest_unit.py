@@ -126,7 +126,7 @@ def test_validate_manifest_accepts_func_c_semantic_clarity_pending_state() -> No
         func = manifest["candidates"][0]
         func["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
         func["formal_recapture_allowed"] = False
-        func["semantic_clarity"] = "user_review_required"
+        func["semantic_clarity"] = "user_confirmation_required"
         assert validate_manifest(manifest, repo_root) == []
 
 
@@ -141,7 +141,7 @@ def test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos() -> N
         # Old status with semantic_clarity field must fail.
         old_status = copy.deepcopy(manifest)
         old_func = old_status["candidates"][0]
-        old_func["semantic_clarity"] = "user_review_required"
+        old_func["semantic_clarity"] = "user_confirmation_required"
         errors = validate_manifest(old_status, repo_root)
         assert any("semantic_clarity only allowed" in e for e in errors)
 
@@ -152,7 +152,7 @@ def test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos() -> N
         bad_func["technical_review_status"] = "artifact_removed_semantic_clarity_pending_user"
         bad_func["formal_recapture_allowed"] = True
         bad_func["reviewer_approved"] = True
-        bad_func["semantic_clarity"] = "user_review_required"
+        bad_func["semantic_clarity"] = "user_confirmation_required"
         errors = validate_manifest(bad_approval, repo_root)
         assert any("formal_recapture_allowed must be false" in e for e in errors)
         assert any("reviewer_approved must be false" in e for e in errors)
@@ -165,7 +165,7 @@ def test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos() -> N
         bad_sem_func["formal_recapture_allowed"] = False
         bad_sem_func["semantic_clarity"] = "any_string_should_not_pass"
         errors = validate_manifest(bad_semantic, repo_root)
-        assert any("semantic_clarity must be user_review_required" in e for e in errors)
+        assert any("semantic_clarity must be user_confirmation_required" in e for e in errors)
 
 
 def test_validate_manifest_accepts_reference_locked_rework_state() -> None:
@@ -195,12 +195,50 @@ def test_validate_manifest_accepts_occlusion_fix_pending_state() -> None:
         func["technical_review_status"] = "visual_rework_parts_occlusion_fix_pending"
         func["formal_recapture_allowed"] = False
         func["reviewer_approved"] = False
-        func["semantic_clarity"] = "user_review_required"
+        func["semantic_clarity"] = "user_confirmation_required"
         func["reference_locked"] = {
             "reference_frame_sha256": "a" * 64,
             "rejected_frame_sha256": "b" * 64,
         }
         assert validate_manifest(manifest, repo_root) == []
+
+
+def test_validate_manifest_accepts_reference_visual_pending_user_confirmation_state() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["global_flags"]["technical_review_status"] = "reference_visual_pass_pending_user_confirmation"
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "reference_visual_pass_pending_user_confirmation"
+        func["reviewer_approved"] = False
+        func["formal_recapture_allowed"] = False
+        func["artifact_removal_technical_pass"] = True
+        func["reference_bin_visual_contract_pass"] = True
+        func["semantic_clarity"] = "user_confirmation_required"
+        assert validate_manifest(manifest, repo_root) == []
+
+
+def test_validate_manifest_rejects_reference_visual_pending_user_confirmation_bad_flags() -> None:
+    with tempfile.TemporaryDirectory() as td:
+        tmpdir = Path(td)
+        repo_root = tmpdir / "repo"
+        repo_root.mkdir()
+        manifest = _base_manifest(tmpdir, repo_root)
+        manifest["global_flags"]["technical_review_status"] = "reference_visual_pass_pending_user_confirmation"
+        func = manifest["candidates"][0]
+        func["technical_review_status"] = "reference_visual_pass_pending_user_confirmation"
+        func["reviewer_approved"] = True
+        func["formal_recapture_allowed"] = True
+        func["artifact_removal_technical_pass"] = False
+        func["reference_bin_visual_contract_pass"] = False
+        func["semantic_clarity"] = "user_confirmation_required"
+        errors = validate_manifest(manifest, repo_root)
+        assert any("reviewer_approved must be false under reference visual pending user confirmation status" in e for e in errors)
+        assert any("formal_recapture_allowed must be false under reference visual pending user confirmation status" in e for e in errors)
+        assert any("artifact_removal_technical_pass must be true under reference visual pending user confirmation status" in e for e in errors)
+        assert any("reference_bin_visual_contract_pass must be true under reference visual pending user confirmation status" in e for e in errors)
 
 
 if __name__ == "__main__":
@@ -211,4 +249,6 @@ if __name__ == "__main__":
     test_validate_manifest_rejects_old_or_illegal_semantic_clarity_combos()
     test_validate_manifest_accepts_reference_locked_rework_state()
     test_validate_manifest_accepts_occlusion_fix_pending_state()
+    test_validate_manifest_accepts_reference_visual_pending_user_confirmation_state()
+    test_validate_manifest_rejects_reference_visual_pending_user_confirmation_bad_flags()
     print(json.dumps({"ok": True}))

@@ -13,11 +13,12 @@ ALLOWED_TECHNICAL_REVIEW_STATUS = {
     "pending_user_review",
     "technical_temporal_pass_pending_user",
     "artifact_removed_semantic_clarity_pending_user",
+    "reference_visual_pass_pending_user_confirmation",
     "visual_rework_in_progress_reference_locked",
     "visual_rework_parts_occlusion_fix_pending",
     "fail",
 }
-ALLOWED_SEMANTIC_CLARITY = {"user_review_required"}
+ALLOWED_SEMANTIC_CLARITY = {"user_confirmation_required"}
 
 
 def _sha256(path: Path) -> str:
@@ -59,21 +60,36 @@ def validate_manifest(manifest: dict[str, Any], repo_root: Path) -> list[str]:
             errors.append(f"{rid}: reviewer_approved must be false")
         if c.get("technical_review_status") not in ALLOWED_TECHNICAL_REVIEW_STATUS:
             errors.append(f"{rid}: technical_review_status invalid")
-        if c.get("technical_review_status") == "artifact_removed_semantic_clarity_pending_user":
+        status = c.get("technical_review_status")
+        if status == "artifact_removed_semantic_clarity_pending_user":
             if c.get("reviewer_approved") is not False:
                 errors.append(f"{rid}: reviewer_approved must be false under semantic_clarity pending status")
             if c.get("formal_recapture_allowed") is not False:
                 errors.append(f"{rid}: formal_recapture_allowed must be false under semantic_clarity pending status")
             if c.get("semantic_clarity") not in ALLOWED_SEMANTIC_CLARITY:
-                errors.append(f"{rid}: semantic_clarity must be user_review_required under semantic_clarity pending status")
-        elif "semantic_clarity" in c and c.get("technical_review_status") not in {
+                errors.append(f"{rid}: semantic_clarity must be user_confirmation_required under semantic_clarity pending status")
+        if status == "reference_visual_pass_pending_user_confirmation":
+            if c.get("reviewer_approved") is not False:
+                errors.append(f"{rid}: reviewer_approved must be false under reference visual pending user confirmation status")
+            if c.get("formal_recapture_allowed") is not False:
+                errors.append(f"{rid}: formal_recapture_allowed must be false under reference visual pending user confirmation status")
+            if c.get("artifact_removal_technical_pass") is not True:
+                errors.append(f"{rid}: artifact_removal_technical_pass must be true under reference visual pending user confirmation status")
+            if c.get("reference_bin_visual_contract_pass") is not True:
+                errors.append(f"{rid}: reference_bin_visual_contract_pass must be true under reference visual pending user confirmation status")
+        if "semantic_clarity" in c and status not in {
+            "artifact_removed_semantic_clarity_pending_user",
+            "reference_visual_pass_pending_user_confirmation",
             "visual_rework_in_progress_reference_locked",
             "visual_rework_parts_occlusion_fix_pending",
         }:
             errors.append(
-                f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user "
+                f"{rid}: semantic_clarity only allowed with artifact_removed_semantic_clarity_pending_user, "
+                "reference_visual_pass_pending_user_confirmation "
                 "or visual_rework_in_progress_reference_locked"
             )
+        if "semantic_clarity" in c and c.get("semantic_clarity") not in ALLOWED_SEMANTIC_CLARITY:
+            errors.append(f"{rid}: semantic_clarity must be user_confirmation_required")
         if c.get("technical_review_status") in {
             "visual_rework_in_progress_reference_locked",
             "visual_rework_parts_occlusion_fix_pending",
