@@ -1,0 +1,77 @@
+FROM gmdisturb:e01-func-c-m1e-20260723
+
+# Bake tracked normalization scripts into image; do not mount host-generated assets.
+COPY GMRobot/scripts/normalize_container_usd.py /opt/projects/GMRobot/scripts/normalize_container_usd.py
+COPY GMRobot/scripts/normalize_part_usd.py /opt/projects/GMRobot/scripts/normalize_part_usd.py
+
+# Generate fixed USD assets and run strict structural gates in one layer.
+RUN set -eux; \
+    USD_LIBS=$(find /isaac-sim/extscache -maxdepth 1 -name "omni.usd.libs-*" -type d | head -1); \
+    test -n "$USD_LIBS"; \
+    export PYTHONPATH="$USD_LIBS:${PYTHONPATH:-}"; \
+    export LD_LIBRARY_PATH="$USD_LIBS/bin:${LD_LIBRARY_PATH:-}"; \
+    /isaac-sim/kit/python/bin/python3 /opt/projects/GMRobot/scripts/normalize_container_usd.py; \
+    /isaac-sim/kit/python/bin/python3 /opt/projects/GMRobot/scripts/normalize_part_usd.py; \
+    test -s /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd; \
+    test -s /opt/projects/GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd; \
+    /isaac-sim/kit/python/bin/python3 - <<'PY'
+from pxr import Usd, UsdPhysics
+
+container = "/opt/projects/GMRobot/source/GMRobot/GMRobot/assets/container_fixed.usd"
+part = "/opt/projects/GMRobot/source/GMRobot/GMRobot/assets/part/part_fixed.usd"
+
+def enabled_rigid_paths(stage):
+    paths = []
+    for prim in stage.Traverse():
+        if not prim.HasAPI(UsdPhysics.RigidBodyAPI):
+            continue
+        rb = UsdPhysics.RigidBodyAPI(prim)
+        enabled = rb.GetRigidBodyEnabledAttr().Get()
+        if enabled is not False:
+            paths.append(str(prim.GetPath()))
+    return paths
+
+def iter_descendants(root_prim):
+    for prim in Usd.PrimRange(root_prim):
+        if prim == root_prim:
+            continue
+        yield prim
+
+# container gate: exactly one enabled rigid body and no rigid body descendants (nested)
+cs = Usd.Stage.Open(container, load=Usd.Stage.LoadAll)
+assert cs is not None, f"FATAL: cannot open {container}"
+cpaths = enabled_rigid_paths(cs)
+assert cpaths == ["/Root/Container"], f"FATAL: container rigid paths invalid: {cpaths}"
+for path in cpaths:
+    prim = cs.GetPrimAtPath(path)
+    for child in iter_descendants(prim):
+        if child.HasAPI(UsdPhysics.RigidBodyAPI):
+            rb = UsdPhysics.RigidBodyAPI(child)
+            if rb.GetRigidBodyEnabledAttr().Get() is not False:
+                raise RuntimeError(f"FATAL: nested enabled rigid body under {path}: {child.GetPath()}")
+print("Gate OK: container_fixed.usd has single non-nested kinematic rigid body")
+
+crb = UsdPhysics.RigidBodyAPI(cs.GetPrimAtPath("/Root/Container"))
+kin = crb.GetKinematicEnabledAttr().Get()
+assert kin is True, f"FATAL: /Root/Container kinematic_enabled must be True, got {kin}"
+
+# part gate: only /Root rigid body + MassAPI(mass=0.2); no child rigid bodies
+ps = Usd.Stage.Open(part, load=Usd.Stage.LoadAll)
+assert ps is not None, f"FATAL: cannot open {part}"
+ppaths = enabled_rigid_paths(ps)
+assert ppaths == ["/Root"], f"FATAL: part rigid paths invalid: {ppaths}"
+root = ps.GetPrimAtPath("/Root")
+mass_api = UsdPhysics.MassAPI(root)
+assert mass_api, "FATAL: /Root missing MassAPI"
+mass = mass_api.GetMassAttr().Get()
+assert abs(float(mass) - 0.2) <= 1e-6, f"FATAL: /Root mass must be 0.2, got {mass}"
+for child in iter_descendants(root):
+    if child.HasAPI(UsdPhysics.RigidBodyAPI):
+        rb = UsdPhysics.RigidBodyAPI(child)
+        if rb.GetRigidBodyEnabledAttr().Get() is not False:
+            raise RuntimeError(f"FATAL: part has child enabled rigid body: {child.GetPath()}")
+print("Gate OK: part_fixed.usd has root rigid body + MassAPI(0.2), no child rigid body")
+PY
+
+LABEL gmdisturb.e01_func_c_m1j="20260723" \
+      gmdisturb.base_tag="gmdisturb:e01-func-c-m1e-20260723"

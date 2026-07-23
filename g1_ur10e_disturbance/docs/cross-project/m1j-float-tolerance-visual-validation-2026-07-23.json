@@ -1,0 +1,82 @@
+{
+  "task": "M1J float tolerance and visual validation",
+  "date": "2026-07-23",
+  "repo": "/home/czz/GMrobot",
+  "start_head": "5706c47",
+  "branch": "main",
+  "verdict": "M1J_HUMAN_REVIEW_REQUIRED",
+  "allow_formal_func_c_single_recapture": false,
+  "non_formal_sample": true,
+  "stage_a": {
+    "dockerfile": "GMRobot/docker/Dockerfile.e01-func-c-m1j",
+    "base_image": "gmdisturb:e01-func-c-m1e-20260723",
+    "target_tag": "gmdisturb:e01-func-c-m1j-20260723",
+    "build_command": "docker build -f GMRobot/docker/Dockerfile.e01-func-c-m1j -t gmdisturb:e01-func-c-m1j-20260723 .",
+    "build_executed_times": 1,
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/build.stdout.log",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/build.stderr.log",
+    "exit_file": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/build.exit",
+    "real_exit_code": 0,
+    "elapsed_seconds": 1,
+    "image_sha": "sha256:c3fd8087df51d5c9811fe192c1e0be61c0224209bb01c7ad4941632bac0f8248",
+    "static_scan": {
+      "get_descendants_count": 0,
+      "tolerance_expression_count": 1,
+      "tolerance_expression": "abs(float(mass) - 0.2) <= 1e-6",
+      "expected_mass_unchanged": true
+    }
+  },
+  "stage_b": {
+    "executed": true,
+    "run_executed_times": 1,
+    "run_command_entrypoint": "/isaac-sim/python.sh",
+    "required_env": {
+      "GMROBOT_V1E01_TARGET_FULL": "1"
+    },
+    "mount_policy": {
+      "only_results_and_caches": true,
+      "mounted_code_yaml_usd": false
+    },
+    "stdout_log": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/stdout.txt",
+    "stderr_log": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/stderr.txt",
+    "exit_file": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/run.exit",
+    "real_exit_code": 0,
+    "elapsed_seconds": 30,
+    "log_gate": {
+      "traceback": false,
+      "file_not_found": false,
+      "device_lost": false,
+      "nested_rb_signal": false
+    },
+    "xid": {
+      "pre_file": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/xid_pre.txt",
+      "post_file": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/xid_post.txt",
+      "diff_file": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/meta/xid_diff.txt",
+      "pre_lines": 0,
+      "post_lines": 0,
+      "new_lines": 0
+    },
+    "frame": {
+      "path": "g1_ur10e_disturbance/results/paper_demo/m1j_visual_validation_20260723/scene/frame_000000_env0.png",
+      "sha256": "1c68b10b21aa8c19bea375cb647dbd7548a040e2fd4e0df9896825bde1832a77",
+      "dtype": "uint8",
+      "shape": [
+        480,
+        640,
+        3
+      ]
+    },
+    "visual_semantic_checks": {
+      "white_sector_disappeared": "HUMAN_REVIEW_REQUIRED",
+      "two_boxes_scale_normal": "HUMAN_REVIEW_REQUIRED",
+      "containerA_and_20_source_parts_normal": "HUMAN_REVIEW_REQUIRED",
+      "containerB_complete_and_filled_contents_visible": "HUMAN_REVIEW_REQUIRED"
+    }
+  },
+  "policy": {
+    "build_then_run_gate": true,
+    "stop_on_build_fail": true,
+    "rerun_on_run_fail": false,
+    "no_generated_assets_in_commit": true
+  }
+}
