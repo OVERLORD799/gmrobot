@@ -3,8 +3,8 @@
 - image/tag: `gmdisturb:e01-func-c-dual-reference-m1f12-20260723`
 - frame: `/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/scene/frame_000000_env0.png`
 - result_dir: `/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723`
-- visual_verdict: `REVIEW_REQUIRED`
-- overall_status: `STOP_NO_RETRY`
+- visual_verdict: `NO_FRAME`
+- overall_status: `SMOKE_STARTUP_FAIL_FINAL`
 
 ## 预算与约束
 - build: `1/1`；smoke: `1/1`；retry: `0`
@@ -20,9 +20,9 @@
 ## 自动门禁
 - gates: `{'exit0': True, 'png': False, 'double_green_box_roi': False, 'grid': False, 'content': False, 'assertions': False, 'POST0': True, 'noTraceback': False, 'device': True, 'xid': True, 'residual': True}`
 
-## 人工复核（必须）
-- 结论固定：`REVIEW_REQUIRED`（禁止自动视觉 PASS）
-- 本次因帧缺失，无法进行场景布局与双绿壳/白格对照
+## 人工复核（本次不适用）
+- 本次为启动失败：`camera_flag_missing`
+- 无 `frame_000000_env0.png`，因此判定为 `NO_FRAME`，不进入人工视觉复核流程
 
 ## 审计元数据
 - HEAD: `d2b5d09f500a5bf3d7e029133bf7dc9a4432a883`

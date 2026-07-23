@@ -70,6 +70,13 @@ def test_no_legacy_content_or_full_assets_in_dual_reference_runner() -> None:
     assert "gm_state_machine_agent.py" not in runner
 
 
+def test_shell_preflight_camera_enablement_contract_present() -> None:
+    shell = (ROOT / "scripts" / "run_e01_func_c_dual_reference_capture.sh").read_text(encoding="utf-8")
+    assert "build_dual_reference_smoke_inner_command" in shell
+    assert "preflight_camera_flag_or_fail" in shell
+    assert "assert_single_camera_flag" in shell
+
+
 def test_b0_b4_yaml_unchanged_by_git_diff() -> None:
     # Guardrail: V1-M1F11 must not alter frozen B0-B4 paper scenario YAMLs.
     import subprocess
@@ -91,6 +98,7 @@ def main() -> None:
     test_opt_in_maps_to_target_slots_and_other_box_empty()
     test_scene_identity_and_runtime_assertions_contract()
     test_no_legacy_content_or_full_assets_in_dual_reference_runner()
+    test_shell_preflight_camera_enablement_contract_present()
     test_b0_b4_yaml_unchanged_by_git_diff()
     print("PASS test_v1m1f11_func_c_dual_reference_scene_unit")
 

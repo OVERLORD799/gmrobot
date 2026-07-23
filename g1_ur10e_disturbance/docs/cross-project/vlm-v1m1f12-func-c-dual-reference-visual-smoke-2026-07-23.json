@@ -17,8 +17,8 @@
   "frame_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/scene/frame_000000_env0.png",
   "frame_present": false,
   "reference_frame330_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
-  "visual_verdict": "REVIEW_REQUIRED",
-  "overall_status": "STOP_NO_RETRY",
+  "visual_verdict": "NO_FRAME",
+  "overall_status": "SMOKE_STARTUP_FAIL_FINAL",
   "smoke_exit_code": 0,
   "failure_reason": "camera flag missing: A camera was spawned without the --enable_cameras flag",
   "runtime_scene_assertions_path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_func_c_dual_reference_smoke_m1f12_20260723/meta/runtime_scene_assertions.json",
@@ -69,14 +69,14 @@
     "new_xid_detected": false
   },
   "manual_review": {
-    "verdict": "REVIEW_REQUIRED",
+    "verdict": "NOT_APPLICABLE_NO_FRAME",
     "checks": {
       "scene_layout_match_reference": "REVIEW_REQUIRED",
       "two_green_shells_and_white_grids_match_reference": "REVIEW_REQUIRED",
       "left_reference_empty_box_no_white_tray": "REVIEW_REQUIRED",
       "other_box_has_20_parts_inside_grid": "REVIEW_REQUIRED"
     },
-    "note": "No frame generated in this failed smoke run."
+    "note": "No frame generated due to startup failure (camera_flag_missing)."
   },
   "constraints": {
     "formal_capture": false,

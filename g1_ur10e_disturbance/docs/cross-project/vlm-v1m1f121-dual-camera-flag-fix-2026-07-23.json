@@ -1,0 +1,55 @@
+{
+  "milestone": "V1-M1F12.1",
+  "date": "2026-07-23",
+  "preflight": {
+    "required_head": "f78ac38",
+    "actual_head": "f78ac38ca070fb90260e59c3667b24123907b21d",
+    "worktree_clean_before_change": true
+  },
+  "scope": {
+    "offline_only": true,
+    "docker_forbidden": true,
+    "build_forbidden": true,
+    "isaac_forbidden": true,
+    "network_forbidden": true
+  },
+  "root_cause": {
+    "id": "camera_flag_missing",
+    "symptom": "A camera was spawned without the --enable_cameras flag",
+    "failure_status": "SMOKE_STARTUP_FAIL_FINAL",
+    "visual_verdict": "NO_FRAME"
+  },
+  "fix": {
+    "new_guard_module": "g1_ur10e_disturbance/func_c_dual_reference_smoke_guard.py",
+    "runner_shell_wired": "g1_ur10e_disturbance/scripts/run_e01_func_c_dual_reference_capture.sh",
+    "canonical_constraints": {
+      "enable_cameras_exactly_once": true,
+      "preflight_fail_when_missing": true,
+      "forbid_duplicate_python_launcher": true,
+      "forbid_duplicate_entrypoint": true,
+      "preserve_headless_save_camera_pose_visual_env": true
+    }
+  },
+  "tests": {
+    "new_unit": [
+      "g1_ur10e_disturbance/scripts/test_v1m1f121_dual_camera_flag_unit.py"
+    ],
+    "updated_unit": [
+      "g1_ur10e_disturbance/scripts/test_v1m1f11_func_c_dual_reference_scene_unit.py"
+    ]
+  },
+  "m1f12_doc_correction": {
+    "target": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1f12-func-c-dual-reference-visual-smoke-2026-07-23.{md,json}",
+    "overall_status": "SMOKE_STARTUP_FAIL_FINAL",
+    "visual_verdict": "NO_FRAME",
+    "failure_reason_key": "camera_flag_missing",
+    "human_review_claim_removed": true
+  },
+  "max_run_budget": {
+    "build": "1/1",
+    "smoke": "1/1",
+    "retry": "0",
+    "unchanged": true
+  },
+  "next_step_allowed": "copy-only build + one smoke"
+}
