@@ -1,0 +1,24 @@
+{
+  "milestone": "V1-D11",
+  "date": "2026-07-24",
+  "verdict": "D11_PROSPECTIVE_PASS",
+  "capture": {
+    "run": "v1d11_seed52_prospective_20260724",
+    "seed": 52,
+    "scenario": "outer_lateral_patrol",
+    "isaac_runs": 1,
+    "frames": 59
+  },
+  "gates": "3/3 confirmed (sweep trigger, retreat trigger, idle no-trigger)",
+  "decisions_correct": "4/4",
+  "observational_approach": "caught via depth channel (trans 19.9, scale 33.4, aspect 0.44)",
+  "finding_F13": "idle rejection was carried by the aspect threshold alone (0.035 vs 0.05, 1.4x margin); translation floor and scale threshold were both crossed (11.2>=8, 19.3>=18) - depth channel conditions are jointly load-bearing, aspect is the last line for sway+breathing composites",
+  "cumulative": "retrospective 23/24 (zero FP) + prospective 4/4",
+  "eval_report": "results/paper_demo/v1d11_prospective_eval_20260724/v1d11_report.json",
+  "budget": {
+    "isaac_runs": 1,
+    "post_count": 59,
+    "vlm_calls": 0,
+    "retry_count": 0
+  }
+}

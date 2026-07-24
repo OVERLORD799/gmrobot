@@ -62,6 +62,11 @@
       "layer": "evidence_v2_depth",
       "finding": "close-range mask width breathing (both y-edges clipped) fakes depth scale/aspect signature on static subject; translation floor 8 px/s separates (depth-true >=10.5 vs breathing 2.7)",
       "source": "D10 S3 seed51 static_idle"
+    },
+    "F13": {
+      "layer": "evidence_v2_depth",
+      "finding": "sway translation (11.2) + breathing scale (19.3) can jointly cross floor and scale thresholds on a static subject; aspect threshold (0.05) is then the sole discriminator with 1.4x margin",
+      "source": "D11 seed52 static_idle"
     }
   },
   "d4a_drift_detector": {
