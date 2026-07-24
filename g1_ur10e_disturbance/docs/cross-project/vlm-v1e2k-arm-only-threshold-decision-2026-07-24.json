@@ -1,0 +1,38 @@
+{
+  "doc": "vlm-v1e2k-arm-only-threshold-decision-2026-07-24",
+  "milestone": "V1-E2K",
+  "date": "2026-07-24",
+  "user_approved": true,
+  "decision": {
+    "arm_only_settled_threshold_rad": {
+      "old": 1e-06,
+      "new": 0.0005
+    },
+    "ee_disp_settled_threshold_m": {
+      "unchanged": 1e-06,
+      "mandatory": true
+    },
+    "gripper_policy": "report_only_unchanged"
+  },
+  "rationale": {
+    "observed_residual_rad": 0.00015,
+    "observed_joint": "shoulder_lift_joint",
+    "observed_ee_disp_m": 0.0,
+    "interpretation": "PhysX PD-hold joint-space numerical residual, not physical motion",
+    "worst_case_ee_bound_at_5e4_m": 0.00065,
+    "pixel_scale_impact": "negligible vs >=40px centroid gate"
+  },
+  "scope": {
+    "applies_to": "v1e2g1_postrun_analyzer arm-freeze qualification (Dyn-C lineage)",
+    "frozen_b0_b4_thresholds_touched": false,
+    "historical_verdicts_rewritten": false,
+    "e2j1_verdict_unchanged": "FAIL_STOP_NO_RETRY_NO_FORMAL_CAPTURE"
+  },
+  "allows": {
+    "formal_e2k_capture_single_run_no_retry": true
+  },
+  "labels_policy_unchanged": {
+    "label_status": "provisional",
+    "reviewer_approved": false
+  }
+}

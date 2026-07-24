@@ -1,0 +1,81 @@
+{
+  "doc": "vlm-v1e2k-dyn-c-formal-capture-2026-07-24",
+  "milestone": "V1-E2K",
+  "verdict": "DYN_C_FORMAL_CAPTURE_PASS",
+  "next_gate": "HUMAN_DYNAMIC_LABEL_REVIEW",
+  "run_count": 1,
+  "retry_count": 0,
+  "image_rebuild": false,
+  "threshold_decision_doc": "vlm-v1e2k-arm-only-threshold-decision-2026-07-24",
+  "identity": {
+    "git_head_at_run": "940f9b94f5f04f8732ab3b63f9f13fa928236a2c",
+    "image_tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j1-20260724",
+    "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724"
+  },
+  "scenario": {
+    "scenario": "mirrored_outer_lateral_patrol",
+    "motion_source_label": "scripted_g1_mirrored_outer_lateral_patrol",
+    "seed": 44,
+    "freeze_ur10e": true,
+    "max_steps": 260,
+    "camera_pos": [0.45, 0.0, 2.7],
+    "camera_rot": [0.7071, 0.0, 0.7071, 0.0],
+    "capture_steps": [169, 170, 249, 259]
+  },
+  "gates": {
+    "run_returncode_raw_0": true,
+    "no_traceback": true,
+    "post_count_0": true,
+    "camera_contract_match": true,
+    "arm_only_settled_le_5e4": true,
+    "ee_near_zero_le_1e6": true,
+    "arm_freeze_qualified": true,
+    "centroid_ge40_pairs_ge2": true,
+    "roi_area_fraction_ge_0012_all": true,
+    "direction_dot_positive": true,
+    "g1_no_fall": true,
+    "no_new_xid": true,
+    "all_pass": true
+  },
+  "metrics": {
+    "arm_settled_max_rad": 0.00015,
+    "arm_settled_joint": "shoulder_lift_joint",
+    "ee_disp_settled_max_m": 0.0,
+    "camera_pose_err": [0.0, 0.0],
+    "centroid_ge40_pair_count": 4,
+    "centroid_pairs_px": {
+      "169_249": 47.644,
+      "169_259": 43.666,
+      "170_249": 47.610,
+      "170_259": 43.623
+    },
+    "roi_area_fraction_min": 0.018624634117121036,
+    "integrated_commanded_xy_m": [0.929, -0.228],
+    "actual_xy_m": [1.059614, -0.282957],
+    "direction_dot": 1.0488956020000002,
+    "max_projected_actual_displacement_px": 54.164784379234526,
+    "adjacent_stability_169_170_sha_equal": true
+  },
+  "harness_note": {
+    "runner_exit": 86,
+    "returncode_raw": 0,
+    "cause": "host require-path mistakenly listed frame_inventory.json as runtime artifact; it is host-offline-generated (as in E2J.1). No rerun performed.",
+    "frame_inventory_generated_offline_with_sha256": true
+  },
+  "labels": {
+    "risk_type": "dynamic",
+    "label_status": "provisional",
+    "reviewer_approved": false,
+    "motion_provenance": "scripted_g1_mirrored_outer_lateral_patrol",
+    "synthetic_scripted": true,
+    "human_hand": false,
+    "PPE": false,
+    "VLM_output": false
+  },
+  "policy": {
+    "results_committed": false,
+    "vlm_sam2_after_pass": false,
+    "auto_label_approval": false,
+    "historical_verdicts_rewritten": false
+  }
+}

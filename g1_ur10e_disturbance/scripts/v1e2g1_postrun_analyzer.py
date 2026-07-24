@@ -16,6 +16,14 @@ if str(ROOT) not in sys.path:
 
 from scene_camera_override import g1_roi_from_body_points, project_world_to_pixel
 
+# V1-E2K user-approved decision (2026-07-24): arm-only settled threshold relaxed
+# from 1e-6 to 5e-4 rad (PhysX PD-hold numerical residual, ~0.65mm worst-case EE
+# at UR10e reach, far below pixel scale). EE near-zero gate stays mandatory at 1e-6 m.
+# See docs/cross-project/vlm-v1e2k-arm-only-threshold-decision-2026-07-24.md
+ARM_SETTLED_THRESHOLD_RAD = 5e-4
+EE_DISP_THRESHOLD_M = 1e-6
+ARM_THRESHOLD_DECISION_DOC = "vlm-v1e2k-arm-only-threshold-decision-2026-07-24"
+
 
 def _load_json(path: Path) -> dict[str, Any]:
     return json.loads(path.read_text(encoding="utf-8"))
@@ -145,8 +153,8 @@ def _analyze_ur10_freeze_from_runtime(
         ee_disp_pairs.append({"from": s0, "to": s1, "disp_m": float((dx * dx + dy * dy + dz * dz) ** 0.5)})
     ee_disp_settled_max_m = max((float(r["disp_m"]) for r in ee_disp_pairs), default=0.0)
 
-    arm_freeze_threshold_max_abs = 1e-6
-    ee_disp_threshold_m = 1e-6
+    arm_freeze_threshold_max_abs = ARM_SETTLED_THRESHOLD_RAD
+    ee_disp_threshold_m = EE_DISP_THRESHOLD_M
     arm_freeze_qualified = bool(
         arm_settled_max <= arm_freeze_threshold_max_abs and ee_disp_settled_max_m <= ee_disp_threshold_m
     )
@@ -170,6 +178,7 @@ def _analyze_ur10_freeze_from_runtime(
         "arm_freeze_thresholds": {
             "arm_joint_delta_max_abs_settled_max": arm_freeze_threshold_max_abs,
             "ee_disp_settled_max_m": ee_disp_threshold_m,
+            "decision_doc": ARM_THRESHOLD_DECISION_DOC,
         },
         "arm_freeze_qualified": arm_freeze_qualified,
     }
