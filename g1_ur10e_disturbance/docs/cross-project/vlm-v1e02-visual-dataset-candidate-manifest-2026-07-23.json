@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.7.0",
+  "manifest_version": "3.8.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -34,7 +34,8 @@
     },
     "3.4.0",
     "3.5.0",
-    "3.6.0"
+    "3.6.0",
+    "3.7.0"
   ],
   "review_packet": {
     "run_id": "v1e03_dyn_b_offline_temporal_evidence_20260723",
@@ -736,7 +737,7 @@
     {
       "id": "E02-D9-S46-APPROACH",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed46_20260724",
@@ -746,10 +747,10 @@
         145
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -762,12 +763,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis receding walk (off-axis perspective translation)",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S46-DYN-SWEEP",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_dynamic_positive",
+      "category": "reviewer_approved_dynamic_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed46_20260724",
@@ -777,10 +784,10 @@
         249
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -793,12 +800,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "mirrored negative lateral sweep",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S46-RETREAT",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed46_20260724",
@@ -808,10 +821,10 @@
         400
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -824,12 +837,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis approaching walk",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S46-STATIC-IDLE",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_static_negative",
+      "category": "reviewer_approved_static_negative",
       "risk_type": "static",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed46_20260724",
@@ -839,10 +858,10 @@
         465
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
+      "reviewer_approved": true,
       "count_as_dynamic_positive_group": false,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -855,12 +874,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "idle balance sway only",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed46.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S47-APPROACH",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed47_20260724",
@@ -870,10 +895,10 @@
         145
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -886,12 +911,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis receding walk (off-axis perspective translation)",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S47-DYN-SWEEP",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_dynamic_positive",
+      "category": "reviewer_approved_dynamic_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed47_20260724",
@@ -901,10 +932,10 @@
         249
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -917,12 +948,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "mirrored negative lateral sweep",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S47-RETREAT",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed47_20260724",
@@ -932,10 +969,10 @@
         400
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -948,12 +985,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis approaching walk",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S47-STATIC-IDLE",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_static_negative",
+      "category": "reviewer_approved_static_negative",
       "risk_type": "static",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed47_20260724",
@@ -963,10 +1006,10 @@
         465
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
+      "reviewer_approved": true,
       "count_as_dynamic_positive_group": false,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -979,12 +1022,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "idle balance sway only",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed47.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S48-APPROACH",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed48_20260724",
@@ -994,10 +1043,10 @@
         145
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -1010,12 +1059,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis receding walk (off-axis perspective translation)",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S48-DYN-SWEEP",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_dynamic_positive",
+      "category": "reviewer_approved_dynamic_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed48_20260724",
@@ -1025,10 +1080,10 @@
         249
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -1041,12 +1096,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "mirrored negative lateral sweep",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S48-RETREAT",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_depth_motion_positive",
+      "category": "reviewer_approved_depth_motion_positive",
       "risk_type": "dynamic",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed48_20260724",
@@ -1056,10 +1117,10 @@
         400
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
-      "count_as_dynamic_positive_group": false,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -1072,12 +1133,18 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "camera-axis approaching walk",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     },
     {
       "id": "E02-D9-S48-STATIC-IDLE",
       "source_milestone": "V1-D9-S1S2",
-      "category": "provisional_static_negative",
+      "category": "reviewer_approved_static_negative",
       "risk_type": "static",
       "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
       "scene_group": "v1d9_s1s2_seed48_20260724",
@@ -1087,10 +1154,10 @@
         465
       ],
       "temporal_pair_required": true,
-      "reviewer_approved": false,
+      "reviewer_approved": true,
       "count_as_dynamic_positive_group": false,
       "technical_review_status": "d9_tracking_100pct_on_target_rule_v21_correct",
-      "status": "provisional_pending_human_review",
+      "status": "reviewer_approved",
       "semantic_identity": "scripted_g1_locomotion",
       "scripted_locomotion": true,
       "human_motion": false,
@@ -1103,7 +1170,13 @@
       "control_evidence": false,
       "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
       "boundary_note": "idle balance sway only",
-      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png"
+      "review_packet_image": "results/paper_demo/v1d9_review_packet_20260724/review_seed48.png",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "montage_first_last_frame_review_all_4_windows_per_seed",
+        "review_doc": "vlm-v1d9-1-human-label-review-2026-07-24"
+      }
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",
