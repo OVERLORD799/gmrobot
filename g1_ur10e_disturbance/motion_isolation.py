@@ -302,11 +302,24 @@ def compute_ur10_freeze_metrics(
     delta = cur - init
     arm_delta = delta[:6]
     gripper_delta = float(delta[6])
+    arm_joint_delta_abs = np.abs(arm_delta)
+    arm_joint_delta_by_name = {
+        str(name): float(arm_delta[idx]) for idx, name in enumerate(ARM_JOINT_NAMES[:6])
+    }
+    arm_joint_delta_abs_by_name = {
+        str(name): float(arm_joint_delta_abs[idx]) for idx, name in enumerate(ARM_JOINT_NAMES[:6])
+    }
+    arm_joint_delta_max_idx = int(np.argmax(arm_joint_delta_abs)) if arm_joint_delta_abs.size else 0
+    arm_joint_delta_max_name = str(ARM_JOINT_NAMES[arm_joint_delta_max_idx])
     aggregate_semantics = "legacy_aggregate_arm6_plus_gripper1"
     return {
         "ur10_action_norm": float(np.linalg.norm(eff[:7])),
         "ur10_arm_joint_delta_norm": float(np.linalg.norm(arm_delta)),
         "ur10_arm_joint_delta_max_abs": float(np.max(np.abs(arm_delta))),
+        "ur10_arm_joint_delta_max_abs_joint_name": arm_joint_delta_max_name,
+        "ur10_arm_joint_delta_max_abs_joint_value": float(arm_delta[arm_joint_delta_max_idx]),
+        "ur10_arm_joint_delta_by_name": arm_joint_delta_by_name,
+        "ur10_arm_joint_delta_abs_by_name": arm_joint_delta_abs_by_name,
         "ur10_gripper_joint_delta": gripper_delta,
         # Backward-compatible aggregate metrics: keep unchanged semantics.
         "ur10_joint_delta_norm": float(np.linalg.norm(delta)),

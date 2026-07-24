@@ -72,6 +72,39 @@ def _analyze_ur10_freeze_from_runtime(
         (_safe_float(r.get("ur10_arm_joint_delta_max_abs"), 0.0) for r in runtime_rows),
         default=0.0,
     )
+    arm_joint_max_name = ""
+    arm_joint_max_value = 0.0
+    arm_settled_joint_max_name = ""
+    arm_settled_joint_max_value = 0.0
+    arm_joint_abs_by_name_at_max: dict[str, float] = {}
+    arm_settled_trace: list[dict[str, Any]] = []
+    for row in runtime_rows:
+        _cand_name = str(row.get("ur10_arm_joint_delta_max_abs_joint_name", "")).strip()
+        _cand_val = _safe_float(row.get("ur10_arm_joint_delta_max_abs_joint_value"), 0.0)
+        if abs(_cand_val) >= abs(arm_joint_max_value):
+            arm_joint_max_name = _cand_name
+            arm_joint_max_value = _cand_val
+            raw_json = str(row.get("ur10_arm_joint_delta_abs_by_name_json", "")).strip()
+            if raw_json:
+                try:
+                    parsed = json.loads(raw_json)
+                    if isinstance(parsed, dict):
+                        arm_joint_abs_by_name_at_max = {str(k): float(v) for k, v in parsed.items()}
+                except Exception:
+                    arm_joint_abs_by_name_at_max = {}
+        settled_name = str(row.get("ur10_arm_joint_delta_max_abs_settled_joint_name", "")).strip()
+        settled_val = _safe_float(row.get("ur10_arm_joint_delta_max_abs_settled_joint_value"), 0.0)
+        if abs(settled_val) >= abs(arm_settled_joint_max_value):
+            arm_settled_joint_max_name = settled_name
+            arm_settled_joint_max_value = settled_val
+        arm_settled_trace.append(
+            {
+                "sim_step": int(float(row.get("sim_step", "0"))),
+                "arm_joint_delta_max_abs_settled": _safe_float(row.get("ur10_arm_joint_delta_max_abs_settled"), 0.0),
+                "arm_joint_delta_max_abs_settled_joint_name": settled_name,
+                "arm_joint_delta_max_abs_settled_joint_value": settled_val,
+            }
+        )
     grip_settled_abs_max = max(
         (abs(_safe_float(r.get("ur10_gripper_joint_delta_settled"), 0.0)) for r in runtime_rows),
         default=0.0,
@@ -122,6 +155,12 @@ def _analyze_ur10_freeze_from_runtime(
         "arm_joint_delta_max_abs_max": arm_max_abs,
         "arm_joint_delta_norm_max": arm_norm_max,
         "arm_joint_delta_max_abs_settled_max": arm_settled_max,
+        "arm_joint_delta_max_abs_joint_name_at_max": arm_joint_max_name or "unknown",
+        "arm_joint_delta_max_abs_joint_value_at_max": float(arm_joint_max_value),
+        "arm_joint_delta_abs_by_name_at_max": arm_joint_abs_by_name_at_max,
+        "arm_joint_delta_max_abs_settled_joint_name": arm_settled_joint_max_name or "unknown",
+        "arm_joint_delta_max_abs_settled_joint_value": float(arm_settled_joint_max_value),
+        "arm_settled_trace": arm_settled_trace,
         "gripper_selected_state": selected,
         "gripper_joint_delta_settled_abs_max": grip_settled_abs_max,
         "legacy_joint_delta_max_abs_settled_max": legacy_settled_max,

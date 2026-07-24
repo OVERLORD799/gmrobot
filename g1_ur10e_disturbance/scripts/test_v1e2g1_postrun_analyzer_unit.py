@@ -73,11 +73,16 @@ def test_postrun_analyzer_projects_visibility_roi_and_arm_freeze_with_gripper_se
                     "ur10_gripper_selected_state": "open",
                     "ur10_arm_joint_delta_norm": "0.0",
                     "ur10_arm_joint_delta_max_abs": "0.0",
+                    "ur10_arm_joint_delta_max_abs_joint_name": "wrist_3_joint",
+                    "ur10_arm_joint_delta_max_abs_joint_value": "0.0",
+                    "ur10_arm_joint_delta_abs_by_name_json": "{\"wrist_3_joint\": 0.0}",
                     "ur10_gripper_joint_delta": "0.314159",
                     "ur10_joint_delta_norm": "0.314159",
                     "ur10_joint_delta_max_abs": "0.314159",
                     "ur10_joint_delta_semantics": "legacy_aggregate_arm6_plus_gripper1",
                     "ur10_arm_joint_delta_max_abs_settled": "0.0",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_name": "wrist_3_joint",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_value": "0.0",
                     "ur10_gripper_joint_delta_settled": "0.314159",
                     "ur10_joint_delta_max_abs_settled": "0.314159",
                 },
@@ -86,11 +91,16 @@ def test_postrun_analyzer_projects_visibility_roi_and_arm_freeze_with_gripper_se
                     "ur10_gripper_selected_state": "open",
                     "ur10_arm_joint_delta_norm": "0.0",
                     "ur10_arm_joint_delta_max_abs": "0.0",
+                    "ur10_arm_joint_delta_max_abs_joint_name": "wrist_3_joint",
+                    "ur10_arm_joint_delta_max_abs_joint_value": "0.0",
+                    "ur10_arm_joint_delta_abs_by_name_json": "{\"wrist_3_joint\": 0.0}",
                     "ur10_gripper_joint_delta": "0.314159",
                     "ur10_joint_delta_norm": "0.314159",
                     "ur10_joint_delta_max_abs": "0.314159",
                     "ur10_joint_delta_semantics": "legacy_aggregate_arm6_plus_gripper1",
                     "ur10_arm_joint_delta_max_abs_settled": "0.0",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_name": "wrist_3_joint",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_value": "0.0",
                     "ur10_gripper_joint_delta_settled": "0.314159",
                     "ur10_joint_delta_max_abs_settled": "0.314159",
                 },
@@ -105,6 +115,7 @@ def test_postrun_analyzer_projects_visibility_roi_and_arm_freeze_with_gripper_se
         assert rep["ur10"]["gripper_selected_state"] == "open"
         assert abs(rep["ur10"]["gripper_joint_delta_settled_abs_max"] - 0.314159) < 1e-6
         assert abs(rep["ur10"]["legacy_joint_delta_max_abs_settled_max"] - 0.314159) < 1e-6
+        assert rep["ur10"]["arm_joint_delta_max_abs_settled_joint_name"] == "wrist_3_joint"
 
 
 def test_postrun_analyzer_arm_motion_breaks_arm_freeze_gate() -> None:
@@ -138,11 +149,16 @@ def test_postrun_analyzer_arm_motion_breaks_arm_freeze_gate() -> None:
                     "ur10_gripper_selected_state": "close",
                     "ur10_arm_joint_delta_norm": "0.05",
                     "ur10_arm_joint_delta_max_abs": "0.05",
+                    "ur10_arm_joint_delta_max_abs_joint_name": "elbow_joint",
+                    "ur10_arm_joint_delta_max_abs_joint_value": "0.05",
+                    "ur10_arm_joint_delta_abs_by_name_json": "{\"elbow_joint\": 0.05}",
                     "ur10_gripper_joint_delta": "0.0",
                     "ur10_joint_delta_norm": "0.05",
                     "ur10_joint_delta_max_abs": "0.05",
                     "ur10_joint_delta_semantics": "legacy_aggregate_arm6_plus_gripper1",
                     "ur10_arm_joint_delta_max_abs_settled": "0.05",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_name": "elbow_joint",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_value": "0.05",
                     "ur10_gripper_joint_delta_settled": "0.0",
                     "ur10_joint_delta_max_abs_settled": "0.05",
                 }
@@ -151,6 +167,7 @@ def test_postrun_analyzer_arm_motion_breaks_arm_freeze_gate() -> None:
         rep = analyze_postrun(d)
         assert rep["ur10"]["arm_freeze_qualified"] is False
         assert rep["ur10"]["arm_joint_delta_max_abs_settled_max"] > 1e-6
+        assert rep["ur10"]["arm_joint_delta_max_abs_settled_joint_name"] == "elbow_joint"
 
 
 if __name__ == "__main__":

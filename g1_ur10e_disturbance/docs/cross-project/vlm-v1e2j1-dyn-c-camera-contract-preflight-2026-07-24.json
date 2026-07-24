@@ -1,0 +1,104 @@
+{
+  "milestone": "V1-E2J.1",
+  "date": "2026-07-24",
+  "status": "preflight_fail",
+  "decision": "STOP_NO_RETRY_NO_FORMAL_CAPTURE",
+  "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j1_dyn_c_camera_contract_preflight_20260724",
+  "build": {
+    "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j1-20260724"
+  },
+  "camera_contract": {
+    "requested_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "requested_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "effective_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "effective_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "pose_abs_error": {
+      "pos_max_abs": 0.0,
+      "rot_max_abs": 0.0
+    },
+    "contract_match": true
+  },
+  "ur10": {
+    "arm_joint_delta_max_abs_settled_max": 0.00015,
+    "arm_joint_delta_max_abs_settled_joint_name": "shoulder_lift_joint",
+    "arm_joint_delta_max_abs_settled_joint_value": -0.00015,
+    "ee_disp_settled_max_m": 0.0,
+    "gripper_selected_state": "open",
+    "gripper_joint_delta_settled_abs_max": 0.314159
+  },
+  "gates": {
+    "exit0": true,
+    "no_traceback": true,
+    "no_xid_in_logs": true,
+    "g1_no_fall": true,
+    "actual_same_direction": true,
+    "projected_roi_exists": true,
+    "projected_centroid_ge40_count_ge2": true,
+    "arm_only_settled_le_1e6": false,
+    "ee_near_zero_le_1e6": true,
+    "post0_vlm_perception_off": true
+  },
+  "metrics": {
+    "integrated_commanded_xy_m": [
+      1.114799999999995,
+      -0.27360000000000007
+    ],
+    "actual_xy_m": [
+      1.0598587393760681,
+      -0.28755156695842743
+    ],
+    "direction_dot": 1.2602046313762612,
+    "max_projected_actual_displacement_px": 54.164784379234526,
+    "centroid_ge40_count": 4,
+    "centroids": [
+      {
+        "step": 169,
+        "u": 310.3089443100798,
+        "v": 409.0391494159136,
+        "max_uv": 409.0391494159136
+      },
+      {
+        "step": 170,
+        "u": 310.33543507776346,
+        "v": 408.57535802952646,
+        "max_uv": 408.57535802952646
+      },
+      {
+        "step": 249,
+        "u": 263.67770739112075,
+        "v": 406.3094997925861,
+        "max_uv": 406.3094997925861
+      },
+      {
+        "step": 259,
+        "u": 267.1394713281266,
+        "v": 405.47476198919134,
+        "max_uv": 405.47476198919134
+      }
+    ]
+  },
+  "artifacts": {
+    "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j1_dyn_c_camera_contract_preflight_20260724/safety_logs/phase3.csv": "75f5eb0264a8db5f34d30acea25b23a2363a455886335b804b8b778f04bac049",
+    "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j1_dyn_c_camera_contract_preflight_20260724/safety_logs/phase3_runtime_telemetry.csv": "a2bcb4627c2d4ef225edaaa4b115db6debb1361313a66be385eb13748aec2c8b",
+    "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j1_dyn_c_camera_contract_preflight_20260724/meta/camera_pose.json": "fa6bc4689ca0eceb8dd4e5dc06fd829a096a443f84e0bbe74d4c126a091f1804",
+    "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j1_dyn_c_camera_contract_preflight_20260724/meta/v1e2j1_postrun_analyzer.json": "aa70c18950da1e357060659896c084168c0d6c9991f95f960f43f517fb8a1aa9"
+  }
+}

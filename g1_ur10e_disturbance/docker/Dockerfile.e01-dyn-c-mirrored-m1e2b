@@ -7,6 +7,7 @@ COPY scripts/ /opt/projects/g1_ur10e_disturbance/scripts/
 COPY mdp/ /opt/projects/g1_ur10e_disturbance/mdp/
 COPY vendored/ /opt/projects/g1_ur10e_disturbance/vendored/
 COPY config_loader.py /opt/projects/g1_ur10e_disturbance/config_loader.py
+COPY camera_contract.py /opt/projects/g1_ur10e_disturbance/camera_contract.py
 COPY dual_env_cfg.py /opt/projects/g1_ur10e_disturbance/dual_env_cfg.py
 COPY dynamic_audit_csv.py /opt/projects/g1_ur10e_disturbance/dynamic_audit_csv.py
 COPY dynamic_sweep_proxy.py /opt/projects/g1_ur10e_disturbance/dynamic_sweep_proxy.py
@@ -31,6 +32,8 @@ COPY runtime_telemetry_csv.py /opt/projects/g1_ur10e_disturbance/runtime_telemet
 COPY test_metrics.py /opt/projects/g1_ur10e_disturbance/test_metrics.py
 COPY ur10e_controller.py /opt/projects/g1_ur10e_disturbance/ur10e_controller.py
 COPY configs/e01_dyn_c_capture.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_c_capture.yaml
+COPY configs/e01_dyn_c_motion_preflight_v1e2jk_20260724.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_c_motion_preflight_v1e2jk_20260724.yaml
+COPY configs/e01_dyn_c_motion_preflight_v1e2j1k_20260724.yaml /opt/projects/g1_ur10e_disturbance/configs/e01_dyn_c_motion_preflight_v1e2j1k_20260724.yaml
 
 LABEL gmdisturb.e01_dyn_c_mirrored_m1e2b="20260723" \
   gmdisturb.base_tag="gmdisturb:b4-p010-20260721" \

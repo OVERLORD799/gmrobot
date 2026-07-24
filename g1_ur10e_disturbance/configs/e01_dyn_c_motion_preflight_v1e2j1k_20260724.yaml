@@ -1,0 +1,23 @@
+scene: E01-Dyn-C
+scenario: mirrored_outer_lateral_patrol
+motion_source: scripted_g1_mirrored_outer_lateral_patrol
+seed: 44
+enable_capture: false
+execute_capture: false
+task_execution: false
+visual_dataset_only: true
+freeze_ur10e: true
+camera:
+  override: true
+  pos: [0.45, 0.0, 2.7]
+  rot: [0.7071, 0.0, 0.7071, 0.0]
+max_steps: 260
+progress_interval: 50
+capture_steps: [169, 170, 249, 259]
+gates:
+  min_projected_displacement_px: 40
+  min_roi_area_fraction: 0.012
+  ur10_action_norm_max: 1.0e-6
+  ur10_joint_delta_max_abs: 1.0e-6
+  require_no_fall: true
+  require_command_actual_direction_consistent: true

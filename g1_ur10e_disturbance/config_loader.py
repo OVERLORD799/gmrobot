@@ -139,6 +139,13 @@ class DynamicSweepConfig:
 
 
 @dataclass(frozen=True)
+class CameraConfig:
+    override: bool = False
+    pos: Tuple[float, float, float] = (1.0, 0.0, 3.0)
+    rot: Tuple[float, float, float, float] = (0.7071, 0.0, 0.7071, 0.0)
+
+
+@dataclass(frozen=True)
 class ReplanConfig:
     trigger_threshold: int = 5   # synced with default.yaml (was 25 — stale GMRobot default)
     detour_lateral_m: float = 0.10
@@ -188,6 +195,7 @@ class Phase3Config:
     safety: SafetyConfig = field(default_factory=SafetyConfig)
     batch: BatchConfig = field(default_factory=BatchConfig)
     dynamic_sweep: DynamicSweepConfig = field(default_factory=DynamicSweepConfig)
+    camera: CameraConfig = field(default_factory=CameraConfig)
     per_part_protocol: bool = False
 
     # ------------------------------------------------------------------
@@ -242,6 +250,7 @@ def _validate_prebuild_schema(raw: dict) -> None:
         "safety",
         "ee_track",
         "dynamic_sweep",
+        "camera",
         "batch",
         "arm",
     )
@@ -396,6 +405,12 @@ def _build_config(raw: dict) -> Phase3Config:
         retreat_duration_steps=int(ds_raw.get("retreat_duration_steps", 50)),
         trigger_phase=str(ds_raw.get("trigger_phase", "transit")),
     )
+    c_raw = _ensure_mapping_section(raw, "camera")
+    camera = CameraConfig(
+        override=bool(c_raw.get("override", False)),
+        pos=tuple(c_raw.get("pos", (1.0, 0.0, 3.0))),
+        rot=tuple(c_raw.get("rot", (0.7071, 0.0, 0.7071, 0.0))),
+    )
 
     per_part_protocol = bool(raw.get("per_part_protocol", False))
 
@@ -426,6 +441,7 @@ def _build_config(raw: dict) -> Phase3Config:
         safety=safety,
         batch=batch,
         dynamic_sweep=dynamic_sweep,
+        camera=camera,
         per_part_protocol=per_part_protocol,
     )
 

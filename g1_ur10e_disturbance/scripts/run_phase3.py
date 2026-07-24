@@ -243,6 +243,23 @@ parser.add_argument(
     help="Optional path to write resolved scene camera pose JSON.",
 )
 parser.add_argument(
+    "--scene-camera-override",
+    action="store_true",
+    help="Force scene camera override on (CLI takes precedence over config).",
+)
+parser.add_argument(
+    "--scene-camera-pos",
+    type=str,
+    default="",
+    help="Scene camera position CSV (x,y,z), requires --scene-camera-rot.",
+)
+parser.add_argument(
+    "--scene-camera-rot",
+    type=str,
+    default="",
+    help="Scene camera quaternion CSV (w,x,y,z), requires --scene-camera-pos.",
+)
+parser.add_argument(
     "--body_pose_jsonl",
     type=str,
     default="",
@@ -306,6 +323,7 @@ _PROJ_ROOT_EARLY = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 if _PROJ_ROOT_EARLY not in sys.path:
     sys.path.insert(0, _PROJ_ROOT_EARLY)
 from config_loader import load_config as _load_config_early
+from camera_contract import apply_contract_envvars, resolve_camera_contract
 _cfg_early = _load_config_early(args_cli.config)
 if _cfg_early.per_part_protocol:
     args_cli.per_part_protocol = True
@@ -317,6 +335,18 @@ else:
     args_cli.enforcement_mode = str(args_cli.enforcement_mode).lower()
 if args_cli.enforcement_mode == "off":
     args_cli.no_safety = True
+
+_camera_contract = resolve_camera_contract(
+    config_camera={
+        "override": bool(_cfg_early.camera.override),
+        "pos": tuple(float(v) for v in _cfg_early.camera.pos),
+        "rot": tuple(float(v) for v in _cfg_early.camera.rot),
+    },
+    cli_override=(True if bool(args_cli.scene_camera_override) else None),
+    cli_pos=str(args_cli.scene_camera_pos or ""),
+    cli_rot=str(args_cli.scene_camera_rot or ""),
+)
+apply_contract_envvars(_camera_contract, env=os.environ)
 
 # §5.2 enforcement: --per-part-protocol and --scenario-hand require --virtual-hand
 if args_cli.per_part_protocol and args_cli.virtual_hand is None:
@@ -434,6 +464,7 @@ from motion_isolation import (
 from runtime_telemetry_csv import init_runtime_telemetry_writer
 from spawn_utils import apply_g1_spawn_to_env_cfg, spawn_pose_error
 from mat_event_detector import MatEventDetector
+from camera_contract import apply_contract_to_env_cfg, pose_abs_error, read_env_cfg_pose
 from g1_disturbance_controller import (
     G1DisturbanceController,
     DisturbanceMode,
@@ -652,6 +683,33 @@ def main():
 
     task_id = "G1-UR10e-Disturbance-v0"
     env_cfg = parse_env_cfg(task_id, num_envs=1)
+    apply_contract_to_env_cfg(env_cfg, _camera_contract)
+    _effective_cam_pos_pre, _effective_cam_rot_pre = read_env_cfg_pose(env_cfg)
+    _cam_contract_error = pose_abs_error(
+        _camera_contract.requested_pos,
+        _camera_contract.requested_rot,
+        _effective_cam_pos_pre,
+        _effective_cam_rot_pre,
+    )
+    _cam_contract_match = (
+        _cam_contract_error["pos_max_abs"] <= 0.0
+        and _cam_contract_error["rot_max_abs"] <= 0.0
+    )
+    print(
+        "[phase3] camera_contract "
+        f"source={_camera_contract.source} "
+        f"requested_pos={list(_camera_contract.requested_pos)} "
+        f"effective_pos={list(_effective_cam_pos_pre)} "
+        f"pos_err={_cam_contract_error['pos_max_abs']:.8f} "
+        f"rot_err={_cam_contract_error['rot_max_abs']:.8f}"
+    )
+    if not _cam_contract_match:
+        raise RuntimeError(
+            "camera contract mismatch before gym.make: "
+            f"requested={list(_camera_contract.requested_pos)}/{list(_camera_contract.requested_rot)} "
+            f"effective={list(_effective_cam_pos_pre)}/{list(_effective_cam_rot_pre)} "
+            f"err={_cam_contract_error}"
+        )
     # Keep PhysX/Isaac episode horizon >= CLI max_steps.  Default
     # episode_length_s=200s truncates at 10000 steps @ 50 Hz and silently
     # ends B1 before 20 parts complete ("Episode ended at step 9999").
@@ -785,15 +843,18 @@ def main():
             f"[phase3] save_camera=ON dir={_cam_out} "
             f"steps={sorted(_cam_steps) if _cam_steps else f'every progress_interval={args_cli.progress_interval}'}"
         )
-    from scene_camera_override import (
-        resolve_scene_camera_pose,
-        scene_camera_override_enabled,
-    )
-    _cam_pos, _cam_rot = resolve_scene_camera_pose()
+    _cam_pos, _cam_rot = read_env_cfg_pose(env_cfg)
     _cam_pose_record = {
-        "override_enabled": scene_camera_override_enabled(),
-        "pos": list(_cam_pos),
-        "rot": list(_cam_rot),
+        "override_enabled": bool(_camera_contract.override_enabled),
+        "contract_source": str(_camera_contract.source),
+        "requested_pos": [float(x) for x in _camera_contract.requested_pos],
+        "requested_rot": [float(x) for x in _camera_contract.requested_rot],
+        "effective_pos": [float(x) for x in _cam_pos],
+        "effective_rot": [float(x) for x in _cam_rot],
+        "pose_abs_error": dict(_cam_contract_error),
+        "contract_match": bool(_cam_contract_match),
+        "pos": [float(x) for x in _cam_pos],
+        "rot": [float(x) for x in _cam_rot],
         "motion_source_label": args_cli.motion_source_label or "",
         "scenario": args_cli.scenario or "wander",
         "seed": int(_episode_seed),
@@ -814,6 +875,13 @@ def main():
             json.dump(_cam_pose_record, _pf, indent=2)
             _pf.write("\n")
         print(f"[phase3] camera pose sidecar: {_pose_json}")
+    if not _cam_contract_match:
+        raise RuntimeError(
+            f"camera contract mismatch fail-closed: sidecar={_pose_json or '<none>'} "
+            f"requested={_cam_pose_record['requested_pos']}/{_cam_pose_record['requested_rot']} "
+            f"effective={_cam_pose_record['effective_pos']}/{_cam_pose_record['effective_rot']} "
+            f"err={_cam_pose_record['pose_abs_error']}"
+        )
     if args_cli.body_pose_jsonl:
         _bp_dir = os.path.dirname(args_cli.body_pose_jsonl)
         if _bp_dir:
@@ -1392,6 +1460,8 @@ def main():
     )
     _UR10_SETTLING_STEPS = 5
     _ur10_arm_joint_delta_max_abs_settled = 0.0
+    _ur10_arm_joint_delta_max_abs_settled_joint_name = ""
+    _ur10_arm_joint_delta_max_abs_settled_joint_value = 0.0
     _ur10_gripper_joint_delta_settled = 0.0
     _ur10_joint_delta_max_abs_settled = 0.0
     _ur10_gripper_selected_state = str(ur10e_gripper_term_audit.get("selected", "unknown"))
@@ -2487,9 +2557,17 @@ def main():
             initial_joint_pose=_ur10_joint0,
         )
         if step >= _UR10_SETTLING_STEPS:
+            _arm_settled_now = float(_ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs"])
+            if _arm_settled_now >= float(_ur10_arm_joint_delta_max_abs_settled):
+                _ur10_arm_joint_delta_max_abs_settled_joint_name = str(
+                    _ur10_freeze_last_metrics.get("ur10_arm_joint_delta_max_abs_joint_name", "")
+                )
+                _ur10_arm_joint_delta_max_abs_settled_joint_value = float(
+                    _ur10_freeze_last_metrics.get("ur10_arm_joint_delta_max_abs_joint_value", 0.0)
+                )
             _ur10_arm_joint_delta_max_abs_settled = max(
                 float(_ur10_arm_joint_delta_max_abs_settled),
-                float(_ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs"]),
+                _arm_settled_now,
             )
             _ur10_gripper_joint_delta_settled = max(
                 float(_ur10_gripper_joint_delta_settled),
@@ -2939,11 +3017,17 @@ def main():
                     "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                     "ur10_arm_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_norm']:.6f}",
                     "ur10_arm_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs']:.6f}",
+                    "ur10_arm_joint_delta_max_abs_joint_name": str(_ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs_joint_name"]),
+                    "ur10_arm_joint_delta_max_abs_joint_value": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs_joint_value']:.6f}",
+                    "ur10_arm_joint_delta_by_name_json": json.dumps(_ur10_freeze_last_metrics["ur10_arm_joint_delta_by_name"], sort_keys=True, ensure_ascii=True),
+                    "ur10_arm_joint_delta_abs_by_name_json": json.dumps(_ur10_freeze_last_metrics["ur10_arm_joint_delta_abs_by_name"], sort_keys=True, ensure_ascii=True),
                     "ur10_gripper_joint_delta": f"{_ur10_freeze_last_metrics['ur10_gripper_joint_delta']:.6f}",
                     "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                     "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
                     "ur10_joint_delta_semantics": str(_ur10_freeze_last_metrics["ur10_joint_delta_semantics"]),
                     "ur10_arm_joint_delta_max_abs_settled": f"{float(_ur10_arm_joint_delta_max_abs_settled):.6f}",
+                    "ur10_arm_joint_delta_max_abs_settled_joint_name": _ur10_arm_joint_delta_max_abs_settled_joint_name,
+                    "ur10_arm_joint_delta_max_abs_settled_joint_value": f"{float(_ur10_arm_joint_delta_max_abs_settled_joint_value):.6f}",
                     "ur10_gripper_joint_delta_settled": f"{float(_ur10_gripper_joint_delta_settled):.6f}",
                     "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                 }
@@ -3012,11 +3096,17 @@ def main():
                     "ur10_action_norm": _ur10_freeze_last_metrics["ur10_action_norm"],
                     "ur10_arm_joint_delta_norm": _ur10_freeze_last_metrics["ur10_arm_joint_delta_norm"],
                     "ur10_arm_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs"],
+                    "ur10_arm_joint_delta_max_abs_joint_name": _ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs_joint_name"],
+                    "ur10_arm_joint_delta_max_abs_joint_value": _ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs_joint_value"],
+                    "ur10_arm_joint_delta_by_name": _ur10_freeze_last_metrics["ur10_arm_joint_delta_by_name"],
+                    "ur10_arm_joint_delta_abs_by_name": _ur10_freeze_last_metrics["ur10_arm_joint_delta_abs_by_name"],
                     "ur10_gripper_joint_delta": _ur10_freeze_last_metrics["ur10_gripper_joint_delta"],
                     "ur10_joint_delta_norm": _ur10_freeze_last_metrics["ur10_joint_delta_norm"],
                     "ur10_joint_delta_max_abs": _ur10_freeze_last_metrics["ur10_joint_delta_max_abs"],
                     "ur10_joint_delta_semantics": _ur10_freeze_last_metrics["ur10_joint_delta_semantics"],
                     "ur10_arm_joint_delta_max_abs_settled": float(_ur10_arm_joint_delta_max_abs_settled),
+                    "ur10_arm_joint_delta_max_abs_settled_joint_name": _ur10_arm_joint_delta_max_abs_settled_joint_name,
+                    "ur10_arm_joint_delta_max_abs_settled_joint_value": float(_ur10_arm_joint_delta_max_abs_settled_joint_value),
                     "ur10_gripper_joint_delta_settled": float(_ur10_gripper_joint_delta_settled),
                     "ur10_joint_delta_max_abs_settled": float(_ur10_joint_delta_max_abs_settled),
                 }
@@ -3062,11 +3152,17 @@ def main():
                         "ur10_action_norm": f"{_ur10_freeze_last_metrics['ur10_action_norm']:.6f}",
                         "ur10_arm_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_norm']:.6f}",
                         "ur10_arm_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs']:.6f}",
+                        "ur10_arm_joint_delta_max_abs_joint_name": str(_ur10_freeze_last_metrics["ur10_arm_joint_delta_max_abs_joint_name"]),
+                        "ur10_arm_joint_delta_max_abs_joint_value": f"{_ur10_freeze_last_metrics['ur10_arm_joint_delta_max_abs_joint_value']:.6f}",
+                        "ur10_arm_joint_delta_by_name_json": json.dumps(_ur10_freeze_last_metrics["ur10_arm_joint_delta_by_name"], sort_keys=True, ensure_ascii=True),
+                        "ur10_arm_joint_delta_abs_by_name_json": json.dumps(_ur10_freeze_last_metrics["ur10_arm_joint_delta_abs_by_name"], sort_keys=True, ensure_ascii=True),
                         "ur10_gripper_joint_delta": f"{_ur10_freeze_last_metrics['ur10_gripper_joint_delta']:.6f}",
                         "ur10_joint_delta_norm": f"{_ur10_freeze_last_metrics['ur10_joint_delta_norm']:.6f}",
                         "ur10_joint_delta_max_abs": f"{_ur10_freeze_last_metrics['ur10_joint_delta_max_abs']:.6f}",
                         "ur10_joint_delta_semantics": str(_ur10_freeze_last_metrics["ur10_joint_delta_semantics"]),
                         "ur10_arm_joint_delta_max_abs_settled": f"{float(_ur10_arm_joint_delta_max_abs_settled):.6f}",
+                        "ur10_arm_joint_delta_max_abs_settled_joint_name": _ur10_arm_joint_delta_max_abs_settled_joint_name,
+                        "ur10_arm_joint_delta_max_abs_settled_joint_value": f"{float(_ur10_arm_joint_delta_max_abs_settled_joint_value):.6f}",
                         "ur10_gripper_joint_delta_settled": f"{float(_ur10_gripper_joint_delta_settled):.6f}",
                         "ur10_joint_delta_max_abs_settled": f"{float(_ur10_joint_delta_max_abs_settled):.6f}",
                     }
