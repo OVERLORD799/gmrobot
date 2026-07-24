@@ -17,6 +17,11 @@ SEMANTIC_KEY_VERSION_V2 = "semantic_key_v2"
 # MUST be deployed together with drift rejection (track_drift / D4A).
 PROMPT_VERSION_V3_TEMPORAL = "five_stage_safety_v3_temporal_directive"
 
+# D5A: deterministic evidence-gated dynamic rule (path B). The dynamic
+# detection decision is sunk into auditable code; the VLM is annotation-only
+# on this path and cannot veto or mint the trigger.
+EVIDENCE_GATED_RULE_VERSION_V1 = "evidence_gated_dynamic_rule_v1"
+
 ALLOWED_PROMPT_VERSIONS = frozenset(
     {PROMPT_VERSION_V1, PROMPT_VERSION_V2_TEMPORAL, PROMPT_VERSION_V3_TEMPORAL}
 )

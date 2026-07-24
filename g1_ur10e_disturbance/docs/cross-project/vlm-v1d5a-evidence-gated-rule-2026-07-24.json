@@ -1,0 +1,34 @@
+{
+  "milestone": "V1-D5A",
+  "date": "2026-07-24",
+  "verdict": "D5A_RULE_OFFLINE_EVAL_PASS",
+  "path": "B_symbolic_rule_sink",
+  "motivation": "F5/F8: prompting cannot make the VLM a reliable dynamic classifier",
+  "module": "GMRobot/source/GMRobot/GMRobot/safety/evidence_gated_rule.py",
+  "rule_version": "evidence_gated_dynamic_rule_v1",
+  "core_rule": "dynamic_triggered <=> validate_temporal_evidence(evidence).valid",
+  "authority_contract": {
+    "vlm_cannot_veto": true,
+    "vlm_cannot_mint": true,
+    "vlm_action_escalate_only": true,
+    "gate_confidence_is_tracker_score_not_semantic": true
+  },
+  "fusion_v1_untouched": true,
+  "semantic_gate_0_85_untouched": true,
+  "offline_eval": {
+    "result_dir": "results/paper_demo/v1d5a_rule_offline_eval_20260724",
+    "post_count": 0,
+    "cases": {
+      "C1_d3c_drift_with_d4a": {"triggered": false, "reason": "track_drift_suspect"},
+      "C2_d3c_drift_without_d4a": {"triggered": true, "meaning": "rule inherits evidence quality; D4A mandatory in deployment"},
+      "C3_perfect_tracker_probe": {"triggered": true, "action": "slow_down", "meaning": "dynamic true positive the VLM never produced (real recorded static@0.7 attached as annotation); GT-derived probe diagnostic_only"},
+      "C4_d3b_sparse_low_score": {"triggered": false, "reason": "score_below_threshold"},
+      "C5_vlm_alone_cannot_mint": {"triggered": false, "reason": "no_track_evidence"}
+    },
+    "all_as_expected": true
+  },
+  "tests": {"unit_new": "8/8 pass", "regression": "63 pass"},
+  "architecture_conclusion": "deterministic floor (symbolic detection) + learned ceiling (VLM semantics; future finetune competes for ceiling only); floor retained permanently as defense in depth",
+  "remaining_online_gap": "end-to-end online trigger still blocked by F1 (GDINO target selection) and F3 (SAM2 drift); dataset/perception work",
+  "boundary": {"b0_b4_freeze_untouched": true, "evidence_thresholds_unchanged": true}
+}
