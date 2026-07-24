@@ -98,6 +98,9 @@ class TemporalTrackEvidence:
     session_ref: str = ""  # redacted local alias only (e.g. session_1)
     session_generation: int | None = None
     rejection_reason: str = ""
+    # Geometric mask-leak drift flag (see track_drift.assess_box_drift).
+    # Default False keeps prior behavior; producers opt in by setting it.
+    drift_suspect: bool = False
 
     def to_dict(self) -> dict[str, Any]:
         return asdict(self)
@@ -150,6 +153,7 @@ def build_temporal_evidence_from_track_result(
     source_frame_id: str,
     config: TemporalEvidenceConfig | None = None,
     now_age_s: float = 0.0,
+    drift_suspect: bool = False,
 ) -> TemporalTrackEvidence:
     """Build evidence snapshot from a *completed* track result (frame N)."""
     cfg = config or TemporalEvidenceConfig()
@@ -227,6 +231,7 @@ def build_temporal_evidence_from_track_result(
         session_ref=session_ref,
         session_generation=generation,
         rejection_reason="pending_validation",
+        drift_suspect=bool(drift_suspect),
     )
     return ev
 
@@ -257,6 +262,8 @@ def validate_temporal_evidence(
         reason = "speed_below_threshold"
     elif evidence.re_detected:
         reason = "re_detected_reset_required"
+    elif evidence.drift_suspect:
+        reason = "track_drift_suspect"
     else:
         # session continuity
         if evidence.track_state == "tracking":
