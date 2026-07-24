@@ -1,0 +1,177 @@
+{
+  "handoff_date": "2026-07-24",
+  "repo": "/home/czz/GMrobot",
+  "generation_preflight": {
+    "branch": "main",
+    "head": "04992f462db25c662aeee393563cdf5fc9efd3e9",
+    "origin_main_local_ref": "04992f462db25c662aeee393563cdf5fc9efd3e9",
+    "worktree_clean": true,
+    "docs_metadata_only": true
+  },
+  "global_goal": {
+    "gmrobot_five_stage_progression": true,
+    "g1_adversarial_and_visual_dataset_expansion": true
+  },
+  "physical_baseline_freeze": {
+    "frozen_modules": [
+      "B0",
+      "B1",
+      "B2",
+      "B4"
+    ],
+    "image_tag": "gmdisturb:b4-p010-20260721",
+    "image_sha": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "rerun_forbidden": true
+  },
+  "gateway_and_shadow_evidence": {
+    "canonical_legacy_gateway_lineage_recorded": true,
+    "five_stage_shadow_v0c3_pass": true,
+    "semantic_shadow_v1c1r_p1_pass": true,
+    "paper_complete_five_stage_claim_allowed": false,
+    "active_semantic_control_success_claim_allowed": false
+  },
+  "vlm_remote_model_and_history": {
+    "important_runs": [
+      {
+        "milestone": "V0-C3",
+        "type": "isaac_shadow",
+        "post_count": 6,
+        "verdict": "PASS"
+      },
+      {
+        "milestone": "V1-C1R",
+        "type": "isaac_semantic_shadow",
+        "post_count": "unknown",
+        "verdict": "FAIL_IMPORT_PACKAGING"
+      },
+      {
+        "milestone": "V1-C1R-P1",
+        "type": "isaac_semantic_shadow",
+        "post_count": 6,
+        "verdict": "PASS_NEGATIVE_SCENE_ACCEPTED_0"
+      },
+      {
+        "milestone": "V1-D2B",
+        "type": "fixed_frame_replay",
+        "post_count": 2,
+        "verdict": "D2B_TASK_CONTEXT_FAIL"
+      }
+    ]
+  },
+  "dataset_status": {
+    "overall": "DATASET_INSUFFICIENT",
+    "func_c": {
+      "is_visual_capture_evidence": true,
+      "control_grade_geometry_or_control_clean": false,
+      "default_claim_label": "provisional",
+      "default_reviewer_approved": false,
+      "note": "unless explicit approval is adopted per current accepted documentation policy"
+    }
+  },
+  "dyn_status": {
+    "dyn_a": "GEOMETRY_WINDOW_FAIL",
+    "dyn_b": "TECHNICAL_TEMPORAL_PASS_PENDING_USER_DATASET_STILL_INSUFFICIENT",
+    "dyn_c": {
+      "latest": "V1-E2J.1",
+      "camera_contract_pass": true,
+      "roi_gate_pass": true,
+      "centroid_ge_40px_gate_pass": true,
+      "g1_actual_direction_pass": true,
+      "ur10_ee_near_zero_pass": true,
+      "single_blocker": "arm_only_settled_threshold",
+      "arm_only_observed_rad": 0.00015,
+      "arm_only_current_threshold_rad": 1e-06,
+      "formal_e2k_count": 0,
+      "preflight_is_formal_sample": false
+    }
+  },
+  "pending_user_decision": {
+    "question": "whether to relax arm-only settled threshold to 5e-4 rad while preserving EE near-zero gate",
+    "approved": false,
+    "formal_capture_allowed_before_approval": false
+  },
+  "known_images_and_sha": [
+    {
+      "tag": "gmdisturb:b4-p010-20260721",
+      "sha": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68"
+    },
+    {
+      "tag": "gmdisturb:five-stage-shadow-v0c3-20260721",
+      "sha": "sha256:cab6bf5cf637a1f16bd1ac4b14cd6611bb85c7c75ec71cacfddffc963b6ed452"
+    },
+    {
+      "tag": "gmdisturb:semantic-shadow-v1c0p1-20260722",
+      "sha": "sha256:f81e59ce6cac9b66e568246dc58b42828d41cb60e94e984ecbe679fde4ddde7c"
+    },
+    {
+      "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j-20260724",
+      "sha": "sha256:1b560306690316117db34491fee73381993a276a23868fddb637b12f56352f76"
+    },
+    {
+      "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j1-20260724",
+      "sha": "unknown"
+    }
+  ],
+  "commit_chain": {
+    "current_head": "04992f462db25c662aeee393563cdf5fc9efd3e9",
+    "recent": [
+      "04992f4",
+      "acaab2e",
+      "f017402",
+      "7cebe69",
+      "992cabb"
+    ]
+  },
+  "key_paths": {
+    "docs_root": "g1_ur10e_disturbance/docs/cross-project",
+    "results_root": "g1_ur10e_disturbance/results/paper_demo",
+    "frozen_b0_b1_summary": "g1_ur10e_disturbance/results/paper_demo/b0_b1_final_summary_p010.json",
+    "frozen_b2_b4_summary": "g1_ur10e_disturbance/results/paper_demo/b2_b4_final_summary_p010.json"
+  },
+  "do_not_touch": [
+    "frozen B0/B1/B2/B4 assets and results",
+    "historical FAIL verdicts and directories",
+    "active semantic control state",
+    "formal capture before explicit user gate decision"
+  ],
+  "safe_next_steps": [
+    "record threshold decision in docs only",
+    "if approved, prepare single-run formal Dyn-C runbook with no retry",
+    "keep dataset claim boundary conservative"
+  ],
+  "recovery_commands": [
+    "git status --porcelain=v1 --branch",
+    "git rev-parse HEAD",
+    "git rev-parse origin/main",
+    "git log --oneline -12"
+  ],
+  "acceptance_checklist": [
+    "reconfirm main/origin-main/clean before actions",
+    "docs-only task must avoid Docker/Isaac/POST",
+    "preflight evidence must not be treated as formal sample",
+    "no active semantic claim without formal approved evidence"
+  ],
+  "ppe_and_active_control": {
+    "approved_glove_ppe_asset_available": false,
+    "focus": [
+      "vlm-to-low-level-control feedback boundary",
+      "dataset quality and completeness"
+    ],
+    "active_semantic_control_paused": true
+  },
+  "paper_claim_boundary": {
+    "can_claim": [
+      "B0/B1/B2/B4 frozen pass on defe95e lineage",
+      "real five-stage shadow pass exists with negative-scene boundary",
+      "semantic supervisor shadow isolation pass exists with legal negative rejects",
+      "Dyn-C currently blocked pre-formal-capture"
+    ],
+    "cannot_claim": [
+      "paper-complete visual semantic validation",
+      "active semantic positive control success",
+      "Dyn-C formal sample pass",
+      "preflight as formal dataset sample"
+    ]
+  },
+  "next_agent_short_context": "Repo /home/czz/GMrobot on main HEAD 04992f462db25c662aeee393563cdf5fc9efd3e9 (origin/main same, clean). Physical baselines B0/B1/B2/B4 are frozen at gmdisturb:b4-p010-20260721 / sha256:defe95e7... and must not be rerun. V0-C3 and V1-C1R-P1 shadow evidence are PASS but negative-scene/shadow-boundary only; do not claim active semantic control success. Dataset remains insufficient for paper-level control-grade positive claims. Dyn-C latest E2J.1 fixed camera contract and passed ROI/centroid/G1-direction/UR10-EE gates, but still fails arm-only settle gate (0.00015 rad vs 1e-6), so formal E2K count is 0. Pending explicit user approval: whether to relax arm-only threshold to 5e-4 rad while keeping EE near-zero gate mandatory. Until approved, no formal capture."
+}
