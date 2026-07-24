@@ -3,13 +3,61 @@
   "date": "2026-07-24",
   "type": "findings_ledger_plus_d4a_d4b_records",
   "findings": {
-    "F1": {"layer": "gdino", "finding": "systematic target selection failure, 0/24 G1 hits across 4 prompts x 6 frames x 3 scenes", "source": "D3B phase C"},
-    "F2": {"layer": "sam2", "finding": "sparse 79-frame gap propagation fails, score 0.26 rejected by evidence layer", "source": "D3B phase B"},
-    "F3": {"layer": "sam2", "finding": "dense-replay long-horizon drift: correct GT seed lost within 8/17 frames, mask leaked onto static content at score 0.947", "source": "D3C"},
-    "F4": {"layer": "evidence", "finding": "blindspot: score/speed/continuity validation passes confident-wrong tracks; valid-but-wrong evidence reached VLM prompt", "source": "D3C"},
-    "F5": {"layer": "vlm", "finding": "under prompt v2, completely insensitive to temporal evidence content (speed 15-300, entity labels, task context all static@0.70)", "source": "D3A/D3C/D4B"},
-    "F6": {"layer": "vlm", "finding": "incidental backstop: never trusted injected evidence blindly; net system behavior fail-closed with zero false dynamic claims", "source": "D3C/D4B"},
-    "F7": {"layer": "evidence_schema", "finding": "ENTITY_CLASSES has no humanoid class; label 'robot' mis-canonicalizes to robotic_arm via substring alias", "source": "D4B code review"}
+    "F1": {
+      "layer": "gdino",
+      "finding": "systematic target selection failure, 0/24 G1 hits across 4 prompts x 6 frames x 3 scenes",
+      "source": "D3B phase C"
+    },
+    "F2": {
+      "layer": "sam2",
+      "finding": "sparse 79-frame gap propagation fails, score 0.26 rejected by evidence layer",
+      "source": "D3B phase B"
+    },
+    "F3": {
+      "layer": "sam2",
+      "finding": "dense-replay long-horizon drift: correct GT seed lost within 8/17 frames, mask leaked onto static content at score 0.947",
+      "source": "D3C"
+    },
+    "F4": {
+      "layer": "evidence",
+      "finding": "blindspot: score/speed/continuity validation passes confident-wrong tracks; valid-but-wrong evidence reached VLM prompt",
+      "source": "D3C"
+    },
+    "F5": {
+      "layer": "vlm",
+      "finding": "under prompt v2, completely insensitive to temporal evidence content (speed 15-300, entity labels, task context all static@0.70)",
+      "source": "D3A/D3C/D4B"
+    },
+    "F6": {
+      "layer": "vlm",
+      "finding": "incidental backstop: never trusted injected evidence blindly; net system behavior fail-closed with zero false dynamic claims",
+      "source": "D3C/D4B"
+    },
+    "F7": {
+      "layer": "evidence_schema",
+      "finding": "ENTITY_CLASSES has no humanoid class; label 'robot' mis-canonicalizes to robotic_arm via substring alias",
+      "source": "D4B code review"
+    },
+    "F8": {
+      "layer": "vlm",
+      "finding": "dynamic compliance is brittle/non-literal: dynamic@0.90 only in a narrow pocket (entity!=humanoid AND speed=160); ignores stated >=10 px/s rule; suppresses dynamic for humanoid entity",
+      "source": "D4C.1/D4C.2 titration"
+    },
+    "F9": {
+      "layer": "evidence_d4a",
+      "finding": "size-band drift heuristic does not generalize: legitimate gait/depth/trailing size changes flagged as drift -> 3/3 dynamic boundary windows fail-closed missed",
+      "source": "D7A boundary batch"
+    },
+    "F10": {
+      "layer": "evidence_speed",
+      "finding": "last-frame instantaneous speed threshold 10 px/s is below G1 idle balance sway (25-35 px/s instantaneous) -> static false positive",
+      "source": "D7A b3_static_idle"
+    },
+    "F11": {
+      "layer": "evidence_v2",
+      "finding": "window-aggregate rigid decomposition (translation vs scale) separates dynamics (43-69 px/s) from sway (14.7) with ~1.7x margin at 25 px/s; depth motion scale-dominant, kept fail-closed",
+      "source": "D7B offline eval 5/6 correct"
+    }
   },
   "d4a_drift_detector": {
     "fixes": "F4",
@@ -17,13 +65,34 @@
     "evidence_field_added": "drift_suspect (default false, backwards compatible)",
     "rejection_reason": "track_drift_suspect",
     "principle": "mask leak changes box size; rigid translation moves box without deformation",
-    "thresholds": {"size_ratio_band": [0.85, 1.15], "min_expansion_px": 8.0},
-    "offline_validation": {
-      "d3c_drifted_track": {"flagged": true, "first_flag_sim_step": 185, "iou_zero_step": 210, "max_size_ratio": 1.387},
-      "d3c_gt_perfect_tracker": {"flagged": false, "max_size_ratio": 1.048, "max_expansion_px": 3.9},
-      "d3b_sparse_pair": {"flagged": true, "min_size_ratio": 0.629}
+    "thresholds": {
+      "size_ratio_band": [
+        0.85,
+        1.15
+      ],
+      "min_expansion_px": 8.0
     },
-    "tests": {"unit": "8/8 pass (test_track_drift_unit.py)", "regression": "43 temporal-evidence-related tests pass"},
+    "offline_validation": {
+      "d3c_drifted_track": {
+        "flagged": true,
+        "first_flag_sim_step": 185,
+        "iou_zero_step": 210,
+        "max_size_ratio": 1.387
+      },
+      "d3c_gt_perfect_tracker": {
+        "flagged": false,
+        "max_size_ratio": 1.048,
+        "max_expansion_px": 3.9
+      },
+      "d3b_sparse_pair": {
+        "flagged": true,
+        "min_size_ratio": 0.629
+      }
+    },
+    "tests": {
+      "unit": "8/8 pass (test_track_drift_unit.py)",
+      "regression": "43 temporal-evidence-related tests pass"
+    },
     "calibration_boundary": "single-scene (Dyn-C replay) preliminary calibration; revalidate before cross-scene claims"
   },
   "d4b_vlm_sensitivity_ablation": {
@@ -34,18 +103,45 @@
     "post_count": 7,
     "retry_count": 0,
     "matrix": {
-      "V0_no_evidence": ["static", 0.7],
-      "V1_real_d3c_replay": ["static", 0.7],
-      "V2_entity_unknown_humanoid": ["static", 0.7],
-      "V3_high_speed_toward": ["static", 0.7],
-      "V4_slow_mover": ["static", 0.7],
-      "V5_transit_context": ["static", 0.7],
-      "V6_directive_prompt": ["dynamic", 0.9]
+      "V0_no_evidence": [
+        "static",
+        0.7
+      ],
+      "V1_real_d3c_replay": [
+        "static",
+        0.7
+      ],
+      "V2_entity_unknown_humanoid": [
+        "static",
+        0.7
+      ],
+      "V3_high_speed_toward": [
+        "static",
+        0.7
+      ],
+      "V4_slow_mover": [
+        "static",
+        0.7
+      ],
+      "V5_transit_context": [
+        "static",
+        0.7
+      ],
+      "V6_directive_prompt": [
+        "dynamic",
+        0.9
+      ]
     },
     "conclusion": "root cause is the prompt v2 contract, not model capability: evidence is presented as data with no usage instruction; one explicit trust-directive paragraph unlocks dynamic@0.90",
     "coupling": "directive prompt (sensitivity) must be deployed together with D4A drift rejection (specificity), otherwise valid-but-wrong evidence would become false positives",
     "diagnostic_only": true,
-    "synthetic_probe_variants": ["V2", "V3", "V4", "V5", "V6"]
+    "synthetic_probe_variants": [
+      "V2",
+      "V3",
+      "V4",
+      "V5",
+      "V6"
+    ]
   },
   "boundary": {
     "probe_values_never_dataset_labels": true,
@@ -58,5 +154,6 @@
     "formalize prompt v3 with evidence-trust directive",
     "fix F7: add humanoid entity class and alias ordering",
     "paired end-to-end replay with D4A + prompt v3"
-  ]
+  ],
+  "d7ab_ref": "vlm-v1d7ab-boundary-batch-and-window-motion-2026-07-24"
 }

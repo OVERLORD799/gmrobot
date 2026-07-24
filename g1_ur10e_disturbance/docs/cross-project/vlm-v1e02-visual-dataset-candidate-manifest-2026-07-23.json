@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.4.0",
+  "manifest_version": "3.5.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -31,7 +31,8 @@
       "version": "3.3.0",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
       "immutable": true
-    }
+    },
+    "3.4.0"
   ],
   "review_packet": {
     "run_id": "v1e03_dyn_b_offline_temporal_evidence_20260723",
@@ -581,6 +582,130 @@
         }
       ],
       "attribution_quadrant": "g1_only"
+    },
+    {
+      "id": "E02-DYN-D7A-B1-REVERSE",
+      "source_milestone": "V1-D7A",
+      "category": "provisional_dynamic_positive",
+      "risk_type": "dynamic",
+      "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
+      "scene_group": "v1d7a_b1_reverse_sweep_20260724",
+      "camera": "front_view_v1d6a_pos_-2.0_-0.15_-0.05",
+      "required_steps": [
+        250,
+        315
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": false,
+      "count_as_dynamic_positive_group": false,
+      "technical_review_status": "d7a_capture_pass_tracking_100pct_on_target",
+      "status": "provisional_pending_human_review",
+      "semantic_identity": "scripted_g1_locomotion",
+      "scripted_locomotion": true,
+      "human_motion": false,
+      "human_hand": false,
+      "glove": false,
+      "PPE": false,
+      "synthetic": true,
+      "VLM_output": false,
+      "geometry_evidence": false,
+      "control_evidence": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
+      "boundary_note": "reverse (positive) sweep phase; opposite direction vs E2K window",
+      "evidence_layer_note": "v1 evidence stack failed on this window (see F9/F10); v2 window-motion verdict recorded in vlm-v1d7ab doc"
+    },
+    {
+      "id": "E02-DYN-D7A-B2-RETREAT-DEPTH",
+      "source_milestone": "V1-D7A",
+      "category": "provisional_depth_motion_boundary",
+      "risk_type": "dynamic",
+      "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
+      "scene_group": "v1d7a_b2_retreat_depth_20260724",
+      "camera": "front_view_v1d6a_pos_-2.0_-0.15_-0.05",
+      "required_steps": [
+        325,
+        400
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": false,
+      "count_as_dynamic_positive_group": false,
+      "technical_review_status": "d7a_capture_pass_tracking_100pct_on_target",
+      "status": "provisional_pending_human_review",
+      "semantic_identity": "scripted_g1_locomotion",
+      "scripted_locomotion": true,
+      "human_motion": false,
+      "human_hand": false,
+      "glove": false,
+      "PPE": false,
+      "synthetic": true,
+      "VLM_output": false,
+      "geometry_evidence": false,
+      "control_evidence": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
+      "boundary_note": "camera-axis approach; pixel translation attenuated (14.5 px/s), scale-dominant; preregistered fail-closed limitation",
+      "evidence_layer_note": "v1 evidence stack failed on this window (see F9/F10); v2 window-motion verdict recorded in vlm-v1d7ab doc"
+    },
+    {
+      "id": "E02-STA-D7A-B3-IDLE",
+      "source_milestone": "V1-D7A",
+      "category": "provisional_static_negative",
+      "risk_type": "static",
+      "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
+      "scene_group": "v1d7a_b3_static_idle_20260724",
+      "camera": "front_view_v1d6a_pos_-2.0_-0.15_-0.05",
+      "required_steps": [
+        420,
+        465
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": false,
+      "count_as_dynamic_positive_group": false,
+      "technical_review_status": "d7a_capture_pass_tracking_100pct_on_target",
+      "status": "provisional_pending_human_review",
+      "semantic_identity": "scripted_g1_locomotion",
+      "scripted_locomotion": true,
+      "human_motion": false,
+      "human_hand": false,
+      "glove": false,
+      "PPE": false,
+      "synthetic": true,
+      "VLM_output": false,
+      "geometry_evidence": false,
+      "control_evidence": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
+      "boundary_note": "idle balance sway only (GT centroid disp 9.4 px over 45 steps); exposes instantaneous-speed false positive (F10)",
+      "evidence_layer_note": "v1 evidence stack failed on this window (see F9/F10); v2 window-motion verdict recorded in vlm-v1d7ab doc"
+    },
+    {
+      "id": "E02-DYN-D7A-B4-OUTER",
+      "source_milestone": "V1-D7A",
+      "category": "provisional_dynamic_positive",
+      "risk_type": "dynamic",
+      "motion_label": "scripted_g1_outer_lateral_patrol",
+      "scene_group": "v1d7a_b4_outer_traj_20260724",
+      "camera": "front_view_v1d6a_pos_-2.0_-0.15_-0.05",
+      "required_steps": [
+        165,
+        245
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": false,
+      "count_as_dynamic_positive_group": false,
+      "technical_review_status": "d7a_capture_pass_tracking_100pct_on_target",
+      "status": "provisional_pending_human_review",
+      "semantic_identity": "scripted_g1_locomotion",
+      "scripted_locomotion": true,
+      "human_motion": false,
+      "human_hand": false,
+      "glove": false,
+      "PPE": false,
+      "synthetic": true,
+      "VLM_output": false,
+      "geometry_evidence": false,
+      "control_evidence": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
+      "boundary_note": "different trajectory family (Dyn-B outer lane, seed 43); cross-trajectory generalization",
+      "evidence_layer_note": "v1 evidence stack failed on this window (see F9/F10); v2 window-motion verdict recorded in vlm-v1d7ab doc"
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",

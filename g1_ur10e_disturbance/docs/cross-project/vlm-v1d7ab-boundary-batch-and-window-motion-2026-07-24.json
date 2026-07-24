@@ -1,0 +1,87 @@
+{
+  "milestones": [
+    "V1-D7A",
+    "V1-D7B"
+  ],
+  "date": "2026-07-24",
+  "d7a": {
+    "captures": {
+      "b1_reverse_sweep": {
+        "run": "v1d7a_b1_reverse_sweep_20260724",
+        "scenario": "mirrored_outer_lateral_patrol",
+        "seed": 44,
+        "steps": [
+          250,
+          315
+        ],
+        "gt": "dynamic",
+        "tracking_on_target": "14/14",
+        "v1_outcome": "miss_fail_closed"
+      },
+      "b2_retreat_depth": {
+        "run": "v1d7a_b2_retreat_depth_20260724",
+        "scenario": "mirrored_outer_lateral_patrol",
+        "seed": 44,
+        "steps": [
+          325,
+          400
+        ],
+        "gt": "dynamic",
+        "tracking_on_target": "16/16",
+        "v1_outcome": "miss_fail_closed"
+      },
+      "b3_static_idle": {
+        "run": "v1d7a_b3_static_idle_20260724",
+        "scenario": "mirrored_outer_lateral_patrol",
+        "seed": 44,
+        "steps": [
+          420,
+          465
+        ],
+        "gt": "static",
+        "tracking_on_target": "10/10",
+        "v1_outcome": "false_positive"
+      },
+      "b4_outer_traj": {
+        "run": "v1d7a_b4_outer_traj_20260724",
+        "scenario": "outer_lateral_patrol",
+        "seed": 43,
+        "steps": [
+          165,
+          245
+        ],
+        "gt": "dynamic",
+        "tracking_on_target": "17/17",
+        "v1_outcome": "miss_fail_closed"
+      }
+    },
+    "perception_generalization": "4/4 captures 100pct on-target (GDINO text seed + SAM2, no GT seeding)",
+    "v1_evidence_stack_verdicts_correct": "0/4",
+    "occlusion_phase": "unavailable: no scripted scenario passes G1 behind workbench from front view"
+  },
+  "findings": {
+    "F9": "D4A v1 size-band drift heuristic does not generalize: legitimate gait/depth/trailing size changes flagged as drift -> 3/3 dynamic boundary windows fail-closed missed",
+    "F10": "last-frame instantaneous speed threshold 10 px/s is below G1 idle balance sway (25-35 px/s instantaneous) -> static false positive",
+    "F11": "first-to-last box rigid decomposition separates dynamics (translation 43-69 px/s) from sway (14.7) with ~1.7x margin at threshold 25 px/s; depth motion is scale-dominant and stays fail-closed"
+  },
+  "d7b": {
+    "module": "GMRobot/vlm/window_motion.py",
+    "unit_tests": "6/6 pass",
+    "offline_eval": "results/paper_demo/v1d7b_window_motion_offline_eval_20260724/v1d7b_report.json",
+    "v2_correct": "5/6",
+    "v1_correct": "1/6",
+    "residual_error": "b2 depth motion miss (preregistered fail-closed limitation)",
+    "not_yet_wired_into_production_rule": true
+  },
+  "dataset": {
+    "manifest_version": "3.5.0",
+    "new_provisional_candidates": 4,
+    "human_review_required": true
+  },
+  "budget": {
+    "isaac_runs": 4,
+    "post_count": 57,
+    "d7b_post_count": 0,
+    "retry_count": 0
+  }
+}
