@@ -1,0 +1,45 @@
+{
+  "milestone": "V1-D8A",
+  "date": "2026-07-24",
+  "verdict": "D8A_PROSPECTIVE_PASS",
+  "rule": "evidence_gated_dynamic_rule_v2_window",
+  "capture": {
+    "run": "v1d8a_seed45_prospective_20260724",
+    "seed": 45,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "isaac_runs": 1,
+    "frames": 27
+  },
+  "preregistered_predictions": {
+    "dyn_sweep_170_249": "trigger",
+    "static_idle_420_465": "no_trigger"
+  },
+  "results": {
+    "dyn_sweep": {
+      "gt": "dynamic",
+      "translation_rate_px_s": 61.94,
+      "scale_rate_px_s": 10.25,
+      "v2": "trigger_correct",
+      "v1": "miss_d4a_drift_flag"
+    },
+    "static_idle": {
+      "gt": "static",
+      "translation_rate_px_s": 11.51,
+      "scale_rate_px_s": 6.67,
+      "v2": "no_trigger_correct",
+      "v1": "false_positive_instantaneous_sway"
+    }
+  },
+  "unit_tests": "14/14 (6 new v2 cases)",
+  "known_limits": [
+    "camera_axis_depth_motion_fail_closed",
+    "occlusion_untested_scene_unavailable",
+    "one_new_seed_one_scenario_family"
+  ],
+  "budget": {
+    "post_count": 27,
+    "vlm_calls": 0,
+    "retry_count": 0
+  },
+  "eval_report": "results/paper_demo/v1d8a_prospective_eval_20260724/v1d8a_report.json"
+}

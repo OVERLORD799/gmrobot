@@ -22,6 +22,11 @@ PROMPT_VERSION_V3_TEMPORAL = "five_stage_safety_v3_temporal_directive"
 # on this path and cannot veto or mint the trigger.
 EVIDENCE_GATED_RULE_VERSION_V1 = "evidence_gated_dynamic_rule_v1"
 
+# D8A: rule v2 replaces the falsified motion components of v1 (last-frame
+# instantaneous speed F10, D4A size-band drift gate F9) with the D7B
+# window-aggregate translation verdict; identity/quality gates are retained.
+EVIDENCE_GATED_RULE_VERSION_V2_WINDOW = "evidence_gated_dynamic_rule_v2_window"
+
 ALLOWED_PROMPT_VERSIONS = frozenset(
     {PROMPT_VERSION_V1, PROMPT_VERSION_V2_TEMPORAL, PROMPT_VERSION_V3_TEMPORAL}
 )

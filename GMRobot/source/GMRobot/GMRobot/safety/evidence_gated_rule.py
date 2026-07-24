@@ -30,7 +30,10 @@ from GMRobot.vlm.temporal_evidence import (
     TemporalTrackEvidence,
     validate_temporal_evidence,
 )
-from GMRobot.vlm.versions import EVIDENCE_GATED_RULE_VERSION_V1
+from GMRobot.vlm.versions import (
+    EVIDENCE_GATED_RULE_VERSION_V1,
+    EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
+)
 
 # Strictness ordering for action escalation (VLM may escalate, never relax).
 _ACTION_RANK = {"none": 0, "continue": 1, "alert": 2, "replan": 3, "slow_down": 4, "stop": 5}
@@ -136,4 +139,77 @@ def decide_dynamic_from_evidence(
         vlm_annotation=annotation,
         rule_version=EVIDENCE_GATED_RULE_VERSION_V1,
         trigger_source="evidence_gated_rule",
+    )
+
+
+def decide_dynamic_from_window_motion(
+    window_metrics: Mapping[str, Any] | None,
+    *,
+    track_score: float = 0.0,
+    canonical_entity: str = "none",
+    min_track_score: float = 0.5,
+    vlm_annotation: Mapping[str, Any] | None = None,
+) -> EvidenceGatedDecision:
+    """Rule v2 (D8A): dynamic detection from D7B window-aggregate motion.
+
+    Replaces the two v1 motion components falsified in D7A — last-frame
+    instantaneous speed (F10) and the D4A size-band drift gate (F9) — with the
+    window translation verdict from ``assess_window_motion`` (F11). Track
+    identity/quality gating (score) is retained. Fail-closed on missing or
+    invalid window metrics. The VLM remains annotation-only (may escalate the
+    action, never veto or mint the trigger).
+    """
+    annotation = _extract_annotation(vlm_annotation)
+    wm = dict(window_metrics or {})
+    translation_rate = float(wm.get("translation_rate_px_s") or 0.0)
+    scale_rate = float(wm.get("scale_rate_px_s") or 0.0)
+
+    def _no_trigger(reason: str) -> EvidenceGatedDecision:
+        return EvidenceGatedDecision(
+            dynamic_triggered=False,
+            rejection_reason=reason,
+            gate_confidence=float(track_score),
+            speed_px_s=translation_rate,
+            motion_bucket="none",
+            canonical_entity=canonical_entity,
+            drift_suspect=False,
+            recommended_action="none",
+            action_source="rule_no_trigger",
+            vlm_annotation=annotation,
+            rule_version=EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
+            trigger_source="evidence_gated_rule_window",
+        )
+
+    if not wm:
+        return _no_trigger("no_window_metrics")
+    if not wm.get("valid"):
+        return _no_trigger(str(wm.get("reason") or "window_metrics_invalid"))
+    if float(track_score) < min_track_score:
+        return _no_trigger("track_score_below_min")
+    if not wm.get("dynamic_by_translation"):
+        # Depth motion (scale-dominant) is a documented fail-closed limitation.
+        if scale_rate > translation_rate:
+            return _no_trigger("translation_below_threshold_scale_dominant")
+        return _no_trigger("translation_below_threshold")
+
+    action = DEFAULT_TRIGGERED_ACTION
+    action_source = "rule_floor"
+    vlm_action = str((vlm_annotation or {}).get("suggested_action") or "").strip().lower()
+    if vlm_action in _ACTION_RANK and _ACTION_RANK[vlm_action] > _ACTION_RANK[action]:
+        action = vlm_action
+        action_source = "vlm_escalation"
+
+    return EvidenceGatedDecision(
+        dynamic_triggered=True,
+        rejection_reason="",
+        gate_confidence=float(track_score),
+        speed_px_s=translation_rate,
+        motion_bucket="window_translation",
+        canonical_entity=canonical_entity,
+        drift_suspect=False,
+        recommended_action=action,
+        action_source=action_source,
+        vlm_annotation=annotation,
+        rule_version=EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
+        trigger_source="evidence_gated_rule_window",
     )

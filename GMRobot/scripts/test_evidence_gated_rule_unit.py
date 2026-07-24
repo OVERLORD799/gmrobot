@@ -108,6 +108,74 @@ def test_lost_track_rejected():
     assert d.rejection_reason == "track_state_lost"
 
 
+# ---- rule v2 (D8A window motion) ----
+
+from GMRobot.safety.evidence_gated_rule import decide_dynamic_from_window_motion  # noqa: E402
+
+
+def _wm(**over):
+    base = {
+        "valid": True,
+        "translation_rate_px_s": 45.0,
+        "scale_rate_px_s": 5.0,
+        "dynamic_by_translation": True,
+        "reason": "",
+    }
+    base.update(over)
+    return base
+
+
+def test_v2_window_translation_triggers():
+    d = decide_dynamic_from_window_motion(_wm(), track_score=0.9, canonical_entity="humanoid")
+    assert d.dynamic_triggered is True
+    assert d.rule_version == "evidence_gated_dynamic_rule_v2_window"
+    assert d.motion_bucket == "window_translation"
+    assert d.recommended_action == "slow_down"
+
+
+def test_v2_sway_below_threshold_not_triggered():
+    d = decide_dynamic_from_window_motion(
+        _wm(translation_rate_px_s=14.7, dynamic_by_translation=False),
+        track_score=0.9, canonical_entity="humanoid",
+    )
+    assert d.dynamic_triggered is False
+    assert d.rejection_reason == "translation_below_threshold"
+
+
+def test_v2_depth_motion_scale_dominant_fail_closed():
+    d = decide_dynamic_from_window_motion(
+        _wm(translation_rate_px_s=14.5, scale_rate_px_s=28.8, dynamic_by_translation=False),
+        track_score=0.9, canonical_entity="humanoid",
+    )
+    assert d.dynamic_triggered is False
+    assert d.rejection_reason == "translation_below_threshold_scale_dominant"
+
+
+def test_v2_missing_or_invalid_metrics_fail_closed():
+    assert decide_dynamic_from_window_motion(None).dynamic_triggered is False
+    d = decide_dynamic_from_window_motion(
+        _wm(valid=False, reason="insufficient_boxes_lt_3"), track_score=0.9,
+    )
+    assert d.dynamic_triggered is False
+    assert d.rejection_reason == "insufficient_boxes_lt_3"
+
+
+def test_v2_low_track_score_rejected():
+    d = decide_dynamic_from_window_motion(_wm(), track_score=0.3)
+    assert d.dynamic_triggered is False
+    assert d.rejection_reason == "track_score_below_min"
+
+
+def test_v2_vlm_escalates_but_cannot_veto():
+    d = decide_dynamic_from_window_motion(
+        _wm(), track_score=0.9,
+        vlm_annotation={"risk_type": "static", "suggested_action": "stop"},
+    )
+    assert d.dynamic_triggered is True
+    assert d.recommended_action == "stop"
+    assert d.action_source == "vlm_escalation"
+
+
 if __name__ == "__main__":
     fails = 0
     for name, fn in sorted(globals().items()):
