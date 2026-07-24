@@ -1,0 +1,50 @@
+{
+  "milestone": "V1-D3C",
+  "date": "2026-07-24",
+  "verdict": "D3C_DENSE_TEMPORAL_CHAIN_FAIL_FAILCLOSED_HELD",
+  "capture": {
+    "result_dir": "results/paper_demo/v1d3c_dyn_c_dense_capture_20260724",
+    "image": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j1-20260724",
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "capture_steps": [170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240, 245, 249],
+    "runner_exit": 0,
+    "frames": 17,
+    "determinism_vs_e2k": {"step170_maxdiff": 0.0, "step249_maxdiff": 0.0, "bitwise_identical": true},
+    "camera_contract_match": true
+  },
+  "evaluation": {
+    "result_dir": "results/paper_demo/v1d3c_dense_replay_eval_20260724",
+    "script": "GMRobot/scripts/run_v1d3c_dense_replay.py",
+    "post_count": 18,
+    "retry_count": 0,
+    "gates": {
+      "G1_tracking_on_target_ge_80pct": {"pass": false, "observed": "8/17"},
+      "G2_evidence_valid": {"pass": true, "score": 0.9468, "speed_px_s": 160.08},
+      "G3_vlm_dynamic_conf_ge_085": {"pass": false, "observed": ["static", 0.7]},
+      "FC_no_dynamic_claim_without_valid_evidence": {"pass": true}
+    },
+    "sam2_drift": {
+      "seed_iou_170": 0.68,
+      "iou_zero_from_step": 210,
+      "drift_direction": "box right edge expanded onto static scene while G1 moved left",
+      "mask_score_while_drifted": 0.9468
+    },
+    "evidence_layer_blindspot": "score/speed/continuity checks passed on a semantically wrong track; valid-but-wrong evidence reached the VLM prompt",
+    "vlm_behavior": "prompt contained valid temporal evidence (160 px/s, tracking); Qwen2.5-VL-7B still output static@0.70, keywords ['robotic arm','containers','placement']"
+  },
+  "four_layer_failure_summary": {
+    "gdino": "systematic target selection failure, 0/24 G1 hits (D3B phase C)",
+    "sam2": "sparse-gap propagation rejected at score 0.26 (D3B phase B); dense-replay long-horizon drift 8/17 on-target (D3C)",
+    "evidence_layer": "cannot detect high-confidence drift, 0.947 passed validation (D3C)",
+    "vlm": "insensitive to textual temporal evidence, 0 dynamic>=0.85 across D3A/D3B/D3C"
+  },
+  "net_conclusion": "five-stage pipeline currently cannot produce an end-to-end dynamic true positive; every failure stayed fail-closed with zero false dynamic claims",
+  "boundary": {
+    "gt_used_only_for_initial_seed_and_labels": true,
+    "motion_evidence_sam2_only": true,
+    "evidence_thresholds_unchanged": {"min_track_score": 0.5, "min_speed_px_s": 10.0},
+    "confidence_gate_0_85_unchanged": true,
+    "b0_b4_freeze_untouched": true
+  }
+}
