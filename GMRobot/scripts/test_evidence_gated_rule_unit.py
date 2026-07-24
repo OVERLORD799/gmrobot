@@ -166,6 +166,24 @@ def test_v2_low_track_score_rejected():
     assert d.rejection_reason == "track_score_below_min"
 
 
+def test_v21_depth_path_triggers_when_enabled():
+    wm = _wm(translation_rate_px_s=14.5, dynamic_by_translation=False,
+             scale_rate_px_s=28.8, depth_motion_suspect=True)
+    off = decide_dynamic_from_window_motion(wm, track_score=0.9)
+    assert off.dynamic_triggered is False  # v2 default: depth stays fail-closed
+    on = decide_dynamic_from_window_motion(wm, track_score=0.9, enable_depth_path=True)
+    assert on.dynamic_triggered is True
+    assert on.motion_bucket == "window_depth_scale"
+    assert on.rule_version == "evidence_gated_dynamic_rule_v2_1_depth"
+
+
+def test_v21_depth_path_static_sway_still_rejected():
+    wm = _wm(translation_rate_px_s=16.0, dynamic_by_translation=False,
+             scale_rate_px_s=14.7, depth_motion_suspect=False)
+    d = decide_dynamic_from_window_motion(wm, track_score=0.9, enable_depth_path=True)
+    assert d.dynamic_triggered is False
+
+
 def test_v2_vlm_escalates_but_cannot_veto():
     d = decide_dynamic_from_window_motion(
         _wm(), track_score=0.9,

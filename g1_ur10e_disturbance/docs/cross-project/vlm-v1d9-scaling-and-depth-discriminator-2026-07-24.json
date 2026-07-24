@@ -1,0 +1,64 @@
+{
+  "milestones": [
+    "V1-D9-S1S2",
+    "V1-D9A",
+    "V1-D9B",
+    "V1-D9C"
+  ],
+  "date": "2026-07-24",
+  "captures": {
+    "runs": [
+      "v1d9_s1s2_seed46_20260724",
+      "v1d9_s1s2_seed47_20260724",
+      "v1d9_s1s2_seed48_20260724"
+    ],
+    "isaac_runs": 3,
+    "frames_per_run": 61,
+    "windows": [
+      "approach_60_145",
+      "dyn_sweep_170_249",
+      "retreat_325_400",
+      "static_idle_420_465"
+    ]
+  },
+  "chain_eval": {
+    "post_count": 183,
+    "tracking_on_target": "12/12 windows, 183/183 frames",
+    "report": "results/paper_demo/v1d9_batch_chain_eval_20260724/v1d9_report.json"
+  },
+  "scorecards": {
+    "v1": "4/12",
+    "v2_translation_only": "9/12",
+    "v2_1_with_depth_path": "12/12"
+  },
+  "d9a": {
+    "discriminator": "scale_rate>=18 AND aspect_change>=0.05",
+    "margins": {
+      "scale": "~1.2x",
+      "aspect": ">=2.5x"
+    },
+    "known_risk": "width-only mask leak aspect signature overlaps approach (D3C 0.27); mitigated by retired-viewpoint provenance + safe-side slow_down action",
+    "holdout": "seed 48 excluded from screening"
+  },
+  "d9b": {
+    "rule": "evidence_gated_dynamic_rule_v2_1_depth",
+    "enable_flag": "enable_depth_path",
+    "unit_tests": "22/22"
+  },
+  "d9c": {
+    "verdict": "D9C_HOLDOUT_PASS",
+    "predictions_confirmed": "4/4",
+    "report": "results/paper_demo/v1d9c_holdout_eval_20260724/v1d9c_report.json"
+  },
+  "dataset": {
+    "manifest_version": "3.7.0",
+    "new_provisional": 12,
+    "review_packet": "results/paper_demo/v1d9_review_packet_20260724/"
+  },
+  "budget": {
+    "isaac_runs": 3,
+    "post_count": 183,
+    "vlm_calls": 0,
+    "retry_count": 0
+  }
+}

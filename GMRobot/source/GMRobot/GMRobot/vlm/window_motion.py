@@ -33,13 +33,23 @@ from dataclasses import dataclass
 from typing import Any, Sequence
 
 TRANSLATION_DYNAMIC_THRESHOLD_PX_S = 25.0
+# D9A depth path (2026-07-24): missed depth windows show scale_rate 21.5-28.8
+# and aspect_change 0.08-0.27 vs static maxima 14.7 / 0.02. Margins ~1.2x on
+# scale, >=2.5x on aspect. Known risk: a D3C-style width-only mask leak also
+# produces aspect change; never observed in the production front view, and a
+# false trigger costs only a conservative slow_down (safe-side error).
+SCALE_DEPTH_THRESHOLD_PX_S = 18.0
+ASPECT_CHANGE_DEPTH_THRESHOLD = 0.05
 CALIBRATION_DOC = "vlm-v1d7b-window-motion-eval-2026-07-24"
+DEPTH_CALIBRATION_DOC = "vlm-v1d9-depth-discriminator-2026-07-24"
 
 
 @dataclass(frozen=True)
 class WindowMotionConfig:
     fps: float = 60.0
     translation_dynamic_threshold_px_s: float = TRANSLATION_DYNAMIC_THRESHOLD_PX_S
+    scale_depth_threshold_px_s: float = SCALE_DEPTH_THRESHOLD_PX_S
+    aspect_change_depth_threshold: float = ASPECT_CHANGE_DEPTH_THRESHOLD
     min_boxes: int = 3
 
 
@@ -65,9 +75,12 @@ def assess_window_motion(
         "translation_rate_px_s": None,
         "scale_rate_px_s": None,
         "x_edge_asymmetry": None,
+        "aspect_change": None,
         "dynamic_by_translation": False,
+        "depth_motion_suspect": False,
         "threshold_px_s": cfg.translation_dynamic_threshold_px_s,
         "calibration_doc": CALIBRATION_DOC,
+        "depth_calibration_doc": DEPTH_CALIBRATION_DOC,
     }
     if len(seq) < cfg.min_boxes:
         base["reason"] = f"insufficient_boxes_lt_{cfg.min_boxes}"
@@ -85,13 +98,27 @@ def assess_window_motion(
     scale_rate = (abs(d_r - d_l) + abs(d_b - d_t)) / 2.0 / dur
     x_asym = abs(abs(d_l) - abs(d_r)) / max(abs(d_l) + abs(d_r), 1e-6)
 
+    import math
+
+    w0, h0 = b0[2] - b0[0], b0[3] - b0[1]
+    w1, h1 = b1[2] - b1[0], b1[3] - b1[1]
+    if min(w0, h0, w1, h1) <= 1e-6:
+        base["reason"] = "degenerate_box"
+        return base
+    aspect_change = abs(math.log((w1 / h1) / (w0 / h0)))
+
     base.update({
         "valid": True,
         "window_duration_s": dur,
         "translation_rate_px_s": translation_rate,
         "scale_rate_px_s": scale_rate,
         "x_edge_asymmetry": x_asym,
+        "aspect_change": aspect_change,
         "dynamic_by_translation": translation_rate >= cfg.translation_dynamic_threshold_px_s,
+        "depth_motion_suspect": (
+            scale_rate >= cfg.scale_depth_threshold_px_s
+            and aspect_change >= cfg.aspect_change_depth_threshold
+        ),
         "reason": "",
     })
     return base

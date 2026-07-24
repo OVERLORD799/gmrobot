@@ -32,6 +32,7 @@ from GMRobot.vlm.temporal_evidence import (
 )
 from GMRobot.vlm.versions import (
     EVIDENCE_GATED_RULE_VERSION_V1,
+    EVIDENCE_GATED_RULE_VERSION_V2_1_DEPTH,
     EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
 )
 
@@ -148,9 +149,10 @@ def decide_dynamic_from_window_motion(
     track_score: float = 0.0,
     canonical_entity: str = "none",
     min_track_score: float = 0.5,
+    enable_depth_path: bool = False,
     vlm_annotation: Mapping[str, Any] | None = None,
 ) -> EvidenceGatedDecision:
-    """Rule v2 (D8A): dynamic detection from D7B window-aggregate motion.
+    """Rule v2/v2.1: dynamic detection from D7B window-aggregate motion.
 
     Replaces the two v1 motion components falsified in D7A — last-frame
     instantaneous speed (F10) and the D4A size-band drift gate (F9) — with the
@@ -158,11 +160,22 @@ def decide_dynamic_from_window_motion(
     identity/quality gating (score) is retained. Fail-closed on missing or
     invalid window metrics. The VLM remains annotation-only (may escalate the
     action, never veto or mint the trigger).
+
+    With ``enable_depth_path`` (v2.1, D9B) the depth channel
+    (``depth_motion_suspect``: scale_rate + aspect_change, D9A calibration)
+    is a second trigger path for camera-axis motion. Known residual risk: a
+    width-only mask leak can mimic the aspect signature (only ever observed in
+    the retired top-down viewpoint); a false trigger yields a conservative
+    slow_down (safe-side error).
     """
     annotation = _extract_annotation(vlm_annotation)
     wm = dict(window_metrics or {})
     translation_rate = float(wm.get("translation_rate_px_s") or 0.0)
     scale_rate = float(wm.get("scale_rate_px_s") or 0.0)
+    rule_version = (
+        EVIDENCE_GATED_RULE_VERSION_V2_1_DEPTH if enable_depth_path
+        else EVIDENCE_GATED_RULE_VERSION_V2_WINDOW
+    )
 
     def _no_trigger(reason: str) -> EvidenceGatedDecision:
         return EvidenceGatedDecision(
@@ -176,7 +189,7 @@ def decide_dynamic_from_window_motion(
             recommended_action="none",
             action_source="rule_no_trigger",
             vlm_annotation=annotation,
-            rule_version=EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
+            rule_version=rule_version,
             trigger_source="evidence_gated_rule_window",
         )
 
@@ -186,11 +199,15 @@ def decide_dynamic_from_window_motion(
         return _no_trigger(str(wm.get("reason") or "window_metrics_invalid"))
     if float(track_score) < min_track_score:
         return _no_trigger("track_score_below_min")
-    if not wm.get("dynamic_by_translation"):
-        # Depth motion (scale-dominant) is a documented fail-closed limitation.
+    depth_hit = enable_depth_path and bool(wm.get("depth_motion_suspect"))
+    if not wm.get("dynamic_by_translation") and not depth_hit:
+        # Camera-axis depth motion without depth path stays fail-closed.
         if scale_rate > translation_rate:
             return _no_trigger("translation_below_threshold_scale_dominant")
         return _no_trigger("translation_below_threshold")
+    motion_bucket = (
+        "window_translation" if wm.get("dynamic_by_translation") else "window_depth_scale"
+    )
 
     action = DEFAULT_TRIGGERED_ACTION
     action_source = "rule_floor"
@@ -204,12 +221,12 @@ def decide_dynamic_from_window_motion(
         rejection_reason="",
         gate_confidence=float(track_score),
         speed_px_s=translation_rate,
-        motion_bucket="window_translation",
+        motion_bucket=motion_bucket,
         canonical_entity=canonical_entity,
         drift_suspect=False,
         recommended_action=action,
         action_source=action_source,
         vlm_annotation=annotation,
-        rule_version=EVIDENCE_GATED_RULE_VERSION_V2_WINDOW,
+        rule_version=rule_version,
         trigger_source="evidence_gated_rule_window",
     )
