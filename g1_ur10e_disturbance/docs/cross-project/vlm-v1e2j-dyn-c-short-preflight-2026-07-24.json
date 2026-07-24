@@ -1,0 +1,143 @@
+{
+  "milestone": "V1-E2J",
+  "date": "2026-07-24",
+  "task": "Dyn-C short preflight single-run with E2I.1 preregistered shifted audit frames",
+  "status": "preflight_fail",
+  "verdict": "FAIL_STOP_NO_RETRY_NO_FORMAL_CAPTURE",
+  "decision": "STOP_NO_RETRY_NO_FORMAL_CAPTURE",
+  "run_counts": {
+    "preflight_runs": 1,
+    "formal_runs": 0
+  },
+  "repo": "/home/czz/GMrobot",
+  "head": {
+    "branch": "main",
+    "full": "f017402c45250747cd6e6479147fbd8a941f96a6",
+    "contains_f017402": true
+  },
+  "build": {
+    "dockerfile": "/home/czz/GMrobot/g1_ur10e_disturbance/docker/Dockerfile.e01-dyn-c-mirrored-m1e2b",
+    "tag": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j-20260724",
+    "base_tag": "gmdisturb:b4-p010-20260721",
+    "base_id": "sha256:defe95e7df25b73cb08c3bb768c3e18d15807d0ae38fc52135d5474d3c820b68",
+    "image_id": "sha256:1b560306690316117db34491fee73381993a276a23868fddb637b12f56352f76",
+    "config_path": "/home/czz/GMrobot/g1_ur10e_disturbance/configs/e01_dyn_c_motion_preflight_v1e2jk_20260724.yaml",
+    "config_sha256": "b0663690906f7f2e98b6fd7028f961ff82f7fcf9fbc49426e6412f1a685fb275"
+  },
+  "contract": {
+    "requested_camera_pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "requested_camera_rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ],
+    "requested_capture_steps": [
+      149,
+      150,
+      239,
+      250
+    ],
+    "seed": 44,
+    "freeze_ur10e": true,
+    "vlm_perception_post_off": true
+  },
+  "observed": {
+    "camera_pos_from_sidecar": [
+      1.0,
+      0.0,
+      3.0
+    ],
+    "camera_contract_match": false,
+    "max_projected_actual_displacement_px": 36.802840533688624,
+    "projected_centroid_ge40_frames": [],
+    "projected_centroid_ge40_count": 0,
+    "roi_exists_all_frames": true,
+    "ur10_arm_joint_delta_max_abs_settled_max": 0.00015,
+    "ur10_gripper_selected_state": "open",
+    "ur10_gripper_joint_delta_settled_abs_max": 0.314159,
+    "ur10_ee_displacement_settled_max_m": 3.129243850708008e-07,
+    "g1_commanded_xy_m": [
+      1.1164,
+      -0.2928
+    ],
+    "g1_actual_xy_m": [
+      1.0598587393760681,
+      -0.28755156695842743
+    ],
+    "g1_direction_dot": 1.26742139544487,
+    "g1_fell": "False"
+  },
+  "gates": {
+    "exit0": true,
+    "no_traceback": true,
+    "no_new_xid": true,
+    "g1_no_fall": true,
+    "g1_actual_xy_same_direction": true,
+    "projected_roi_exists": true,
+    "projected_centroid_ge40_count_ge2": false,
+    "ur10_arm_only_settled_le_1e6": false,
+    "ur10_ee_settled_near_zero": true,
+    "post0_vlm_perception_off": true
+  },
+  "artifacts": {
+    "result_dir": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724",
+    "phase3_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/safety_logs/phase3.csv",
+    "phase3_csv_sha256": "75f5eb0264a8db5f34d30acea25b23a2363a455886335b804b8b778f04bac049",
+    "runtime_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/safety_logs/phase3_runtime_telemetry.csv",
+    "runtime_csv_sha256": "93d6d9e5588e8b2c3b0be79288a312d39c9e696485daaba45351ae5b2f91d8a1",
+    "steps_csv": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/safety_logs/phase3_steps.csv",
+    "steps_csv_sha256": "419ae96134f7ffcf13b0342d0f3d0d013d54708b0a4d8eee4ee8770f5f3ed03c",
+    "docker_log": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/meta/docker_run.log",
+    "docker_log_sha256": "48ee2bb19407fd894a3f82666ccdd1b685da4b338de539acbee443d7f534ffcd",
+    "postrun_analyzer_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/meta/v1e2j_postrun_analyzer.json",
+    "frame_inventory_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/meta/frame_inventory.json",
+    "png_frames": [
+      {
+        "step": 149,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/scene/frame_000149_env0.png",
+        "sha256": "6b1913036998b4bac529f70db8f2d28e3b49698aad700ca9b3f4af0138c2364d",
+        "resolution": [
+          640,
+          480
+        ]
+      },
+      {
+        "step": 150,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/scene/frame_000150_env0.png",
+        "sha256": "6b1913036998b4bac529f70db8f2d28e3b49698aad700ca9b3f4af0138c2364d",
+        "resolution": [
+          640,
+          480
+        ]
+      },
+      {
+        "step": 239,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/scene/frame_000239_env0.png",
+        "sha256": "649974a8cd1b1d8116f35b46c770a9b4e2c530be350ba9d34284a8a40a54e292",
+        "resolution": [
+          640,
+          480
+        ]
+      },
+      {
+        "step": 250,
+        "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2j_dyn_c_short_preflight_20260724/scene/frame_000250_env0.png",
+        "sha256": "debc7e33ad5f8fb21481bb20d21bb6c8fc79ec8e2a83597d99c4ac245cd980f3",
+        "resolution": [
+          640,
+          480
+        ]
+      }
+    ]
+  },
+  "policy_enforcement": {
+    "formal_capture_executed": false,
+    "reason": "Preflight gates failed (arm-only settled threshold and projected displacement gate; camera contract mismatch). No rerun and no formal capture per instruction."
+  },
+  "generated_at_utc": "2026-07-24T05:10:35Z"
+}
