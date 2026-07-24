@@ -1,0 +1,38 @@
+{
+  "milestone": "V1-D12-B6",
+  "date": "2026-07-24",
+  "verdict": "D12_ONLINE_SHADOW_PASS",
+  "mode": "online shadow supervisor concurrent with Isaac sim",
+  "capture": {
+    "run": "v1d12_online_shadow_capture_20260724",
+    "seed": 53,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "frames": 97
+  },
+  "gates": {
+    "G1_sweep": "4/4",
+    "G2_retreat": "5/6",
+    "G3_idle_zero_fp": "0/14",
+    "G4_realtime_max_backlog": 0
+  },
+  "observational": {
+    "approach_core": "5/5 triggered",
+    "latency_ms": {
+      "median": 201,
+      "p95": 217,
+      "max": 446
+    }
+  },
+  "notes": [
+    "sliding window 14 boxes = 65 sim steps matches calibration length",
+    "inherent detection delay ~1.1s sim time from window aggregation",
+    "actions recorded only; active semantic control (B7) pending user decision"
+  ],
+  "eval_report": "results/paper_demo/v1d12_online_shadow_eval_20260724/v1d12_report.json",
+  "budget": {
+    "isaac_runs": 1,
+    "post_count": 97,
+    "vlm_calls": 0,
+    "retry_count": 0
+  }
+}
