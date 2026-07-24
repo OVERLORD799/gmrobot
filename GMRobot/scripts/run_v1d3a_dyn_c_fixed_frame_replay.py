@@ -138,7 +138,7 @@ def main() -> None:
         VLMClientConfig(
             base_url=args.vlm_base_url,
             timeout_s=args.timeout_s,
-            contract_mode="legacy",
+            contract_mode="legacy_v2",
         )
     )
     health = client.health_check()
@@ -166,19 +166,56 @@ def main() -> None:
     if args.with_sam2:
         from GMRobot.perception.client import PerceptionClient, PerceptionClientConfig
 
-        pclient = PerceptionClient(PerceptionClientConfig(base_url=args.perception_base_url))
+        pclient = PerceptionClient(
+            PerceptionClientConfig(
+                base_url=args.perception_base_url,
+                # First request lazily loads GDINO+SAM2 on the server.
+                timeout_s=max(args.timeout_s, 300.0),
+                track_target_label="robot",
+            )
+        )
         phealth = pclient.health_check()
         (out / "raw" / "perception_health.json").write_text(json.dumps(phealth, indent=2) + "\n")
-        ground = pclient.ground(frames[170], text_prompt="white humanoid robot")
-        (out / "raw" / "ground_step170.json").write_text(json.dumps(ground, indent=2) + "\n")
-        init = pclient.track_init(frames[170], ground_result=ground)
-        post_count += 2
-        track = pclient.track_frame(frames[249])
+
+        g1_prompt = "white humanoid robot"
+        # 60 Hz sim; the two frames are (249-170) steps apart per frame_index increment.
+        dt_s = (249 - 170) / 60.0
+        res_a, session = pclient.track_frame(frames[170], None, text_prompt=g1_prompt)
         post_count += 1
-        (out / "raw" / "track_step249.json").write_text(json.dumps(track, indent=2) + "\n")
-        track = pclient.enrich_track_kinematics(track, dt_s=(249 - 170) / 60.0)
+        (out / "raw" / "track_step170.json").write_text(json.dumps(res_a, indent=2) + "\n")
+
+        def _primary(res: dict[str, Any]) -> dict[str, Any] | None:
+            if res.get("tracks"):
+                return pclient.pick_primary_track(res, target_label="robot")
+            return res if res.get("box_xyxy") or res.get("center_xy") else None
+
+        t_a = _primary(res_a)
+        if t_a is not None:
+            pclient.enrich_track_kinematics(t_a, session=session, dt_s=dt_s)  # seed baseline
+
+        res_b, session = pclient.track_frame(frames[249], session)
+        post_count += 1
+        (out / "raw" / "track_step249.json").write_text(json.dumps(res_b, indent=2) + "\n")
+        t_b = _primary(res_b)
+        session_continuity = bool(
+            res_a.get("ok", True) and res_b.get("ok", True)
+            and session.session_id
+            and str(res_b.get("session_id", session.session_id)) == str(session.session_id)
+        )
+        if t_b is None:
+            track_result: dict[str, Any] = {"ok": False}
+        else:
+            t_b = pclient.enrich_track_kinematics(t_b, session=session, dt_s=dt_s)
+            t_b.setdefault("track_state", "tracking")
+            t_b.setdefault("label", g1_prompt)
+            track_result = {
+                "ok": True,
+                "tracks": [t_b],
+                "session_ref": "session_local",
+                "session_continuity_verified": session_continuity,
+            }
         ev = build_temporal_evidence_from_track_result(
-            track, source_request_id="v1d3a_p2", source_frame_id="v1d3a_p2_frm170"
+            track_result, source_request_id="v1d3a_p2", source_frame_id="v1d3a_p2_frm170"
         )
         ev = validate_temporal_evidence(ev, config=TemporalEvidenceConfig())
         (out / "raw" / "temporal_evidence.json").write_text(
@@ -195,7 +232,7 @@ def main() -> None:
         res2["_prompt_sha256"] = prompt2_sha
         (out / "raw" / "phase2_step249.json").write_text(json.dumps(res2, indent=2) + "\n")
         phase2 = evaluate_phase2(res2, evidence_valid=ev.valid)
-        phase2["init_ok"] = bool(init.get("ok", True))
+        phase2["session_continuity_verified"] = session_continuity
 
     report = {
         "milestone": "V1-D3A",

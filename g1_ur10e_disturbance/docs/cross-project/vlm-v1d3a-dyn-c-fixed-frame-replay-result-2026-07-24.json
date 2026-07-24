@@ -1,0 +1,47 @@
+{
+  "doc": "vlm-v1d3a-dyn-c-fixed-frame-replay-result-2026-07-24",
+  "milestone": "V1-D3A",
+  "date": "2026-07-24",
+  "phase1_verdict": "D3A_NATIVE_DISCIPLINE_PASS",
+  "phase2_verdict": "D3A_TEMPORAL_DYNAMIC_FAIL",
+  "run_count": 1,
+  "retry_count": 0,
+  "post_count": 5,
+  "result_dir": "g1_ur10e_disturbance/results/paper_demo/v1d3a_dyn_c_fixed_frame_replay_20260724",
+  "input_sample": "E02-DYN-C-E2K-STEP170-249 (manifest v3.4.0, reviewer_approved)",
+  "model": {
+    "vlm": "Qwen2.5-VL-7B-Instruct-4bit-nf4 (L40S)",
+    "gdino": "IDEA-Research/grounding-dino-base",
+    "sam2": "sam2.1_hiera_small.pt"
+  },
+  "phase1": {
+    "frame_170": {"risk_type": "static", "risk_confidence": 0.8, "suggested_action": "alert"},
+    "frame_249": {"risk_type": "static", "risk_confidence": 0.7, "suggested_action": "slow_down"},
+    "no_dynamic_guess_without_evidence": true
+  },
+  "phase2": {
+    "failure_layer": "gdino_target_selection",
+    "failure_detail": "ground('white humanoid robot') selected UR10e arm region box [333,108,414,239] (image upper-middle); G1 actually at bottom v~380-460",
+    "sam2_track": {
+      "session_continuity_verified": true,
+      "box_unchanged_170_to_249": true,
+      "speed_px_s": 0.0
+    },
+    "evidence_validation": {
+      "valid": false,
+      "rejection_reason": "speed_below_threshold",
+      "fail_closed_behavior_correct": true
+    },
+    "vlm_response": {"risk_type": "static", "risk_confidence": 0.7},
+    "not_a_vlm_semantic_failure": true
+  },
+  "positive_finding": "end-to-end fail-closed: wrong perception target could not contaminate semantic judgment; VLM did not over-claim dynamic",
+  "next_gate": "GROUNDING_TARGET_SELECTION_EVAL",
+  "boundary": {
+    "body_pose_gt_never_used_as_temporal_evidence": true,
+    "shadow_only_no_control": true,
+    "confidence_gate_0_85_unchanged": true,
+    "evidence_thresholds_unchanged": true,
+    "e2k_dataset_eligibility_unaffected": true
+  }
+}
