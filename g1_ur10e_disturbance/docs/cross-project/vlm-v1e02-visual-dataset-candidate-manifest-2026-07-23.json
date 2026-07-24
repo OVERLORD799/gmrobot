@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.3.0",
+  "manifest_version": "3.4.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -24,6 +24,11 @@
     },
     {
       "version": "3.2.0",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+      "immutable": true
+    },
+    {
+      "version": "3.3.0",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
       "immutable": true
     }
@@ -202,7 +207,7 @@
       ],
       "temporal_pair_required": true,
       "reviewer_approved": false,
-      "technical_review_status": "technical_temporal_pass_pending_user",
+      "technical_review_status": "reclassified_slight_motion_attribution",
       "historical_verdict_ref": {
         "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1m1z9-dyn-b-formal-capture-2026-07-23.json",
         "verdict": "DYN_B_FORMAL_M1Z9_FAIL_FINAL"
@@ -326,6 +331,22 @@
           330
         ],
         "report_json": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/review_packet/v1e03_dyn_b_offline_temporal_evidence_20260723/dyn_b_temporal_evidence.json"
+      },
+      "status": "reclassified",
+      "count_as_dynamic_positive_group": false,
+      "reclassification": {
+        "date": "2026-07-24",
+        "decision_source": "user_explicit_2026-07-24",
+        "new_categories": [
+          "slight_motion",
+          "motion_attribution"
+        ],
+        "attribution_quadrant": "both_moving",
+        "g1_centroid_disp_px": 23.3,
+        "ur10e_ee_delta_m": 0.458203,
+        "distractor": "ur10e_arm",
+        "rationale": "UR10e not frozen in Dyn-B; motion attribution not clean; retains full pose GT; not counted as clean dynamic positive; pending_user review resolved by reclassification",
+        "historical_verdict_unchanged": "DYN_B_FORMAL_M1Z9_FAIL_FINAL"
       }
     },
     {
@@ -424,6 +445,18 @@
         "report_md": "/home/czz/GMrobot/g1_ur10e_disturbance/docs/cross-project/vlm-v1e2h-dyn-c-motion-preflight-2026-07-23.md",
         "gate": "STOP_NO_FORMAL_CAPTURE",
         "root_cause": "ur10_settled_joint_delta_not_near_zero_and_projected_displacement_below_40px"
+      },
+      "reclassification": {
+        "date": "2026-07-24",
+        "decision_source": "user_explicit_2026-07-24",
+        "new_categories": [
+          "motion_attribution"
+        ],
+        "attribution_quadrant": "ur10e_only_visible",
+        "g1_centroid_disp_px": 27.905,
+        "g1_visible_motion": false,
+        "ur10e_ee_delta_m": 0.295559,
+        "rationale": "reused as UR10e-only attribution sample; user_rejected verdict NOT rewritten"
       }
     },
     {
@@ -546,14 +579,15 @@
           "stream": "stability",
           "stability_only": true
         }
-      ]
+      ],
+      "attribution_quadrant": "g1_only"
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",
   "dataset_sufficiency": {
     "functional_formal_visual_group_count": 1,
     "dynamic_reviewer_approved_group_count": 1,
-    "dynamic_technical_candidate_group_count": 1,
+    "dynamic_technical_candidate_group_count": 0,
     "required_minimum": {
       "independent_groups": 2,
       "category_coverage": [
@@ -563,6 +597,13 @@
     },
     "overall_status": "MINIMUM_GROUP_COVERAGE_MET_PROVISIONAL",
     "eligible_for_live_or_active": false,
-    "reason": "1 functional formal group + 1 reviewer-approved dynamic group meets stated minimum; labels remain dataset-level only, no live/active semantic control eligibility"
+    "reason": "1 functional formal group + 1 reviewer-approved dynamic group meets stated minimum; Dyn-B pending resolved by reclassification to slight_motion/attribution (not clean dynamic positive); labels remain dataset-level only",
+    "reclassified_auxiliary_groups": {
+      "slight_motion": 1,
+      "motion_attribution_pairs": 3
+    }
+  },
+  "probe_sets": {
+    "motion_attribution_quadrants": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e04-motion-attribution-probe-set-2026-07-24.json"
   }
 }

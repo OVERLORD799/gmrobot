@@ -1,0 +1,145 @@
+{
+  "doc": "vlm-v1e04-motion-attribution-probe-set-2026-07-24",
+  "version": "1.0.0",
+  "date": "2026-07-24",
+  "purpose": "ground-truth quadrant probe set for agent motion attribution (G1 vs UR10e); evaluation/few-shot/tracker-validation only, NOT a training corpus and NOT dynamic-positive claims",
+  "ground_truth_source": "body_poses.jsonl world poses -> scene_camera_override projection; UR10e EE euclidean delta",
+  "camera": {
+    "pos": [
+      0.45,
+      0.0,
+      2.7
+    ],
+    "rot": [
+      0.7071,
+      0.0,
+      0.7071,
+      0.0
+    ]
+  },
+  "quadrants": {
+    "g1_only": {
+      "pair": [
+        {
+          "run": "v1e2k_dyn_c_formal_capture_20260724",
+          "step": 170,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000170_env0.png",
+          "sha256": "fc721c7d988e2ef3a1f006ba8d30f5839430560473a3c4233652d8d02bcda840"
+        },
+        {
+          "run": "v1e2k_dyn_c_formal_capture_20260724",
+          "step": 249,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000249_env0.png",
+          "sha256": "15c26e75fff64a5126d86078ffc5bf7a4012ff6c9cdb3c82d39c152e08dcddb3"
+        }
+      ],
+      "g1_centroid_disp_px": 47.644,
+      "g1_visible_motion": true,
+      "ur10e_ee_delta_m": 0.0,
+      "ur10e_moved": false,
+      "label": "g1_moving_ur10e_frozen",
+      "provenance": "E02-DYN-C-E2K reviewer_approved dynamic positive"
+    },
+    "ur10e_only_visible": {
+      "pair": [
+        {
+          "run": "v1e2d_dyn_c_mirrored_capture_20260723",
+          "step": 240,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723/scene/frame_000240_env0.png",
+          "sha256": "17eec8f0f188c81229bfcf17f5bc00b0658b6135deabd016ef3fc8784772d42f"
+        },
+        {
+          "run": "v1e2d_dyn_c_mirrored_capture_20260723",
+          "step": 310,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723/scene/frame_000310_env0.png",
+          "sha256": "20fdde41a8612538007dbfb0811ca3cb72b9373ed7a732347aca7b9e091eb1b6"
+        }
+      ],
+      "g1_centroid_disp_px": 27.905,
+      "g1_visible_motion": false,
+      "ur10e_ee_delta_m": 0.295559,
+      "ur10e_moved": true,
+      "label": "ur10e_moving_g1_pixel_static",
+      "note": "G1 projected centroid moved in world but rendered pixels visually static (E2D user_rejected finding, verdict immutable)",
+      "provenance": "v1e2d user_rejected_no_visible_g1_motion (reused as attribution negative, verdict NOT rewritten)"
+    },
+    "both_moving": {
+      "pair": [
+        {
+          "run": "v1e01_dyn_b_formal_m1z9_20260723",
+          "step": 220,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000220_env0.png",
+          "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03"
+        },
+        {
+          "run": "v1e01_dyn_b_formal_m1z9_20260723",
+          "step": 330,
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000330_env0.png",
+          "sha256": "6e2d3351554fa6db86599e8bd9f71b0caf32d03ba6af3144661b8a637ca30a9a"
+        }
+      ],
+      "g1_centroid_disp_px": 23.3,
+      "g1_visible_motion": true,
+      "ur10e_ee_delta_m": 0.458203,
+      "ur10e_moved": true,
+      "label": "g1_slight_motion_with_ur10e_distractor",
+      "provenance": "E02-DYN-B-M1Z9 reclassified slight_motion+attribution (2026-07-24)"
+    },
+    "neither": {
+      "pairs": [
+        [
+          {
+            "run": "v1e2k_dyn_c_formal_capture_20260724",
+            "step": 169,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000169_env0.png",
+            "sha256": "fc721c7d988e2ef3a1f006ba8d30f5839430560473a3c4233652d8d02bcda840"
+          },
+          {
+            "run": "v1e2k_dyn_c_formal_capture_20260724",
+            "step": 170,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000170_env0.png",
+            "sha256": "fc721c7d988e2ef3a1f006ba8d30f5839430560473a3c4233652d8d02bcda840"
+          }
+        ],
+        [
+          {
+            "run": "v1e01_dyn_b_formal_m1z9_20260723",
+            "step": 219,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000219_env0.png",
+            "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03"
+          },
+          {
+            "run": "v1e01_dyn_b_formal_m1z9_20260723",
+            "step": 221,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e01_dyn_b_formal_m1z9_20260723/scene/frame_000221_env0.png",
+            "sha256": "74349d73dfe9a8b32d5aa24f2c744932f28b1c699658921370b06c15258e1d03"
+          }
+        ],
+        [
+          {
+            "run": "v1e2d_dyn_c_mirrored_capture_20260723",
+            "step": 309,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723/scene/frame_000309_env0.png",
+            "sha256": "20fdde41a8612538007dbfb0811ca3cb72b9373ed7a732347aca7b9e091eb1b6"
+          },
+          {
+            "run": "v1e2d_dyn_c_mirrored_capture_20260723",
+            "step": 311,
+            "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2d_dyn_c_mirrored_capture_20260723/scene/frame_000311_env0.png",
+            "sha256": "20fdde41a8612538007dbfb0811ca3cb72b9373ed7a732347aca7b9e091eb1b6"
+          }
+        ]
+      ],
+      "label": "static_stability_pairs",
+      "note": "sha256-identical or <5px pairs"
+    }
+  },
+  "usage_boundary": {
+    "training_from_scratch": false,
+    "evaluation_probe": true,
+    "few_shot_exemplars": true,
+    "sam2_tracker_validation": true,
+    "single_camera_single_scene_synthetic": true,
+    "historical_verdicts_rewritten": false
+  }
+}
