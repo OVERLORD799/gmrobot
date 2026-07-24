@@ -1,0 +1,57 @@
+{
+  "milestone": "V1-D10-S3",
+  "date": "2026-07-24",
+  "captures": {
+    "runs": [
+      "v1d10_s3_seed49_20260724",
+      "v1d10_s3_seed50_20260724",
+      "v1d10_s3_seed51_20260724"
+    ],
+    "isaac_runs": 3,
+    "frames_per_run": 59,
+    "scenario": "outer_lateral_patrol",
+    "windows": [
+      "approach_55_135",
+      "sweep_165_245",
+      "retreat_345_415",
+      "static_idle_430_475"
+    ]
+  },
+  "chain_eval": {
+    "post_count": 177,
+    "tracking_on_target": "12/12 windows 177/177 frames",
+    "report": "results/paper_demo/v1d10_s3_chain_eval_20260724/v1d10_report.json"
+  },
+  "v21_cross_family": "10/12",
+  "errors": {
+    "seed49_approach": "fail_closed_miss_sensitivity_gap_trans_17.2",
+    "seed51_static_idle": "F12 false positive: close-range mask breathing crossed depth thresholds with translation 2.7"
+  },
+  "finding_F12": "with both y-edges clipped, mask width breathing on a static subject fakes the depth scale/aspect signature; discriminating signal is translation (depth-true minima 10.5 px/s vs breathing 2.7)",
+  "v22": {
+    "fix": "depth_translation_floor_px_s=8.0",
+    "margins": {
+      "depth_true": "1.3x",
+      "breathing": "3x"
+    },
+    "posthoc_calibration_disclosed": true,
+    "unit_tests": "8/8",
+    "scorecard_24_windows": {
+      "v1": "4/12 mirrored only",
+      "v2": "9/12 mirrored only",
+      "v2_1": "22/24",
+      "v2_2": "23/24 zero false positives"
+    }
+  },
+  "dataset": {
+    "manifest_version": "3.9.0",
+    "new_provisional": 12,
+    "review_packet": "results/paper_demo/v1d10_review_packet_20260724/"
+  },
+  "budget": {
+    "isaac_runs": 3,
+    "post_count": 177,
+    "vlm_calls": 0,
+    "retry_count": 0
+  }
+}

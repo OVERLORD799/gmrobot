@@ -66,6 +66,26 @@ def test_insufficient_boxes_fail_closed() -> None:
     assert r["reason"].startswith("insufficient_boxes")
 
 
+def test_depth_suspect_requires_translation_floor() -> None:
+    # Mask breathing on a static close-range subject: width shrinks 28 px over
+    # 45 steps (scale+aspect above depth thresholds) but translation ~ 0.
+    seq = [(430 + i * 5, [158.0 + i * 1.4, 0.0, 361.0 - i * 1.7, 479.0]) for i in range(10)]
+    r = assess_window_motion(seq)
+    assert r["scale_rate_px_s"] >= 18.0
+    assert r["aspect_change"] >= 0.05
+    assert r["translation_rate_px_s"] < 8.0
+    assert r["depth_motion_suspect"] is False  # v2.2 floor rejects it
+    assert r["both_y_edges_clipped"] is True
+
+
+def test_depth_suspect_true_depth_motion_passes_floor() -> None:
+    # b2-like retreat: symmetric growth + top edge rising + modest translation
+    seq = [(325 + i * 5, [214.0 - i * 2.0, 128.0 - i * 2.5, 344.0 + i * 1.0, 479.0])
+           for i in range(16)]
+    r = assess_window_motion(seq)
+    assert r["depth_motion_suspect"] is True
+
+
 def test_custom_threshold() -> None:
     b0 = [100.0, 100.0, 200.0, 300.0]
     seq = [(s, _shift(b0, s * 0.3)) for s in range(0, 61, 5)]  # 18 px/s

@@ -40,6 +40,12 @@ TRANSLATION_DYNAMIC_THRESHOLD_PX_S = 25.0
 # false trigger costs only a conservative slow_down (safe-side error).
 SCALE_DEPTH_THRESHOLD_PX_S = 18.0
 ASPECT_CHANGE_DEPTH_THRESHOLD = 0.05
+# D10 refinement (v2.2): true depth motion always carries some off-axis
+# perspective translation (calibrated minima 10.5 px/s across 7 depth-true
+# windows); pure mask breathing on a static close-range subject does not
+# (observed 2.7 px/s, S3 seed-51 idle false positive). Floor at 8 px/s.
+# NOTE: calibrated post-hoc including that failure; needs prospective checks.
+DEPTH_TRANSLATION_FLOOR_PX_S = 8.0
 CALIBRATION_DOC = "vlm-v1d7b-window-motion-eval-2026-07-24"
 DEPTH_CALIBRATION_DOC = "vlm-v1d9-depth-discriminator-2026-07-24"
 
@@ -50,6 +56,7 @@ class WindowMotionConfig:
     translation_dynamic_threshold_px_s: float = TRANSLATION_DYNAMIC_THRESHOLD_PX_S
     scale_depth_threshold_px_s: float = SCALE_DEPTH_THRESHOLD_PX_S
     aspect_change_depth_threshold: float = ASPECT_CHANGE_DEPTH_THRESHOLD
+    depth_translation_floor_px_s: float = DEPTH_TRANSLATION_FLOOR_PX_S
     min_boxes: int = 3
 
 
@@ -118,7 +125,11 @@ def assess_window_motion(
         "depth_motion_suspect": (
             scale_rate >= cfg.scale_depth_threshold_px_s
             and aspect_change >= cfg.aspect_change_depth_threshold
+            and translation_rate >= cfg.depth_translation_floor_px_s
         ),
+        # Audit-only diagnostic: with both y-edges clipped, height carries no
+        # signal and aspect reduces to width breathing (S3 seed-51 idle case).
+        "both_y_edges_clipped": bool(b1[1] <= 1.0 and b1[3] >= 478.0),
         "reason": "",
     })
     return base
