@@ -1,6 +1,6 @@
 {
   "dataset_manifest_id": "vlm-v1e0-dataset-candidates",
-  "manifest_version": "3.2.0",
+  "manifest_version": "3.3.0",
   "previous_version_refs": [
     {
       "version": "1.0.0",
@@ -19,6 +19,11 @@
     },
     {
       "version": "3.1.1",
+      "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
+      "immutable": true
+    },
+    {
+      "version": "3.2.0",
       "path": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e02-visual-dataset-candidate-manifest-2026-07-23.json",
       "immutable": true
     }
@@ -420,11 +425,134 @@
         "gate": "STOP_NO_FORMAL_CAPTURE",
         "root_cause": "ur10_settled_joint_delta_not_near_zero_and_projected_displacement_below_40px"
       }
+    },
+    {
+      "id": "E02-DYN-C-E2K-STEP170-249",
+      "source_milestone": "V1-E2K",
+      "category": "reviewer_approved_dynamic_positive",
+      "risk_type": "dynamic",
+      "motion_label": "scripted_g1_mirrored_outer_lateral_patrol",
+      "scene_group": "v1e2k_dyn_c_formal_capture_20260724",
+      "camera": "dual_scene_topdown_m1z9",
+      "required_steps": [
+        170,
+        249
+      ],
+      "stability_evidence_steps": [
+        169,
+        259
+      ],
+      "temporal_pair_required": true,
+      "reviewer_approved": true,
+      "count_as_dynamic_positive_group": true,
+      "technical_review_status": "dyn_c_formal_capture_pass_all_gates",
+      "status": "reviewer_approved",
+      "semantic_identity": "scripted_g1_locomotion",
+      "scripted_locomotion": true,
+      "human_motion": false,
+      "human_hand": false,
+      "glove": false,
+      "PPE": false,
+      "synthetic": true,
+      "VLM_output": false,
+      "geometry_evidence": false,
+      "control_evidence": false,
+      "motion_attribution": "SCRIPTED_G1_MOTION_SUPPORTED_UR10_FROZEN",
+      "reviewer_approval": {
+        "reviewer_approved": true,
+        "approval_source": "user_explicit_2026-07-24",
+        "approval_scope": "g1_motion_visually_discriminable_frame170_vs_249_dynamic_positive_group",
+        "reviewer_observation": "motion visible only across windows (170 vs 249); adjacent pairs 169-170 and 249-259 static as designed",
+        "scope_limit_not_vlm_or_live_control": true
+      },
+      "historical_verdict_ref": {
+        "doc": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e2k-dyn-c-formal-capture-2026-07-24.json",
+        "verdict": "DYN_C_FORMAL_CAPTURE_PASS"
+      },
+      "threshold_decision_ref": "g1_ur10e_disturbance/docs/cross-project/vlm-v1e2k-arm-only-threshold-decision-2026-07-24.json",
+      "gate_evidence": {
+        "arm_settled_max_rad": 0.00015,
+        "arm_threshold_rad": 0.0005,
+        "ee_disp_settled_max_m": 0.0,
+        "centroid_ge40_pair_count": 4,
+        "max_cross_window_centroid_px": 47.644,
+        "roi_area_fraction_min": 0.018625,
+        "direction_dot": 1.048896,
+        "adjacent_stability_169_170_sha_equal": true,
+        "camera_contract_err": [
+          0.0,
+          0.0
+        ]
+      },
+      "provenance": {
+        "manifest": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/meta/v1e2k_gate_report.json",
+        "camera": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/meta/camera_pose.json",
+        "scene": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene"
+      },
+      "frames": [
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000169_env0.png",
+          "sha256": "fc721c7d988e2ef3a1f006ba8d30f5839430560473a3c4233652d8d02bcda840",
+          "size_bytes": 179999,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-C",
+          "scene_group": "v1e2k_dyn_c_formal_capture_20260724",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 169,
+          "stream": "stability",
+          "stability_only": true
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000170_env0.png",
+          "sha256": "fc721c7d988e2ef3a1f006ba8d30f5839430560473a3c4233652d8d02bcda840",
+          "size_bytes": 179999,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-C",
+          "scene_group": "v1e2k_dyn_c_formal_capture_20260724",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 170,
+          "stream": "primary",
+          "stability_only": false
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000249_env0.png",
+          "sha256": "15c26e75fff64a5126d86078ffc5bf7a4012ff6c9cdb3c82d39c152e08dcddb3",
+          "size_bytes": 178932,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-C",
+          "scene_group": "v1e2k_dyn_c_formal_capture_20260724",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 249,
+          "stream": "primary",
+          "stability_only": false
+        },
+        {
+          "path": "/home/czz/GMrobot/g1_ur10e_disturbance/results/paper_demo/v1e2k_dyn_c_formal_capture_20260724/scene/frame_000259_env0.png",
+          "sha256": "467752f88cdf4bfefe3eeac529474afe74195ab57ed45ad410892f25bf42aeb3",
+          "size_bytes": 179008,
+          "width": 640,
+          "height": 480,
+          "non_empty": true,
+          "source": "Dyn-C",
+          "scene_group": "v1e2k_dyn_c_formal_capture_20260724",
+          "camera": "dual_scene_topdown_m1z9",
+          "step": 259,
+          "stream": "stability",
+          "stability_only": true
+        }
+      ]
     }
   ],
   "generated_by": "/home/czz/GMrobot/g1_ur10e_disturbance/scripts/v1e02_visual_dataset_review_packet.py",
   "dataset_sufficiency": {
     "functional_formal_visual_group_count": 1,
+    "dynamic_reviewer_approved_group_count": 1,
     "dynamic_technical_candidate_group_count": 1,
     "required_minimum": {
       "independent_groups": 2,
@@ -433,8 +561,8 @@
         "dynamic"
       ]
     },
-    "overall_status": "DATASET_INSUFFICIENT",
+    "overall_status": "MINIMUM_GROUP_COVERAGE_MET_PROVISIONAL",
     "eligible_for_live_or_active": false,
-    "reason": "insufficient independent groups and category-level formal coverage"
+    "reason": "1 functional formal group + 1 reviewer-approved dynamic group meets stated minimum; labels remain dataset-level only, no live/active semantic control eligibility"
   }
 }
