@@ -62,3 +62,16 @@ valid-but-wrong 漂移证据。因此 **D4B（敏感性）与 D4A（特异性）
   证据阈值（0.5 / 10 px/s）未变；B0–B4 冻结未触碰；
 - 后续（未执行）：prompt v3 正式化 + F7 schema 修复（增加 humanoid 实体类）+
   D4A/prompt v3 成对端到端重放。
+
+## 五、增补（同日 D4C 系列执行后）
+
+上述"后续"三项已全部执行（见 `vlm-v1d4c-paired-replay-prompt-v3-2026-07-24.md`），
+并新增发现：
+
+| # | 层 | 发现 | 证据来源 |
+|---|---|---|---|
+| F8 | VLM | prompt v3 指令遵从脆弱且非字面：存在速度×实体交互的隐式判定边界（dynamic 仅出现在 entity≠humanoid 且 speed=160 的口袋；宣称的 ≥10 px/s 规则被忽略；humanoid 实体类在 160 px/s 仍被压制为 static） | D4C P3 / D4C.1 / D4C.2 |
+
+D4C 成对重放同时实证：同一份漂移错误证据，有 D4A 拒绝 → static（无假阳性），
+无 D4A → dynamic@0.90（假阳性）。特异性一侧闭环成立；敏感性一侧（可靠真阳性）
+仍开放，候选路径为 VLM 微调或将动态判定下沉为符号规则。

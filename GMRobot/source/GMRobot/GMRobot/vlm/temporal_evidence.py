@@ -12,6 +12,7 @@ ENTITY_CLASSES = frozenset(
         "container",
         "industrial_part",
         "robotic_arm",
+        "humanoid",
         "sphere",
         "device",
         "unknown",
@@ -23,7 +24,13 @@ TRACK_STATES = frozenset(
 )
 MOTION_BUCKETS = frozenset({"none", "L", "R", "toward", "away", "unknown"})
 
+# Iteration order matters for the substring fallback in canonicalize_entity:
+# more specific keys must come before shorter/ambiguous ones. In particular
+# "humanoid robot" and "robotic arm" must precede the bare "robot" alias
+# (F7 fix: bare "robot" used to substring-match "robotic arm").
 _LABEL_ALIASES: dict[str, str] = {
+    "humanoid robot": "humanoid",
+    "humanoid": "humanoid",
     "bare human hand": "human_hand",
     "human hand": "human_hand",
     "hand": "human_hand",
@@ -35,6 +42,7 @@ _LABEL_ALIASES: dict[str, str] = {
     "green compartments": "container",
     "device": "device",
     "robotic arm": "robotic_arm",
+    "robot": "unknown",  # bare "robot" is ambiguous (arm vs humanoid)
     "industrial part": "industrial_part",
     "part": "industrial_part",
     "small objects": "industrial_part",

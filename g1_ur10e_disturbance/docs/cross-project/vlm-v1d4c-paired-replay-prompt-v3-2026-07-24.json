@@ -1,0 +1,58 @@
+{
+  "milestone": "V1-D4C",
+  "date": "2026-07-24",
+  "verdict": "D4C_SPECIFICITY_PASS_SENSITIVITY_FAIL_F8_RECORDED",
+  "post_count_total": 8,
+  "retry_count": 0,
+  "code_delivered": {
+    "prompt_v3": {
+      "module": "GMRobot/source/GMRobot/GMRobot/vlm/prompt_v3.py",
+      "version": "five_stage_safety_v3_temporal_directive",
+      "directive_placement": "after evidence JSON, frozen to D4B V6 wording",
+      "safety_coupling": "must only be used on evidence that passed D4A drift rejection"
+    },
+    "f7_fix": {
+      "entity_class_added": "humanoid",
+      "bare_robot_now": "unknown (was robotic_arm via substring)",
+      "alias_ordering": "specific keys precede ambiguous ones; robotic-arm regressions hold"
+    },
+    "tests": "8 new pass; 47 regression pass"
+  },
+  "d4c_paired_replay": {
+    "result_dir": "results/paper_demo/v1d4c_paired_replay_20260724",
+    "arms": {
+      "P1_paired_drift_rejected": {"evidence": "real D3C drifted track + D4A flag", "evidence_rejection": "track_drift_suspect", "vlm": ["static", 0.7]},
+      "P2_control_no_drift_gate": {"evidence": "same drifted track, valid", "vlm": ["dynamic", 0.9], "meaning": "demonstrated false positive; D4A necessity proven"},
+      "P3_perfect_tracker_probe": {"evidence": "GT-derived 35.5 px/s humanoid, valid, diagnostic_only", "vlm": ["static", 0.7]}
+    },
+    "gates": {
+      "G1_specificity_no_false_positive_when_paired": true,
+      "G2_control_shows_directive_alone_is_unsafe": true,
+      "G3_sensitivity_true_positive_capability": false,
+      "G4_evidence_layer_rejected_drift": true
+    }
+  },
+  "d4c1_d4c2_factorization": {
+    "result_dirs": ["results/paper_demo/v1d4c1_speed_titration_20260724", "results/paper_demo/v1d4c2_entity_speed_factorization_20260724"],
+    "diagnostic_only": true,
+    "cells": {
+      "humanoid": {"35.5": "static", "50": "static", "80": "static", "120": "static", "160": "static"},
+      "unknown": {"120": "static", "160": "dynamic@0.9 (D4B V6)"},
+      "robotic_arm": {"160.08": "dynamic@0.9 (D4C P2)"}
+    },
+    "reproducibility_note": "n=1 per cell, no repeat sampling under no-retry policy; dynamic occurred twice, both in the same pocket"
+  },
+  "finding_F8": {
+    "layer": "vlm",
+    "finding": "prompt v3 directive compliance is brittle and non-literal: implicit speed x entity decision boundary (dynamic only at entity!=humanoid and speed=160); the stated >=10 px/s rule is ignored; humanoid entity class suppresses dynamic even at 160 px/s",
+    "implication": "VLM layer is not a reliable dynamic-risk classifier via prompting alone; candidates are VLM finetuning or sinking the dynamic decision into a symbolic rule over validated evidence"
+  },
+  "boundary": {
+    "probe_evidence_diagnostic_only": true,
+    "p1_p2_use_real_d3c_sam2_records": true,
+    "no_new_perception_posts": true,
+    "production_default_remains_prompt_v2": true,
+    "confidence_gate_0_85_unchanged": true,
+    "b0_b4_freeze_untouched": true
+  }
+}
