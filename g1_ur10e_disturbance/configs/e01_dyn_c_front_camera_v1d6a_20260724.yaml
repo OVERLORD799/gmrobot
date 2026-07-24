@@ -1,0 +1,28 @@
+scene: E01-Dyn-C
+scenario: mirrored_outer_lateral_patrol
+motion_source: scripted_g1_mirrored_outer_lateral_patrol
+seed: 44
+enable_capture: false
+execute_capture: false
+task_execution: false
+visual_dataset_only: true
+freeze_ur10e: true
+# V1-D6A front-view camera (camera contract v2 experiment).
+# Identity quaternion = horizontal view along +X ("world" convention derived
+# from the frozen top-down quat 0.7071,0,0.7071,0 = 90deg about Y = -Z look).
+# Physics identity (seed/scenario/steps) is unchanged from E2K/D3C; the camera
+# is passive and determinism is verified against D3C body poses post-run.
+camera:
+  override: true
+  pos: [-2.0, -0.15, -0.05]
+  rot: [1.0, 0.0, 0.0, 0.0]
+max_steps: 260
+progress_interval: 50
+capture_steps: [170, 175, 180, 185, 190, 195, 200, 205, 210, 215, 220, 225, 230, 235, 240, 245, 249]
+gates:
+  min_projected_displacement_px: 40
+  min_roi_area_fraction: 0.012
+  ur10_action_norm_max: 1.0e-6
+  ur10_joint_delta_max_abs: 1.0e-6
+  require_no_fall: true
+  require_command_actual_direction_consistent: true

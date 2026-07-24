@@ -1,0 +1,44 @@
+{
+  "milestone": "V1-D6A",
+  "date": "2026-07-24",
+  "verdict": "D6A_FRONT_CAMERA_E2E_DYNAMIC_TRUE_POSITIVE",
+  "capture": {
+    "result_dir": "results/paper_demo/v1d6a_dyn_c_front_camera_capture_20260724",
+    "image": "gmdisturb:e01-dyn-c-motion-preflight-m1e2j1-20260724",
+    "seed": 44,
+    "scenario": "mirrored_outer_lateral_patrol",
+    "camera_v2": {"pos": [-2.0, -0.15, -0.05], "rot": [1.0, 0.0, 0.0, 0.0], "view": "front +X", "source": "cli", "contract_match": true},
+    "frames": 17,
+    "physics_determinism_vs_d3c": {"max_numeric_diff": 0.0, "all_steps_all_links": true},
+    "runner_exit": 0
+  },
+  "phase_g_grounding_probe": {
+    "prompts": 4,
+    "frames": [170, 249],
+    "g1_hits": "8/8",
+    "topdown_baseline_d3b": "0/24",
+    "best": {"prompt": "P3 humanoid robot . robotic arm", "score_249": 0.8105},
+    "conclusion": "F1 root cause is viewpoint out-of-distribution, not model incapability; same checkpoint, same prompts, same physics, only view changed"
+  },
+  "phase_t_production_chain": {
+    "seeding": "text prompt only, no GT",
+    "tracking_on_target": "17/17",
+    "d4a_drift": {"flagged": false, "max_size_ratio": 1.075, "cross_view_no_false_positive": true},
+    "evidence": {"valid": true, "score": 0.9513, "speed_px_s_instantaneous": 552.3, "window_mean_px_s": 68, "motion_bucket": "R", "canonical_entity": "humanoid", "f7_fix_active": true},
+    "d5a_rule": {"dynamic_triggered": true, "gate_confidence": 0.9513, "recommended_action": "slow_down", "vlm_alert_correctly_floored": true},
+    "vlm_annotation": {"risk_type": "static", "risk_confidence": 0.8, "keywords_include_humanoid": true, "no_veto_authority": true},
+    "end_to_end_dynamic_true_positive": true,
+    "first_in_project_without_gt": true
+  },
+  "post_count": 26,
+  "retry_count": 0,
+  "paper_narrative_update": "dual-camera architecture: top-down = geometry-gate/GT authority view; front = semantic perception view; F1 reattributed from model failure to deployment-viewpoint mismatch",
+  "boundary": {
+    "gt_only_for_eval_labels": true,
+    "projection_empirically_calibrated_two_landmarks": true,
+    "gt_bbox_upper_body_links_only": true,
+    "single_scene_single_view_pose": true,
+    "depth_motion_px_speed_attenuation_known_limit": true,
+    "frozen_items_untouched": ["topdown_camera_contract", "evidence_thresholds", "semantic_gate_0_85", "B0_B4"]
+  }
+}
